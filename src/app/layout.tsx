@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
+// import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import Header from "@/components/Header";
 import ThemeProvider from "@/components/ThemeProvider";
 import { Toaster } from "sonner";
@@ -40,17 +41,18 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <ThemeProvider 
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Header />
-            {children}
-            <Toaster position="top-right" />
-            <Footer />
-          </ThemeProvider>
+            <ThemeProvider 
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <Header />
+              {children}
+              <Toaster position="top-right" />
+              <Footer />
+            </ThemeProvider>
+          
         </body>
       </html>
     </AuthProvider>

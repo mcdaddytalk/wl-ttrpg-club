@@ -2,14 +2,15 @@
 // hooks/useAuth.ts
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { AuthOtpResponse, OAuthResponse, Session, User } from '@supabase/supabase-js';
+import { AuthOtpResponse, OAuthResponse, Session, SignInWithOAuthCredentials, SignInWithPasswordlessCredentials, User } from '@supabase/supabase-js';
+import { Provider } from '@/lib/types/supabase';
 
 type Auth = {
     session: Session | null;
     user: User | null;
     signOut: () => Promise<void>;
     signInWithOtp: (email: string) => Promise<AuthOtpResponse>;
-    signInWithOAuth: (provider: 'google' | 'apple') => Promise<OAuthResponse>;
+    signInWithOAuth: (provider: Provider) => Promise<OAuthResponse>;
     // Add more auth-related functions here if needed    
 };
 
@@ -46,15 +47,25 @@ export function useAuth(): Auth {
     };
 
     const signInWithOtp = async (email: string): Promise<AuthOtpResponse> => {
-        const response = await supabase.auth.signInWithOtp({ email });
+        const credentials: SignInWithPasswordlessCredentials = {
+            email
+        };
+        const response = await supabase.auth.signInWithOtp(credentials);
         if (response.error) {
             console.error('Error signing in with OTP:', response.error);
         }
         return response;
     }
 
-    const signInWithOAuth = async (provider: 'google' | 'apple'): Promise<OAuthResponse> => {
-        const response = await supabase.auth.signInWithOAuth({ provider });
+    const signInWithOAuth = async (provider: Provider): Promise<OAuthResponse> => {
+        const credentials: SignInWithOAuthCredentials = {
+            provider
+        }
+        if (provider === 'discord') {
+            credentials['options'] = { redirectTo: 'http://localhost:3000/auth/callback' };
+        }
+        // Sign in with OAuth
+        const response = await supabase.auth.signInWithOAuth(credentials);
         if (response.error) {
             console.error('Error signing in with OAuth:', response.error);
         }

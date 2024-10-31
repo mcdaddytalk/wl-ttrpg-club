@@ -11,7 +11,7 @@ export default function Header() {
         <Link href="/" className="flex items-center space-x-2">
             <div className='w-fit bg-[#0160FE]'>
                 <Image 
-                    src='https://shareicon.net/download/2016/07/13/606936_dropbox_2048x2048.png' 
+                    src='https://kthrpfzafznkkvalszoi.supabase.co/storage/v1/object/public/images/wl-ttrpg-club-logo3.webp' 
                     alt='logo' 
                     className='invert'
                     height={50}

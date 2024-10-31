@@ -12,3 +12,4 @@ export type Database = {
     };
   };
   
+export type Provider = 'google' | 'discord';  
