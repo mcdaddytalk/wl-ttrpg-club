@@ -1,6 +1,8 @@
+"use client"
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,7 +35,7 @@ export default function ContactUs(): React.ReactElement {
         },
     });
 
-    async function onSubmit(values: ContactFormValues) {
+    const onSubmit: SubmitHandler<ContactFormValues> = async (values: ContactFormValues): Promise<void> => {
         try {
             // Send the form data to your backend API
             const response = await fetch("/api/contact-us", {
