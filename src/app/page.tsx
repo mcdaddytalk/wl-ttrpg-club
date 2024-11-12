@@ -4,32 +4,53 @@ import { Button } from "@/components/ui/button"
 
 export default function Home() {
   return (
-    <main className=""> 
-      <div className="flex flex-col lg:flex-row items-center bg-[#282929] dark:bg-slate-800">
-        <div className="p-10 flex flex-col bg-[#282929] dark:bg-slate-800 text-white space-y-5">
-          <h1 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-white">Western Loudoun TTRPG Club</h1>
-          <p className="text-gray-500 dark:text-gray-400">Fill out the form below to add yourself to our roster.</p>
-          <Link href="/join-the-club">
-            <Button
-              type="button"
-              className="w-full rounded-lg bg-gradient-to-r from-primary-600 to-primary-500 text-white px-5 py-2.5 text-center"
-            >
-              Join the Club
-            </Button>
-          </Link>
+    <>
+      <section className="overflow-hidden py-24 lg:py-32"> 
+        {/* Gradient background */}
+        <div
+          aria-hidden="true"
+          className="flex absolute -top-96 start-1/2 transform -translate-x-1/2"
+        >
+          <div className="bg-gradient-to-r from-background/50 to-background blur-3xl w-[25rem] h-[44rem] rotate-[-60deg] transform -translate-x-[10rem]" />
+          <div className="bg-gradient-to-tl blur-3xl w-[90rem] h-[50rem] rounded-full origin-top-left -rotate-12 -translate-x-[15rem] from-primary-foreground via-primary-foreground to-background" />
         </div>
-      </div>
-      <p className="text-center font-bold text-xl pt-5">
-        Disclaimer
-      </p>
-      <p className="text-center font-light p-2">
-        This is a demo app.  Please do not use this in a production environment.
-      </p>
-      <p className="text-center font-light p-2">
-        This video is made for informational and educational purposes only.  
-        We do not own or affiliate with Dropbox and/or any of its subsidiares in any form.  
-        The Copyright Disclaimer under section 107 of the Copyright Act 1976, allowance is made for “fair use” for purposes such as criticism, comment, news reporting, teaching, scholarship, education and training.
-      </p>
-    </main>
+        <div className="relative z-10">
+          <div className="container py-10 lg:py-16">
+            <div className="max-w-2xl text-center mx-auto">
+              <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-gray-900 dark:text-white">Western Loudoun</h1>
+              <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-gray-900 dark:text-white">Tabletop Roleplaying Game Club</h1>
+            </div>
+            <div className="mt-5 max-w-3xl">
+              <p className="text-xl text-muted-foreground text-gray-500 dark:text-gray-400">Want to learn more?</p>
+              <p className="text-xl text-muted-foreground text-gray-500 dark:text-gray-400">Click the button below and fill out the form and someone will contact you.</p>
+            </div>
+            <div className="mt-8 gap-3 flex justify-center">
+              <Link href="/join-the-club">
+                <Button
+                  type="button"
+                  className="w-full rounded-lg bg-gradient-to-r from-primary-600 to-primary-500 text-white dark:text-slate-800 px-5 py-2.5 text-center"
+                >
+                  Learn More
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/*
+      <section className="bg-white dark:bg-slate-600">
+        <p className="text-center font-bold text-xl pt-5">
+          Disclaimer
+        </p>
+        <p className="text-center font-light p-2">
+          This is a demo app.  Please do not use this in a production environment.
+        </p>
+        <p className="text-center font-light p-2">
+          This video is made for informational and educational purposes only.  
+          The Copyright Disclaimer under section 107 of the Copyright Act 1976, allowance is made for “fair use” for purposes such as criticism, comment, news reporting, teaching, scholarship, education and training.
+        </p>
+      </section>
+      */}
+    </>
   )
 }

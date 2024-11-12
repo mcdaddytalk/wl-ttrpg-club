@@ -1,10 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
+import { type NextRequest, type NextResponse } from "next/server"
 import { cookies } from "next/headers"
 
 
 
-export async function createClient() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function createSupabaseServerClient(component: boolean = false) {
   const cookieStore = await cookies()
 
   return createServerClient(
@@ -29,4 +31,34 @@ export async function createClient() {
       },
     }
   )
+}
+
+export async function createSupabaseServerComponentClient() {
+  const cookieStore = await cookies()
+  cookieStore.getAll();
+  return createSupabaseServerClient(true);
+}
+
+export async function createSupabaseReqResClient(
+  req: NextRequest,
+  res: NextResponse
+) {
+  const cookieStore = await cookies()
+  cookieStore.getAll();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            res.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
 }

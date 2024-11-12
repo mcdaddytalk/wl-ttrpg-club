@@ -7,8 +7,8 @@ import Header from "@/components/Header";
 import ThemeProvider from "@/components/ThemeProvider";
 import { Toaster } from "sonner";
 import Footer from "@/components/Footer";
-import { AuthProvider } from "@/context/AuthContext";
-
+import ToastHandler from "@/components/ToastHandler";
+import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -21,8 +21,13 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+const defaultUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Western Loudoun Table Top Roleplaying Game Club (WLTTRPG)",
+  metadataBase: new URL(defaultUrl),
+  title: "Western Loudoun Table Top Roleplaying Game Group (WLTTRPGG)",
   description: "Club for table top roleplaying gamers in the Western Loudoun area.",
 };
 
@@ -31,15 +36,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
-    <AuthProvider
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''}
-      signInFallbackRedirectUrl={"/dashboard"}
-      signUpFallbackRedirectUrl={"/sign-in"}
-    >
-      <html lang="en">
+      <html lang="en" className={geistSans.variable + " " + geistMono.variable}>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className="sticky top-0 bg-background text-foreground"
         >
             <ThemeProvider 
               attribute="class"
@@ -48,13 +49,17 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <Header />
-              {children}
               <Toaster position="top-right" />
+              <Suspense fallback="<div>Loading...</div>">
+                <ToastHandler />
+              </Suspense>
+              <div className="layout-container">
+                <main className="flex flex-col items-center">{children}</main>
+              </div>
               <Footer />
             </ThemeProvider>
-          
         </body>
       </html>
-    </AuthProvider>
+    
   );
 }

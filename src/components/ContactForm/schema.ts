@@ -69,7 +69,7 @@ const baseSchema = z.object({
     gamemasterInterest: z.enum(["yes", "no", "maybe"], { message: "Would you be interested in joining or Gamemaster Pool?" }),
     preferredSystem: z.enum(["pf2e", "dd5e", "other", "none"], { message: "Preferred System" }),
     availability: z.string({ message: "When are you generally available to come to the table" }).min(1, 'Please provide availablility'),
-    agreeToRules: z.boolean().refine((val) => val === true, "You must agree to the rules.").default(false),
+    agreeToRules: z.boolean().refine((val) => val === true, "You must agree to the rules.").default(false)
 });
 
 const minorSchema = z.object({
