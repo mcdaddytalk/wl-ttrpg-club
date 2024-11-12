@@ -1,11 +1,17 @@
 import { NextRequest , NextResponse} from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
-import { createClient } from "./utils/supabase/server"
+import { createSupabaseReqResClient } from "./utils/supabase/server"
+import { RoleData, SupabaseRoleResponse } from "./lib/types/custom";
 
 export async function middleware(request: NextRequest) {
   await updateSession(request)
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-  const supabase = await createClient()
+  const supabase = await createSupabaseReqResClient(request, response)
 
 /*
   if (request.nextUrl.pathname === "/" 
@@ -16,7 +22,7 @@ export async function middleware(request: NextRequest) {
   }
   */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data, error } = await supabase.auth.getUser()
+  const { data: { user }, error } = await supabase.auth.getUser()
 
   /*
   if (error || !data.user) {
@@ -26,18 +32,9 @@ export async function middleware(request: NextRequest) {
   }
   */
   const url = request.nextUrl;
-  type RoleData = {
-    roles: { name: string }
-  }
-  type SupabaseResponse = {
-    error: string | null;
-    data: RoleData[];
-    count: number | null;
-    status: number;
-    statusText: string;
-  }
+  
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(name)').eq('member_id', data.user?.id) as unknown as SupabaseResponse;
+  const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
   /*
   if (roleError) {
     console.error('ROLE ERROR ', roleError)
@@ -55,9 +52,9 @@ export async function middleware(request: NextRequest) {
   // Role based redirect
   // Array of restricted paths and role requirements
   const restrictedPaths = [
-    { path: '/profile', role: 'member' },
-    { path: '/dashboard', role: 'member' },
+    { path: '/member', role: 'member' },
     { path: '/games', role: ['member', 'gamemaster'] },
+    { path: '/gamemaster', role: 'gamemaster' },
     { path: '/admin', role: 'admin' },
     { path: '/account', role: 'superadmin' }
   ];

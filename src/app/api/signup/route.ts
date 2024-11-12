@@ -1,11 +1,11 @@
 // app/api/signup/route.ts
 import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/client';
+import { createSupabaseServerClient } from '@/utils/supabase/server';
 
 export async function POST(request: Request) {
   const { email, password, firstName, surname, phoneNumber } = await request.json();
 
-  const supabase = createClient();
+  const supabase = await createSupabaseServerClient()
   // Check if email is already in use in auth.users
   const { data: existingUser, error: userError } = await supabase
     .from('auth.users')

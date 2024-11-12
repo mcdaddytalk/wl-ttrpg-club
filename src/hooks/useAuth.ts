@@ -1,83 +1,136 @@
 "use client";
 // hooks/useAuth.ts
-import { useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import { AuthOtpResponse, OAuthResponse, Session, SignInWithOAuthCredentials, SignInWithPasswordlessCredentials, User } from '@supabase/supabase-js';
-import { Provider } from '@/lib/types/supabase';
+import { useEffect, useState, useCallback } from 'react';
+import { AuthError, Session, User } from '@supabase/supabase-js';
+import { Provider } from '@/lib/types/custom';
+import { 
+    // getInitialSession,
+    getUser,
+    signInWithPassword,
+    signInWithProvider,
+    signInWithOTP,
+    signOut,
+    getUserRoles
+} from '@/server/authActions';
+// import { createClient } from '@/utils/supabase/client';
+// import { useRouter } from 'next/router';
 
-type Auth = {
+interface AuthContext {
     session: Session | null;
     user: User | null;
+    roles: string[];
+    error: string | null;
     signOut: () => Promise<void>;
-    signInWithOtp: (email: string) => Promise<AuthOtpResponse>;
-    signInWithOAuth: (provider: Provider) => Promise<OAuthResponse>;
+    signInWithOTP: (email: string) => Promise<void>;
+    signInWithProvider: (provider: Provider) => Promise<void>;
+    signInWithPassword: (email: string, password: string) => Promise<void>;
+    clearError: () => void;
     // Add more auth-related functions here if needed    
 };
 
-export function useAuth(): Auth {
-    const supabase = createClient();
+export function useAuth(): AuthContext {
     const [session, setSession] = useState<Session | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
+    const [roles, setRoles] = useState<string[]>([]);
+    // const supabaseClient = createClient();
+    // const router = useRouter();
+    
+    const refreshSession = useCallback(async () => {
+        //const { session, user } = await getInitialSession();
+        //setSession(session);
+        const user = await getUser();
+        const roles = await getUserRoles();
+        setUser(user);
+        setRoles(roles);
+    }, [])
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-        });
+        const initializeAuth = async () => {
+            try {
+                await refreshSession();
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (error: unknown) {
+                setError("Failed to initialize authentication")
+            }
+          };
+      
+          initializeAuth();          
+    }, [refreshSession]);
 
-        supabase.auth.getUser().then(({ data: { user } }) => {
-            setUser(user);
-        });
-
-        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-        });
-
-        return () => {
-            authListener.subscription.unsubscribe();
-        };
-    }, [supabase]);
+    // useEffect(() => {
+    //   const { data: authListener } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+    //     setSession(session);
+    //     setUser(session?.user ?? null);
+    //     if (!session) router.push('/'); // Redirect to sign-in if session is null
+    //   });
+    
+    //   return () => {
+    //     authListener.subscription.unsubscribe();
+    //   };
+    // }, [supabaseClient, router]);
 
     // Sign out function
-    const signOut = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            console.error('Error signing out:', error);
+    const handleSignInWithPassword = useCallback(async (email: string, password: string) => {
+        try {
+          await signInWithPassword(email, password);
+          setError(null);
+          await refreshSession(); // Refresh session state after sign-in
+        } catch (error: unknown) {
+          console.error(error);
+          setError(error instanceof AuthError ? error.message : "An error occurred during password sign-in");
         }
-        setSession(null); // Clear session on sign out
-    };
+      }, [refreshSession]);
+    
+      const handleSignInWithProvider = useCallback(async (provider: 'discord' | 'google') => {
+        try {
+          await signInWithProvider(provider);
+          setError(null);
+          await refreshSession(); // Refresh session state after sign-in
+        } catch (error: unknown) {
+            console.error(error);
+            setError(error instanceof AuthError ? error.message : "An error occurred during OAuth sign-in");
+        }
+      }, [refreshSession]);
+    
+      const handleSignInWithOTP = useCallback(async (email: string) => {
+        try {
+          await signInWithOTP(email);
+          setError(null);
+          await refreshSession(); // Refresh session state after sign-in
+        } catch (error: unknown) {
+            console.error(error);
+            setError(error instanceof AuthError ? error.message : "An error occurred during Passwordless sign-in");
+        }
+      }, [refreshSession]);
+    
+      const handleSignOut = useCallback(async () => {
+        try {
+          await signOut();
+        } catch (error: unknown) {
+            setError(error instanceof AuthError ? error.message : "An error occurred during signout");
+        } finally {
+          setSession(null);
+          setUser(null);
+          setRoles([])
+          setError(null);
+          await refreshSession();
+        }
+      }, [refreshSession]);
 
-    const signInWithOtp = async (email: string): Promise<AuthOtpResponse> => {
-        const credentials: SignInWithPasswordlessCredentials = {
-            email
-        };
-        const response = await supabase.auth.signInWithOtp(credentials);
-        if (response.error) {
-            console.error('Error signing in with OTP:', response.error);
-        }
-        return response;
-    }
-
-    const signInWithOAuth = async (provider: Provider): Promise<OAuthResponse> => {
-        const credentials: SignInWithOAuthCredentials = {
-            provider
-        }
-        if (provider === 'discord') {
-            credentials['options'] = { redirectTo: 'http://localhost:3000/auth/callback' };
-        }
-        // Sign in with OAuth
-        const response = await supabase.auth.signInWithOAuth(credentials);
-        if (response.error) {
-            console.error('Error signing in with OAuth:', response.error);
-        }
-        return response;
-    }
-    // Return an object with session and auth functions
-    return {
+      const clearError = useCallback(() => {
+        setError(null);
+      }, []);
+    
+      return {
         session,
         user,
-        signOut,
-        signInWithOtp,
-        signInWithOAuth
-        // You can add more auth-related functions here if needed
-    };
+        roles,
+        error,
+        signInWithPassword: handleSignInWithPassword,
+        signInWithProvider: handleSignInWithProvider,
+        signInWithOTP: handleSignInWithOTP,
+        signOut: handleSignOut,
+        clearError
+      };
 }
