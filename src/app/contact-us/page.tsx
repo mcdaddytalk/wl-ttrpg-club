@@ -38,7 +38,7 @@ export default function ContactUs(): React.ReactElement {
     const onSubmit: SubmitHandler<ContactFormValues> = async (values: ContactFormValues): Promise<void> => {
         try {
             // Send the form data to your backend API
-            const response = await fetch("/api/contact-us", {
+            const response = await fetch("/api/email/contact-us", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

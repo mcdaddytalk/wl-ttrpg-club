@@ -9,6 +9,7 @@ import { Toaster } from "sonner";
 import Footer from "@/components/Footer";
 import ToastHandler from "@/components/ToastHandler";
 import { Suspense } from "react";
+import { getURL } from "@/utils/helpers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -21,9 +22,7 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+const defaultUrl = getURL();
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
