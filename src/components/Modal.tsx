@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Button } from './ui/button';
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,11 +12,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null; // Do not render if modal is not open
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-lg">
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-500">
+    <div className="fixed inset-y-50 inset-x-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="dark:bg-white bg-black p-6 rounded shadow-lg">
+        <Button onClick={onClose} className="absolute top-2 right-2 text-red-600 hover:text-red-800 dark:text-slate-600 dark:hover:dark:text-slate-800">
           &times;
-        </button>
+        </Button>
         {children}
       </div>
     </div>

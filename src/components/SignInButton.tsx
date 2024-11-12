@@ -1,48 +1,40 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth'; // Import your custom useAuth hook
 import Modal from './Modal'; // Import the Modal component
 import { Button } from './ui/button';
+import Link from 'next/link';
+import { 
+  signInWithOTP, 
+  //signInWithProvider 
+} from '@/server/authActions';
+import { OAuthButtons } from './OAuthButtons';
+import PasswordlessButton from './PasswordlessButton';
 
 interface SignInButtonProps {
   mode?: 'modal' | 'inline'; // Accept mode prop
 }
 
+
+
 const SignInButton: React.FC<SignInButtonProps> = ({ mode = 'inline' }) => {
-  const { signInWithOAuth, signInWithOtp, user } = useAuth(); // Ensure useAuth provides the Supabase client
   const [isModalOpen, setModalOpen] = useState(false);
-
-  const handleSignInWithEmail = async () => {
-    const response = await signInWithOtp(prompt('Enter your email:') || '');
-
-    if (response.error) {
-      console.error('Error signing in with email:', response.error);
-    }
+ 
+  const handleSignInWithEmail = async (formData: FormData) => {
+    const email = formData.get('email') as string;
+    await signInWithOTP(email);    
     setModalOpen(false); // Close modal after sign-in attempt
   };
 
-  const handleSignInWithGoogle = async () => {
-    const response = await signInWithOAuth('google');
+  // const handleSignInWithGoogle = async () => {
+  //   await signInWithProvider('google');
+  //   setModalOpen(false); // Close modal after sign-in attempt
+  // };
 
-    if (response.error) {
-      console.error('Sign in error with Google:', response.error);
-    } else {
-        console.log('User signed in with Google:', user);
-    }
-    setModalOpen(false); // Close modal after sign-in attempt
-  };
-
-  const handleSignInWithDiscord = async () => {
-    const response = await signInWithOAuth('discord');
-
-    if (response.error) {
-      console.error('Sign in error with Discord:', response.error);
-    } else {
-      console.log('User signed in with Discord:', user);
-    }
-    setModalOpen(false); // Close modal after sign-in attempt
-  };
+  // const handleSignInWithDiscord = async () => {
+  //   await signInWithProvider('discord');
+  //   setModalOpen(false); // Close modal after sign-in attempt
+  // };
 
   const openModal = () => {
     if (mode === 'modal') {
@@ -54,28 +46,20 @@ const SignInButton: React.FC<SignInButtonProps> = ({ mode = 'inline' }) => {
     setModalOpen(false);
   };
 
+  const SignupText = "Need an account? Sign Up"
+
   return (
-    <div className="flex flex-col items-center mt-4">
+    <div className="flex flex-col items-center mt-1">
       {mode === 'inline' ? (
         <>
-          <Button
-            onClick={handleSignInWithEmail}
-            className="mb-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Sign In with Email
-          </Button>
-          <Button
-            onClick={handleSignInWithGoogle}
-            className="mb-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Sign In with Google
-          </Button>
-          <Button
-            onClick={handleSignInWithDiscord}
-            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-          >
-            Sign In with Discord
-          </Button>
+          <PasswordlessButton useLabel handleSignInWithEmail={handleSignInWithEmail} />
+          <OAuthButtons setModalOpen={setModalOpen} />
+          <Link
+              href="/signup"
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              {SignupText}
+          </Link>
         </>
       ) : (
         <Button
@@ -89,25 +73,16 @@ const SignInButton: React.FC<SignInButtonProps> = ({ mode = 'inline' }) => {
       {mode === 'modal' && (
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <div className="flex flex-col items-center">
-            <h2 className="text-lg font-semibold">Sign In</h2>
-            <Button
-              onClick={handleSignInWithEmail}
-              className="mt-4 mb-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            <h2 className="text-lg font-semibold dark:text-slate-800 text-slate-100">Sign In</h2>
+            <PasswordlessButton handleSignInWithEmail={handleSignInWithEmail} />
+            <OAuthButtons setModalOpen={setModalOpen} />
+            <Link
+              href="/signup"
+              onClick={closeModal}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
-              Sign In with Email
-            </Button>
-            <Button
-              onClick={handleSignInWithGoogle}
-              className="mb-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Sign In with Google
-            </Button>
-            <Button
-              onClick={handleSignInWithDiscord}
-              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-            >
-              Sign In with Apple
-            </Button>
+              {SignupText}
+            </Link>
           </div>
         </Modal>
       )}

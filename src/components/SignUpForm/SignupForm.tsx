@@ -17,10 +17,12 @@ import {
 } from '@/components/ui/form'
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import { formSchema } from "./schema"
 // import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner"
 import { useState } from "react"
+import Router from 'next/router';
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -30,7 +32,7 @@ const steps = [
         name: 'Personal Information',
         fields: [
             'firstName', 'surname', 'email',
-            'phoneNumber', 'isMinor',
+            'phoneNumber', 'birthday', 'isMinor',
             'parentFirstName', 'parentSurname',
             'parentPhone', 'parentEmail'
         ]
@@ -47,42 +49,20 @@ const steps = [
     },
     {
         id: 'Step 4',
-        name: 'Complete'
+        name: 'Account Security',
+        fields: ['password', 'confirmPassword']
+    },
+    {
+        id: 'Step 5',
+        name: 'Sign Up'
     }
 ];
 
-export const SignUpForm = () => {
+export const SignupForm = () => {
     const [previousStep, setPreviousStep] = useState(0)
     const [currentStep, setCurrentStep] = useState(0)
     const delta = currentStep - previousStep
     const [minor, setMinor] = useState(false);
-    // const [formData, setFormData] = useState({
-    //     firstName: '',
-    //     surname: '',
-    //     email: '',
-    //     phoneNumber: '',
-    //     isMinor: false,
-    //     parentFirstName: '',
-    //     parentSurname: '',
-    //     parentPhone: '',
-    //     parentEmail: '',
-    //     experienceLevel: '',
-    //     gamemasterInterest: '',
-    //     preferredSystem: '',
-    //     availability: '',
-    //     agreeToRules: false,
-    // });
-
-    // const {
-    //     register,
-    //     handleSubmit,
-    //     watch,
-    //     reset,
-    //     trigger,
-    //     formState: { errors }
-    // } = useForm<FormValues>({
-    //     resolver: zodResolver(formSchema),
-    // });
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -90,6 +70,9 @@ export const SignUpForm = () => {
             firstName: '',
             surname: '',
             email: '',
+            password: '',
+            confirmPassword: '',
+            birthday: new Date().toISOString().split('T')[0],
             phoneNumber: "+1 000-000-0000",
             isMinor: false,
             parentFirstName: '',
@@ -100,35 +83,36 @@ export const SignUpForm = () => {
             gamemasterInterest: 'no',
             preferredSystem: 'dd5e',
             availability: '',
-            agreeToRules: false,
+            agreeToRules: false
         }
-    })
-    
+    });
+
     const processForm: SubmitHandler<FormValues> = async (data) => {
         console.log('Data received')
         console.log(data)
         console.log('Sending to server...')
 
-        await fetch('http://localhost:3000/api/members', {
+        const signUpResponse = await fetch('/api/signup', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data),
-        }).then(async (response) => {
-            if (response.status !== 200 && !response.ok) {
-                if (response.status === 409) {
-                    toast.error('Email Already In Use.  Please use a different email address.')
-                } else {
-                    const error = await response.json()
-                    throw new Error(error.message);
-                }
+            body: JSON.stringify(data)
+        });
+
+        const signUpData = await signUpResponse.json();
+
+        if (!signUpResponse.ok) {
+            if (signUpResponse.status === 409) {
+                toast.error('Email Already In Use.  Please use a different email address.')
             } else {
-                toast.success("Your form is submit successfully.")
+                const { error } = signUpData;
+                throw new Error(error.message);
             }
-        }).catch((err) => {
-            toast.error(`Something went wrong: ${err}`)
-        })
+        } else {
+            Router.push('/login');
+        }
+        
         // form.reset()
     }
 
@@ -141,13 +125,6 @@ export const SignUpForm = () => {
         if (!output) return;
 
         if ( currentStep < steps.length - 1) {
-            if (currentStep === steps.length - 2) {
-                // last step
-                //console.log('last step')
-                //console.log('Form Errors:  ', form.formState.errors)
-                //console.log('Form Values:  ', form.getValues())
-                await form.handleSubmit(processForm)()
-            }
             setPreviousStep(currentStep)
             setCurrentStep((step) => step + 1)
         }
@@ -422,6 +399,7 @@ export const SignUpForm = () => {
                                     <SelectItem value="pf2e">Pathfinder 2e</SelectItem>
                                     <SelectItem value="dd5e">D&D 5e</SelectItem>
                                     <SelectItem value="other">Other</SelectItem>
+                                    <SelectItem value="none">None</SelectItem>
                                 </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -482,8 +460,57 @@ export const SignUpForm = () => {
                         <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
-                        <p>Thank you for signing up! Review your information:</p>
-                        <pre>{JSON.stringify(form.getValues(), null, 2)}</pre>
+                        <FormField 
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (                                
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" placeholder="Password" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="confirmPassword"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Confirm Password</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" placeholder="Confirm Password" {...field}  />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </motion.div>
+                )}
+
+                {currentStep === 4 && (
+                    <motion.div
+                        initial={{ x: delta >= 0 ? '50%' : '-50%', opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
+                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                            {steps[currentStep].id}: {steps[currentStep].name}
+                        </h2>
+                        <h3>Review your information:</h3>
+                        <Separator />
+                        <p><strong>First Name:</strong> {form.getValues().firstName}</p>
+                        <p><strong>Surname:</strong> {form.getValues().surname}</p>
+                        <p><strong>Email:</strong> {form.getValues().email}</p>
+                        <p><strong>Phone Number:</strong> {form.getValues().phoneNumber}</p>
+                        <p><strong>Birthday:</strong> {form.getValues().birthday}</p>
+                        <p><strong>Experience Level:</strong> {form.getValues().experienceLevel}</p>
+                        <p><strong>Game Master Interest:</strong> {form.getValues().gamemasterInterest}</p>
+                        <p><strong>Preferred System:</strong> {form.getValues().preferredSystem}</p>
+                        <p><strong>Availability:</strong> {form.getValues().availability}</p>
+                        
+                        <Button type='submit' className='w-full' disabled={!form.formState.isValid}>Sign Up!</Button>
                     </motion.div>
                 )}
                 </form>
