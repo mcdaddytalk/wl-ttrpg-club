@@ -9,7 +9,6 @@ import { Toaster } from "sonner";
 import Footer from "@/components/Footer";
 import ToastHandler from "@/components/ToastHandler";
 import { Suspense } from "react";
-import { getURL } from "@/utils/helpers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -22,7 +21,7 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-const defaultUrl = getURL();
+const defaultUrl = process?.env?.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
