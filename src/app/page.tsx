@@ -20,6 +20,23 @@ export default function Home() {
               <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-gray-900 dark:text-white">Western Loudoun</h1>
               <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-gray-900 dark:text-white">Tabletop Roleplaying Game Club</h1>
             </div>
+            <div className="max-w-2xl mx-auto mt-6 text-center">
+              <p className="text-xl text-muted-foreground text-gray-500 dark:text-gray-400">
+                Our website serves as the central hub for a thriving community of tabletop roleplayers who come together to share their passion for immersive storytelling and collaborative adventures. 
+              </p>
+              <p className="text-xl text-muted-foreground text-gray-500 dark:text-gray-400">
+                Whether you&apos;re a seasoned adventurer or just starting your journey, we offer a variety of games, including Dungeons & Dragons 5e, Pathfinder, and many other systems. 
+              </p>
+              <p className="text-xl text-muted-foreground text-gray-500 dark:text-gray-400">  
+              Through our platform, you can easily join the group, schedule new games as a gamemaster, or register for upcoming sessions.
+              </p>
+              <p className="text-xl text-muted-foreground text-gray-500 dark:text-gray-400"> 
+                Our mission is to foster a welcoming environment where players of all experience levels can connect, explore new worlds, and build lasting friendships. 
+              </p>
+              <p className="text-xl text-muted-foreground text-gray-500 dark:text-gray-400">
+                Dive into epic quests, face thrilling challenges, and become a part of our growing community today!                
+              </p>
+            </div>
             <div className="mt-5 max-w-3xl">
               <p className="text-xl text-muted-foreground text-gray-500 dark:text-gray-400">Want to learn more?</p>
               <p className="text-xl text-muted-foreground text-gray-500 dark:text-gray-400">Click the button below and fill out the form and someone will contact you.</p>
