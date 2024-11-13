@@ -11,9 +11,9 @@ export default function Header() {
         <div className="container flex h-14 max-w-screen-2xl items-center">
             <nav className="flex items-center space-x-4 lg:space-x-6">
                 <Link href="/" className="flex items-center space-x-2">
-                    <div className='w-fit bg-[#0160FE]'>
+                    <div className='w-fit bg-slate-500 p-1'>
                         <Image 
-                            src='https://kthrpfzafznkkvalszoi.supabase.co/storage/v1/object/public/images/wl-ttrpg-club-logo1.webp' 
+                            src='https://kthrpfzafznkkvalszoi.supabase.co/storage/v1/object/public/images/wl-ttrpg-club-logo2-transformed.png' 
                             alt='logo' 
                             className='invert'
                             height={50}
