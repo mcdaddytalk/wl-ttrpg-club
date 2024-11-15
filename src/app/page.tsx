@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 export default function Home() {
   return (
     <>
-      <section className="overflow-hidden py-32 lg:py-40 sm:py-24"> 
+      <section className="relative flex h-screen flex-col items-center justify-center px-6 py-32 lg:py-40 sm:py-24"> 
         {/* Gradient background */}
         <div
           aria-hidden="true"
