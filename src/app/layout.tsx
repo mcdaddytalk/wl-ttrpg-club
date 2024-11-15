@@ -30,6 +30,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Western Loudoun Table Top Roleplaying Game Group (WLTTRPGG)",
   description: "Club for table top roleplaying gamers in the Western Loudoun area.",
+  icons: {
+    icon: "/favicon.ico"
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

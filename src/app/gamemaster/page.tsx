@@ -29,10 +29,13 @@ export default async function GamemasterDashboard() {
       system, 
       max_seats, 
       game_schedule(
-        first_game_date,
+        id,
         interval,
-        status,
-        next_game_date
+        day_of_week,
+        first_game_date,
+        next_game_date,
+        last_game_date,
+        status        
       )    
     `)
     .eq('gamemaster_id', user.id);

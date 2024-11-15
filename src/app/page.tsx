@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 export default function Home() {
   return (
     <>
-      <section className="overflow-hidden py-24 lg:py-32"> 
+      <section className="overflow-hidden py-32 lg:py-40 sm:py-24"> 
         {/* Gradient background */}
         <div
           aria-hidden="true"
@@ -14,7 +14,7 @@ export default function Home() {
           <div className="bg-gradient-to-r from-background/50 to-background blur-3xl w-[25rem] h-[44rem] rotate-[-60deg] transform -translate-x-[10rem]" />
           <div className="bg-gradient-to-tl blur-3xl w-[90rem] h-[50rem] rounded-full origin-top-left -rotate-12 -translate-x-[15rem] from-primary-foreground via-primary-foreground to-background" />
         </div>
-        <div className="relative z-10">
+        <div className="relative ">
           <div className="container py-10 lg:py-16">
             <div className="max-w-2xl text-center mx-auto">
               <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-gray-900 dark:text-white">Western Loudoun</h1>

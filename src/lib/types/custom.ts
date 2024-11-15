@@ -112,9 +112,76 @@ export type NewContact = {
   parentSurname?: string;
   parentEmail?: string;
   parentPhone?: string;
-  experienceLevel: string;
+  experienceLevel: ExperienceLevel;
   gamemasterInterest: string;
   preferredSystem: string;
   availability: string;
   agreeToRules: boolean;
+}
+
+export type GameSchedule = {
+  id: string;
+  game_id: string;
+  game_name: string;
+  interval: string;
+  day_of_week: string;
+  first_game_date: Date;
+  next_game_date: Date;
+  last_game_date: Date;
+  status: string;
+  game_registrations: GameRegistrant[]
+}
+
+export type GameRegistrant = {
+  member_id: string;
+  given_name: string;
+  surname: string;
+}
+
+export type SupaGameData = {
+  id: string;
+  name: string;
+}
+
+export type SupaProfileData = {
+  id: string;
+  given_name: string;
+  surname: string;
+}
+
+export type SupaGameRegistrationData = {
+  member_id: string;
+  profiles: SupaProfileData[];
+}
+
+export type SupabaseGameScheduleData = {
+  id: string;
+  game_id: string;
+  interval: string;
+  day_of_week: string;
+  first_game_date: Date;
+  next_game_date: Date;
+  last_game_date: Date;
+  status: string;
+  games: SupaGameData[];
+  game_registrations: SupaGameRegistrationData[];
+};
+
+type DOW = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+
+type GameStatus = 'active' | 'scheduled' | 'completed' | 'awaiting-players' | 'full' | 'cancelled';
+
+type ExperienceLevel = 'new' | 'novice' | 'seasoned' | 'player-gm' | 'forever-gm';
+
+type GameInterval = 'weekly' | 'bimonthly' | 'monthly' | 'yearly' | 'custom';
+
+export type SupaGameSchedule = {
+  gm_id: string;
+  game_id: string;
+  interval: GameInterval;
+  day_of_week: DOW;
+  first_game_date: Date;
+  next_game_date: Date;
+  last_game_date?: Date;
+  status: GameStatus;
 }

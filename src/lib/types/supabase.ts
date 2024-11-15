@@ -72,24 +72,21 @@ export type Database = {
       game_registrations: {
         Row: {
           game_id: string | null
-          id: number
+          id: string
           member_id: string | null
           registered_at: string | null
-          updated_at: string | null
         }
         Insert: {
           game_id?: string | null
-          id?: number
+          id?: string
           member_id?: string | null
           registered_at?: string | null
-          updated_at?: string | null
         }
         Update: {
           game_id?: string | null
-          id?: number
+          id?: string
           member_id?: string | null
           registered_at?: string | null
-          updated_at?: string | null
         }
         Relationships: [
           {
@@ -98,20 +95,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "games"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "game_registrations_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "scheduled_games_view"
-            referencedColumns: ["game_id"]
-          },
-          {
-            foreignKeyName: "game_registrations_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "upcoming_games_view"
-            referencedColumns: ["game_id"]
           },
           {
             foreignKeyName: "game_registrations_member_id_fkey"
@@ -132,31 +115,37 @@ export type Database = {
       game_schedule: {
         Row: {
           created_at: string | null
+          day_of_week: Database["public"]["Enums"]["day_of_week_enum"] | null
           first_game_date: string
           game_id: string | null
-          id: number
+          id: string
           interval: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date: string | null
+          next_game_date: string | null
           status: Database["public"]["Enums"]["game_status_enum"]
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          day_of_week?: Database["public"]["Enums"]["day_of_week_enum"] | null
           first_game_date: string
           game_id?: string | null
-          id?: number
+          id?: string
           interval: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date?: string | null
+          next_game_date?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          day_of_week?: Database["public"]["Enums"]["day_of_week_enum"] | null
           first_game_date?: string
           game_id?: string | null
-          id?: number
+          id?: string
           interval?: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date?: string | null
+          next_game_date?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           updated_at?: string | null
         }
@@ -168,20 +157,6 @@ export type Database = {
             referencedRelation: "games"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "game_schedule_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "scheduled_games_view"
-            referencedColumns: ["game_id"]
-          },
-          {
-            foreignKeyName: "game_schedule_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "upcoming_games_view"
-            referencedColumns: ["game_id"]
-          },
         ]
       }
       games: {
@@ -190,27 +165,27 @@ export type Database = {
           description: string | null
           gamemaster_id: string | null
           id: string
-          name: string
+          max_seats: number | null
           system: string | null
-          updated_at: string | null
+          title: string
         }
         Insert: {
           created_at?: string | null
           description?: string | null
           gamemaster_id?: string | null
           id?: string
-          name: string
+          max_seats?: number | null
           system?: string | null
-          updated_at?: string | null
+          title: string
         }
         Update: {
           created_at?: string | null
           description?: string | null
           gamemaster_id?: string | null
           id?: string
-          name?: string
+          max_seats?: number | null
           system?: string | null
-          updated_at?: string | null
+          title?: string
         }
         Relationships: [
           {
@@ -225,27 +200,6 @@ export type Database = {
             columns: ["gamemaster_id"]
             isOneToOne: false
             referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_profiles_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -420,110 +374,6 @@ export type Database = {
         }
         Relationships: []
       }
-      scheduled_games_view: {
-        Row: {
-          description: string | null
-          first_game_date: string | null
-          game_id: string | null
-          gamemaster_id: string | null
-          gm_given_name: string | null
-          gm_surname: string | null
-          last_game_date: string | null
-          name: string | null
-          registered_at: string | null
-          status: Database["public"]["Enums"]["game_status_enum"] | null
-          system: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "games_gamemaster_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gamemaster_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_profiles_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      upcoming_games_view: {
-        Row: {
-          description: string | null
-          first_game_date: string | null
-          game_id: string | null
-          gamemaster_id: string | null
-          gm_given_name: string | null
-          gm_surname: string | null
-          last_game_date: string | null
-          name: string | null
-          registered_at: string | null
-          status: Database["public"]["Enums"]["game_status_enum"] | null
-          system: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "games_gamemaster_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gamemaster_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_profiles_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Functions: {
       get_scheduled_games_with_counts: {
@@ -541,6 +391,7 @@ export type Database = {
           status: string
           first_game_date: string
           last_game_date: string
+          user_id: string
           registered_at: string
           num_players: number
         }[]
@@ -560,22 +411,38 @@ export type Database = {
           status: string
           first_game_date: string
           last_game_date: string
+          user_id: string
           registered_at: string
           num_players: number
         }[]
       }
     }
     Enums: {
+      day_of_week_enum:
+        | "sunday"
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
       experience_level_enum:
         | "new"
         | "novice"
         | "seasoned"
         | "player-gm"
         | "forever-gm"
-      game_interval_enum: "weekly" | "bimonthly" | "monthly"
+      game_interval_enum:
+        | "weekly"
+        | "bimonthly"
+        | "monthly"
+        | "yearly"
+        | "custom"
       game_status_enum:
+        | "active"
         | "scheduled"
         | "awaiting-players"
+        | "full"
         | "completed"
         | "canceled"
       gamemaster_interest_enum: "yes" | "no" | "maybe"

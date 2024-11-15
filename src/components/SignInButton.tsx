@@ -76,13 +76,18 @@ const SignInButton: React.FC<SignInButtonProps> = ({ mode = 'inline' }) => {
             <h2 className="text-lg font-semibold dark:text-slate-800 text-slate-100">Sign In</h2>
             <PasswordlessButton handleSignInWithEmail={handleSignInWithEmail} />
             <OAuthButtons setModalOpen={setModalOpen} />
-            <Link
-              href="/signup"
-              onClick={closeModal}
-              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              {SignupText}
-            </Link>
+            <Button asChild className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-800">
+              <Link
+                href="/signup"
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent default to ensure `closeModal` logic runs.
+                  setModalOpen(false);
+                  window.location.href = "/signup"; // Redirect to signup after modal close.
+                }}
+              >
+                {SignupText}
+              </Link>
+            </Button>
           </div>
         </Modal>
       )}

@@ -12,7 +12,7 @@ type OAuthProvider = {
     name: Provider;
     displayName: string;
     color: string;
-    bg_color: string;
+    hvr_color: string;
     icon?: React.ReactNode;
 }
 
@@ -26,14 +26,14 @@ export function OAuthButtons({ setModalOpen }: OAuthButtonsProps) {
             name: "google",
             displayName: "Google",
             color: "bg-red-500",
-            bg_color: "bg-red-800",
+            hvr_color: "hover:bg-red-800",
             icon: <FaGoogle size={18} className="mr-2" />
         },
         {
             name: "discord",
             displayName: "Discord",
             color: "bg-blue-500",
-            bg_color: "bg-blue-800",
+            hvr_color: "hover:bg-blue-800",
             icon: <FaDiscord size={18} className="mr-2" />
         },
     ]
@@ -43,7 +43,7 @@ export function OAuthButtons({ setModalOpen }: OAuthButtonsProps) {
             {providers.map((provider) => (
                 <Button
                     key={provider.name}
-                    className={`px-4 py-2 ${provider.color} text-white rounded hover:${provider.bg_color}`}
+                    className={`px-4 py-2 ${provider.color} text-white rounded ${provider.hvr_color}`}
                     onClick={async () => {
                         await signInWithProvider(provider.name)
                         setModalOpen(false)
