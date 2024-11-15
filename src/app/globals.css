@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
  
-html,
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  min-height: 100%; /* Ensures the full height of the viewport */
-}
 @layer base {
   :root {
     --background: 0 0% 100%;

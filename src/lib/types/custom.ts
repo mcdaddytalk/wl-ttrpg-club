@@ -96,9 +96,10 @@ export type GMGameData = {
   description: string;
   system: string;
   scheduled_for: Date;
-  interval: string;
+  interval: GameInterval;
+  day_of_week: DOW;
   maxSeats: number;
-  status: string;
+  status: GameStatus;
   seats: number;
 }
 
@@ -138,6 +139,17 @@ export type GameRegistrant = {
   surname: string;
 }
 
+export type Player = {
+  id: string;
+  email: string;
+  phoneNumber: string;
+  givenName: string;
+  surname: string;
+  avatar: string;
+  isMinor: boolean;
+  experienceLevel: ExperienceLevel;
+}
+
 export type SupaGameData = {
   id: string;
   name: string;
@@ -174,6 +186,18 @@ type GameStatus = 'active' | 'scheduled' | 'completed' | 'awaiting-players' | 'f
 type ExperienceLevel = 'new' | 'novice' | 'seasoned' | 'player-gm' | 'forever-gm';
 
 type GameInterval = 'weekly' | 'bimonthly' | 'monthly' | 'yearly' | 'custom';
+
+export type GMGameSchedule = {
+  id: string;
+  title: string;
+  system: string;
+  interval: GameInterval;
+  dow: DOW;
+  scheduled_next: Date;
+  maxSeats: number;
+  registered: number;
+  status: GameStatus;
+}
 
 export type SupaGameSchedule = {
   gm_id: string;
