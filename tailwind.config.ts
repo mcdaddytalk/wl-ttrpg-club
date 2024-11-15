@@ -8,7 +8,7 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-  	extend: {
+	extend: {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -69,6 +69,15 @@ const config: Config = {
 		fontFamily: {
 			sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
 			mono: ['var(--font-geist-mono)', 'monospace']
+		},
+		backgroundImage: {
+			'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+			'gradient-conic':
+				'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+			'gradient-radial-2': 'radial-gradient(circle, var(--tw-gradient-stops))',
+			banner: "url('/images/WLTTRPG.webp')",
+			'black-overlay': 'linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8) 100%)',
+			'white-overlay': 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8) 100%)',
 		}
   	}
   },

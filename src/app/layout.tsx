@@ -45,7 +45,7 @@ export default function RootLayout({
   return (
       <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
         <body
-          className="min-h-screen sticky top-0 bg-background text-foreground"
+          className="container bg-background text-foreground bg-banner bg-no-repeat bg-center bg-scroll"
         >
             <Analytics />
             <ThemeProvider 
@@ -59,7 +59,7 @@ export default function RootLayout({
               <Suspense fallback="<div>Loading...</div>">
                 <ToastHandler />
               </Suspense>
-              <div className="layout-container">
+              <div className="mx-auto w-full min-h-screen dark:bg-black-overlay bg-white-overlay">
                 <main className="flex flex-col items-center">{children}</main>
               </div>
               <Footer />

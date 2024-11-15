@@ -1,4 +1,5 @@
 import GameList from "@/components/GameList/GameList";
+import ScheduledGamesCard from "@/components/ScheduledGamesCard/ScheduledGamesCard";
 import { Button } from "@/components/ui/button";
 import { 
   Card,
@@ -6,11 +7,14 @@ import {
   CardTitle,
   CardContent
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { GMGameData } from "@/lib/types/custom";
 import { getUser } from "@/server/authActions";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+
+import { mockScheduledGames } from "@/mockData/GameData";
 
 export default async function GamemasterDashboard() {
   const supabase = createSupabaseBrowserClient();
@@ -77,22 +81,53 @@ export default async function GamemasterDashboard() {
     system: game.system,
     scheduled_for: game.game_schedule[0]?.next_game_date,
     interval: game.game_schedule[0]?.interval,
+    day_of_week: game.game_schedule[0]?.day_of_week,
     maxSeats: game.max_seats,
     status: game.game_schedule[0]?.status,
     seats: seatCounts![game.id] || 0,
   })) ?? [];
   
+  const scheduledGames = mockScheduledGames;
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">GM Dashboard</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Button variant="default">
-          <Link href="/gamemaster/add-game">Create New Game</Link>
-        </Button>
-        <GameList games={combinedData} />
-      </CardContent>
-    </Card>     
+    <div className="flex flex-col items-stretch border-4 border-red-500">
+      <div className="w-full space-y-4 border-4 border-blue-500 p-2 m-2">
+        <ScheduledGamesCard scheduledGames={scheduledGames} />        
+      </div>
+      <div className="w-full flex-row space-y-4 border-4 border-green-500 p-2 m-2">
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">GM Dashboard</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button variant="default">
+              <Link href="/gamemaster/add-game">Create New Game</Link>
+            </Button>
+            <GameList games={combinedData} />
+          </CardContent>
+        </Card>
+        <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[250px]" />
+          <Skeleton className="h-4 w-[200px]" />
+        </div>            
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">Upcoming Games</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <GameList games={combinedData} />
+          </CardContent>
+        </Card>
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">Upcoming Games</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <GameList games={combinedData} />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
