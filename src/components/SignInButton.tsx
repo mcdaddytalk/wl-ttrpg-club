@@ -49,7 +49,7 @@ const SignInButton: React.FC<SignInButtonProps> = ({ mode = 'inline' }) => {
   const SignupText = "Need an account? Sign Up"
 
   return (
-    <div className="flex flex-col items-center mt-1">
+    <div className="flex flex-col items-center">
       {mode === 'inline' ? (
         <>
           <PasswordlessButton useLabel handleSignInWithEmail={handleSignInWithEmail} />

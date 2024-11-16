@@ -50,7 +50,10 @@ const UserButton: React.FC = () => {
     router.push('/');
   };
 
-  const userName = user?.user_metadata?.given_name + ' ' + user?.user_metadata?.surname || 'Guest User';
+  const userName = user?.user_metadata?.given_name 
+    && user?.user_metadata?.given_name != null 
+    ? user?.user_metadata?.given_name + ' ' + user?.user_metadata?.surname 
+    : user?.user_metadata?.full_name;
   const userAvatar = user?.user_metadata?.avatar_url; // Get user avatar from session
   
   useEffect(() => {
@@ -93,6 +96,7 @@ const UserButton: React.FC = () => {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={() => toggleDropdown()}
                 className="block px-4 py-2 hover:bg-slate-200 dark:text-black"
               >
                 {link.label}

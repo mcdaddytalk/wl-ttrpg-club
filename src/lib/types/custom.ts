@@ -24,7 +24,7 @@ export type ProfileData = {
 
 export type SupabaseProfileResponse = {
   error: QueryError | null;
-  data: ProfileData[];
+  data: ProfileData;
   count: number | null;
   status: number;
   statusText: string;

@@ -32,7 +32,40 @@ export const mockScheduledGames: GMGameSchedule[] = [
         scheduled_next: new Date(),
         maxSeats: 6,
         registered: 4,
-        status: "scheduled"
+        status: "awaiting-players"
+    },
+    {
+        id: "83e2f7f4-5b5d-4b6b-8a0e-4f1b2c3d4e5f",
+        title: "Game 4",
+        system: "DND 5e",
+        interval: "bimonthly",
+        dow: "wednesday",
+        scheduled_next: new Date(),
+        maxSeats: 6,
+        registered: 6,
+        status: "scheduled" 
+    },
+    {
+        id: "2d6eb983-9c3a-416f-a01b-23a0a47bef04",
+        title: "Game 5",
+        system: "DND 5e",
+        interval: "bimonthly",
+        dow: "wednesday",
+        scheduled_next: new Date(),
+        maxSeats: 6,
+        registered: 6,
+        status: "scheduled" 
+    },
+    {
+        id: "7f2eb983-9c3a-416f-a01b-23a0a47bef04",
+        title: "Game 6",
+        system: "DND 5e",
+        interval: "bimonthly",
+        dow: "wednesday",
+        scheduled_next: new Date(),
+        maxSeats: 6,
+        registered: 6,
+        status: "scheduled" 
     }
 ];
 
