@@ -90,12 +90,12 @@ export default async function GamemasterDashboard() {
   const scheduledGames = mockScheduledGames;
 
   return (
-    <div className="flex flex-col items-stretch border-4 border-red-500">
+    <section className="items-center justify-center border-4 border-red-500">
       <div className="w-full space-y-4 border-4 border-blue-500 p-2 m-2">
         <ScheduledGamesCard scheduledGames={scheduledGames} />        
       </div>
-      <div className="w-full flex-row space-y-4 border-4 border-green-500 p-2 m-2">
-        <Card className="w-full">
+      <div className="w-full flex flex-wrap space-y-4 border-4 border-green-500 p-2 m-2">
+        <Card>
           <CardHeader>
             <CardTitle className="text-2xl font-bold">GM Dashboard</CardTitle>
           </CardHeader>
@@ -105,13 +105,8 @@ export default async function GamemasterDashboard() {
             </Button>
             <GameList games={combinedData} />
           </CardContent>
-        </Card>
-        <Skeleton className="h-[125px] w-[250px] rounded-xl" />
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-[250px]" />
-          <Skeleton className="h-4 w-[200px]" />
-        </div>            
-        <Card className="w-full">
+        </Card>                 
+        <Card>
           <CardHeader>
             <CardTitle className="text-2xl font-bold">Upcoming Games</CardTitle>
           </CardHeader>
@@ -119,7 +114,7 @@ export default async function GamemasterDashboard() {
             <GameList games={combinedData} />
           </CardContent>
         </Card>
-        <Card className="w-full">
+        <Card>
           <CardHeader>
             <CardTitle className="text-2xl font-bold">Upcoming Games</CardTitle>
           </CardHeader>
@@ -127,7 +122,14 @@ export default async function GamemasterDashboard() {
             <GameList games={combinedData} />
           </CardContent>
         </Card>
+        <div>
+          <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>  
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

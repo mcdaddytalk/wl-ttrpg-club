@@ -23,37 +23,13 @@ export const getInitialSession = async (): Promise<{ session: Session | null; us
     return { session, user: session?.user ?? null };
 };
 
-type UserMetadata = {
-    email: string | null;
-    phone: string | null;
-    firstName: string;
-    surname: string;
-    avatar_url: string;
-}
-
-export const getMetaData = async (): Promise<UserMetadata | null> => {
-    const supabase = await createSupabaseServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null
-    const { data: profileData , error: profileError } = await supabase.from('profiles').select('*').eq('id', user.id) as unknown as SupabaseProfileResponse;
-    if (profileError) return null
-    const profile = profileData[0];
-    return {
-        email: user?.email ?? null,
-        phone: user?.phone ?? null,
-        firstName: profile?.given_name ?? null,
-        surname: profile?.surname ?? null,
-        avatar_url: profile?.avatar ?? user?.user_metadata?.avatar_url ?? null
-    }
-}
-
 export const getUser = async (): Promise<User | null> => {
     const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null
-    const { data: profileData , error: profileError } = await supabase.from('profiles').select('*').eq('id', user.id) as unknown as SupabaseProfileResponse;
+    const { data: profileData , error: profileError } = await supabase.from('profiles').select('*').limit(1).eq('id', user.id).maybeSingle() as unknown as SupabaseProfileResponse;
     if (profileError) return null
-    const profile = profileData[0];
+    const profile = profileData;
     const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
     if (roleError) return null
     let avatar_url = profile?.avatar ?? user?.user_metadata?.avatar_url ?? null

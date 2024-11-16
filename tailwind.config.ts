@@ -9,6 +9,16 @@ const config: Config = {
   ],
   theme: {
 	extend: {
+		screens: {
+			"md-lg": "1024px",
+			"lg-sm": "1152px",
+			"lg": "1280px",
+			'xl': '1440px',      // Extra large screens
+			'2xl': '1600px',     // Ultra-wide screens
+			'3xl': '1920px',     // Full HD screens
+			'4xl': '2560px',     // QHD screens
+			'5xl': '3840px',     // 4K displays
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
