@@ -60,7 +60,7 @@ export default function RootLayout({
                 <ToastHandler />
               </Suspense>
               <div className="dark:bg-black-overlay bg-white-overlay">
-                <main className="container w-full md:h-[88vh] overflow-hidden">
+                <main className="container w-full md:h-[88vh] overflow-auto">
                   {children}
                 </main>
               </div>

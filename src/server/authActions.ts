@@ -12,7 +12,7 @@ import {
     SignInWithPasswordlessCredentials, 
     User 
 } from "@supabase/supabase-js";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import useToastStore from "@/store/toastStore";
@@ -63,8 +63,13 @@ export const getUserRoles = async (): Promise<string[]> => {
 
 export async function signOut(): Promise<{ error: AuthError | null }> {
     const supabase = await createSupabaseServerClient();
+    const cookieStore = await cookies()
     const { error } = await supabase.auth.signOut();
     if (error) throw new Error(error.message)
+    // useToastStore.getState().setToast('sign-out','success','You have been signed out!')
+    const accessToken = cookieStore.get('sb-access-token')
+    if (accessToken) cookieStore.set('sb-access-token', '', { expires: new Date(0) })
+    revalidatePath('/', 'layout')
     redirect('/')
 }
 
