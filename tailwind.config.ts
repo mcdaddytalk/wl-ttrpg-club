@@ -86,8 +86,8 @@ const config: Config = {
 				'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
 			'gradient-radial-2': 'radial-gradient(circle, var(--tw-gradient-stops))',
 			banner: "url('/images/WLTTRPG.webp')",
-			'black-overlay': 'linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8) 100%)',
-			'white-overlay': 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8) 100%)',
+			'black-overlay': 'linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8) 50%)',
+			'white-overlay': 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8) 50%)',
 		}
   	}
   },

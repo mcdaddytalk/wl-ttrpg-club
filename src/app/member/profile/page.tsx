@@ -1,15 +1,17 @@
-"use client"
-
-import { useAuth } from '@/hooks/useAuth'
+import { getUser } from '@/server/authActions';
+import { redirect } from "next/navigation";
 import ProfileForm from './ProfileForm'
 
-const ProfilePage = () => {
-    const auth = useAuth()
+const ProfilePage = async () => {
+    const user = await getUser();
+    if (!user) {
+        redirect('/unauthorized');
+    }
     
     return (
-        <>
-            <ProfileForm user={auth.user} />
-        </>
+        <section className="flex flex-col items-center justify-between pt-4">
+            <ProfileForm user={user} />
+        </section>
     )
 }
 

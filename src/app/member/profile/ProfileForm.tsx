@@ -1,8 +1,13 @@
 'use client'
+
 import { useCallback, useEffect, useState } from 'react'
 import { createSupabaseBrowserClient } from '@/utils/supabase/client'
 import { type User } from '@supabase/supabase-js'
 import Avatar from './Avatar'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner'
 
 // ...
 
@@ -15,11 +20,20 @@ export default function AccountForm({ user }: { user: User | null }) {
   const [phone, setPhone] = useState<string | null>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [bio, setBio] = useState<string | null>(null)
+  const [hasChanges, setHasChanges] = useState(false)
+  const [initialData, setInitialData] = useState({
+    givenName: '',
+    surname: '',
+    phone: '',
+    birthday: '',
+    bio: '',
+    avatarUrl: '',
+  });
+
 
   const getProfile = useCallback(async () => {
     try {
         setLoading(true)
-        console.log('USER:  ', user)
         if (!user) return
         const { data, error, status } = await supabase
             .from('profiles')
@@ -39,9 +53,17 @@ export default function AccountForm({ user }: { user: User | null }) {
         setBirthday(data.birthday)
         setAvatarUrl(data.avatar)
         setBio(data.bio)
+        setInitialData({
+          givenName: data.given_name,
+          surname: data.surname,
+          phone: data.phone,
+          birthday: data.birthday,
+          bio: data.bio,
+          avatarUrl: data.avatar,
+        });
       }
     } catch (error) {
-      alert('Error loading user data! ' + error)
+      toast.error('Error loading user data! ' + error)
     } finally {
       setLoading(false)
     }
@@ -50,6 +72,23 @@ export default function AccountForm({ user }: { user: User | null }) {
   useEffect(() => {
     getProfile()
   }, [user, getProfile])
+
+  const handleFieldChange = (
+    setter: React.Dispatch<React.SetStateAction<string | null>>,
+    value: string | null,
+    fieldName: keyof typeof initialData
+  ) => {
+    setter(value);
+    setHasChanges(
+      value !== initialData[fieldName] ||
+      givenName !== initialData.givenName ||
+      surname !== initialData.surname ||
+      phone !== initialData.phone ||
+      birthday !== initialData.birthday ||
+      bio !== initialData.bio ||
+      avatarUrl !== initialData.avatarUrl
+    );
+  };
 
   type ProfileUpdate = {
     givenName: string | null
@@ -81,89 +120,97 @@ export default function AccountForm({ user }: { user: User | null }) {
         updated_at: new Date().toISOString(),
       })
       if (error) throw error
-      alert('Profile updated!')
+      toast.success('Profile updated successfully!')
+      setHasChanges(false)
     } catch (error) {
-        console.error(error)
-      alert(`Error updating the data!`)
+      console.error(error)
+      toast.error(`Error updating the data!`)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="form-widget">
-
-      {/* ... */}
-
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={user?.email} disabled />
-      </div>
-      <div>
-        <label htmlFor="fullName">Full Name</label>
-        <input
-          id="givenName"
-          type="text"
-          value={givenName || ''}
-          onChange={(e) => setGivenName(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="surname">surname</label>
-        <input
-          id="surname"
-          type="text"
-          value={surname || ''}
-          onChange={(e) => setSurname(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="phone">Phone</label>
-        <input
-          id="phone"
-          type="text"
-          value={phone || ''}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="birthday">Birthday</label>
-        <input
-          id="birthday"
-          type="text"
-          value={birthday || ''}
-          onChange={(e) => setBirthday(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="bio">Bio</label>
-        <input
-          id="bio"
-          type="text"
-          value={bio || ''}
-          onChange={(e) => setBio(e.target.value)}
-        />
-      </div>
-      <Avatar
-        uid={user?.id ?? null}
-        url={avatarUrl}
-        size={150}
-        onUpload={(url) => {
-          setAvatarUrl(url)
-          updateProfile({ givenName, surname, phone, birthday, bio, avatarUrl: url })
-        }}
-      />
-
-      <div>
-        <button
-          className="button primary block"
+    <Card className="w-full max-w-2xl mx-auto shadow-lg">
+      <CardHeader>
+        <CardTitle className="text-center text-2xl font-bold">Profile Details</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium">Email</label>
+            <Input id="email" type="text" value={user?.email || ''} disabled />
+          </div>
+          <div>
+            <label htmlFor="givenName" className="block text-sm font-medium">Given Name <span className="text-red-500">*</span></label>
+            <Input
+              id="givenName"
+              type="text"
+              value={givenName || ''}
+              onChange={(e) => handleFieldChange(setGivenName, e.target.value, 'givenName')}
+            />
+          </div>
+          <div>
+            <label htmlFor="surname" className="block text-sm font-medium">Surname <span className="text-red-500">*</span></label>
+            <Input
+              id="surname"
+              type="text"
+              value={surname || ''}
+              onChange={(e) => handleFieldChange(setSurname, e.target.value, 'surname')}
+            />
+          </div>
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium">Phone</label>
+            <Input
+              id="phone"
+              type="text"
+              value={phone || ''}
+              onChange={(e) => handleFieldChange(setPhone, e.target.value, 'phone')}
+            />
+          </div>
+          <div>
+            <label htmlFor="birthday" className="block text-sm font-medium">Birthday <span className="text-red-500">*</span></label>
+            <Input
+              id="birthday"
+              type="date"
+              value={birthday || ''}
+              onChange={(e) => handleFieldChange(setBirthday, e.target.value, 'birthday')}
+            />
+          </div>
+          <div>
+            <label htmlFor="bio" className="block text-sm font-medium">Bio</label>
+            <Input
+              id="bio"
+              type="text"
+              value={bio || ''}
+              onChange={(e) => handleFieldChange(setBio, e.target.value, 'bio')}
+            />
+          </div>
+          <div>
+          <p className="mt-2 text-sm text-gray-500">
+            <span className="text-red-500">*</span> Required fields
+          </p>
+          </div>
+          <Avatar
+            uid={user?.id ?? null}
+            url={avatarUrl}
+            size={150}
+            onUpload={(url) => {
+              setAvatarUrl(url);
+              setHasChanges(true);
+              // updateProfile({ givenName, surname, phone, birthday, bio, avatarUrl: url });
+            }}
+          />
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-center">
+        <Button
           onClick={() => updateProfile({ givenName, surname, phone, birthday, bio, avatarUrl })}
-          disabled={loading}
+          disabled={!hasChanges || loading}
         >
-          {loading ? 'Loading ...' : 'Update'}
-        </button>
-      </div>
-
-    </div>
+          {loading ? 'Loading...' : 'Update Profile'}
+        </Button>
+      </CardFooter>
+    </Card>
   )
 }
