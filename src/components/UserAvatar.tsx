@@ -21,7 +21,7 @@ const UserAvatar: React.FC<AvatarProps> = ({ avatarUrl, fullName }) => {
   return (
     <Avatar className="w-8 h-8">
       <AvatarImage src={avatarUrl} alt={`${fullName}`} />
-      <AvatarFallback className="bg-gray-200 text-gray-600 text-xl font-bold">
+      <AvatarFallback className="bg-slate-200 text-slate-600 text-xl font-bold">
         {getInitials()}
       </AvatarFallback>
     </Avatar>

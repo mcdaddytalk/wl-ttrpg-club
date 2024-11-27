@@ -10,6 +10,7 @@ import {
 } from '@/server/authActions';
 import { OAuthButtons } from './OAuthButtons';
 import PasswordlessButton from './PasswordlessButton';
+import { useRouter } from 'next/navigation';
 
 interface SignInButtonProps {
   mode?: 'modal' | 'inline'; // Accept mode prop
@@ -19,11 +20,21 @@ interface SignInButtonProps {
 
 const SignInButton: React.FC<SignInButtonProps> = ({ mode = 'inline' }) => {
   const [isModalOpen, setModalOpen] = useState(false);
- 
+  const router = useRouter();
+  
   const handleSignInWithEmail = async (formData: FormData) => {
     const email = formData.get('email') as string;
-    await signInWithOTP(email);    
-    setModalOpen(false); // Close modal after sign-in attempt
+    try {
+      await signInWithOTP(email);
+    } catch (error: Error | unknown) {
+      if (error instanceof Error && error.message.includes('Signups not allowed')) {
+        router.push('/signup');
+      } else {
+        router.push('/');
+      }      
+    } finally {
+      setModalOpen(false); // Close modal after sign-in attempt
+    }      
   };
 
   // const handleSignInWithGoogle = async () => {

@@ -32,6 +32,7 @@ const UserButton: React.FC = () => {
   }, [router]);
 
   const menuLinks = [
+    { href: '/member/change-password', label: 'Change Password', roles: ['member'] },
     { href: '/member/profile', label: 'Profile', roles: ['member'] },
     { href: '/member/dashboard', label: 'Dashboard', roles: ['member'] },
     { href: '/games', label: 'Games Dashboard', roles: ['member'] },
@@ -74,7 +75,7 @@ const UserButton: React.FC = () => {
         {/* {userAvatar ? (
           <Image src={userAvatar} alt="User Avatar" className="w-8 h-8 rounded-full" />
         ) : (
-          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center">
             <span>{userName.charAt(0)}</span>
           </div>
         )} */}

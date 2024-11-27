@@ -69,42 +69,82 @@ export type Database = {
         }
         Relationships: []
       }
-      game_registrations: {
+      game_favorites: {
         Row: {
-          game_id: string | null
-          id: string
-          member_id: string | null
-          registered_at: string | null
+          created_at: string
+          game_id: string
+          member_id: string
         }
         Insert: {
-          game_id?: string | null
-          id?: string
-          member_id?: string | null
-          registered_at?: string | null
+          created_at?: string
+          game_id?: string
+          member_id?: string
         }
         Update: {
-          game_id?: string | null
-          id?: string
-          member_id?: string | null
-          registered_at?: string | null
+          created_at?: string
+          game_id?: string
+          member_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "game_registrations_game_id_fkey"
+            foreignKeyName: "game_favorites_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "games"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "game_registrations_member_id_fkey"
+            foreignKeyName: "game_favorites_member_id_fkey"
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "is_admin"
             referencedColumns: ["member_id"]
           },
           {
-            foreignKeyName: "game_registrations_member_id_fkey"
+            foreignKeyName: "game_favorites_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_registrations: {
+        Row: {
+          game_id: string
+          id: string
+          member_id: string
+          registered_at: string
+        }
+        Insert: {
+          game_id: string
+          id?: string
+          member_id: string
+          registered_at?: string
+        }
+        Update: {
+          game_id?: string
+          id?: string
+          member_id?: string
+          registered_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_game_registrations_games"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_game_registrations_members"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "fk_game_registrations_members"
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "members"
@@ -116,11 +156,13 @@ export type Database = {
         Row: {
           created_at: string | null
           day_of_week: Database["public"]["Enums"]["day_of_week_enum"] | null
+          deleted_at: string | null
           first_game_date: string
           game_id: string | null
           id: string
           interval: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date: string | null
+          location: string | null
           next_game_date: string | null
           status: Database["public"]["Enums"]["game_status_enum"]
           updated_at: string | null
@@ -128,11 +170,13 @@ export type Database = {
         Insert: {
           created_at?: string | null
           day_of_week?: Database["public"]["Enums"]["day_of_week_enum"] | null
+          deleted_at?: string | null
           first_game_date: string
           game_id?: string | null
           id?: string
           interval: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date?: string | null
+          location?: string | null
           next_game_date?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           updated_at?: string | null
@@ -140,18 +184,20 @@ export type Database = {
         Update: {
           created_at?: string | null
           day_of_week?: Database["public"]["Enums"]["day_of_week_enum"] | null
+          deleted_at?: string | null
           first_game_date?: string
           game_id?: string | null
           id?: string
           interval?: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date?: string | null
+          location?: string | null
           next_game_date?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "game_schedule_game_id_fkey"
+            foreignKeyName: "fk_game_schedule_games"
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "games"
@@ -162,41 +208,47 @@ export type Database = {
       games: {
         Row: {
           created_at: string | null
+          deleted_at: string | null
           description: string | null
           gamemaster_id: string | null
           id: string
           max_seats: number | null
           system: string | null
           title: string
+          updated_at: string
         }
         Insert: {
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           gamemaster_id?: string | null
           id?: string
           max_seats?: number | null
           system?: string | null
           title: string
+          updated_at?: string
         }
         Update: {
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           gamemaster_id?: string | null
           id?: string
           max_seats?: number | null
           system?: string | null
           title?: string
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "games_gamemaster_id_fkey"
+            foreignKeyName: "fk_games_members"
             columns: ["gamemaster_id"]
             isOneToOne: false
             referencedRelation: "is_admin"
             referencedColumns: ["member_id"]
           },
           {
-            foreignKeyName: "games_gamemaster_id_fkey"
+            foreignKeyName: "fk_games_members"
             columns: ["gamemaster_id"]
             isOneToOne: false
             referencedRelation: "members"
@@ -206,19 +258,22 @@ export type Database = {
       }
       member_roles: {
         Row: {
-          id: number
-          member_id: string | null
-          role_id: number | null
+          assigned_at: string
+          id: string
+          member_id: string
+          role_id: string
         }
         Insert: {
-          id?: number
-          member_id?: string | null
-          role_id?: number | null
+          assigned_at?: string
+          id?: string
+          member_id: string
+          role_id: string
         }
         Update: {
-          id?: number
-          member_id?: string | null
-          role_id?: number | null
+          assigned_at?: string
+          id?: string
+          member_id?: string
+          role_id?: string
         }
         Relationships: [
           {
@@ -247,6 +302,8 @@ export type Database = {
       members: {
         Row: {
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           email: string
           id: string
           is_admin: boolean
@@ -257,6 +314,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           email: string
           id?: string
           is_admin?: boolean
@@ -267,6 +326,8 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string
           id?: string
           is_admin?: boolean
@@ -283,6 +344,7 @@ export type Database = {
           bio: string | null
           birthday: string | null
           created_at: string | null
+          experience_level: Database["public"]["Enums"]["experience_level_enum"]
           given_name: string | null
           id: string
           phone: string | null
@@ -294,6 +356,7 @@ export type Database = {
           bio?: string | null
           birthday?: string | null
           created_at?: string | null
+          experience_level?: Database["public"]["Enums"]["experience_level_enum"]
           given_name?: string | null
           id: string
           phone?: string | null
@@ -305,6 +368,7 @@ export type Database = {
           bio?: string | null
           birthday?: string | null
           created_at?: string | null
+          experience_level?: Database["public"]["Enums"]["experience_level_enum"]
           given_name?: string | null
           id?: string
           phone?: string | null
@@ -313,28 +377,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_member"
+            foreignKeyName: "fk_profiles_members"
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "is_admin"
             referencedColumns: ["member_id"]
           },
           {
-            foreignKeyName: "fk_member"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "profiles_id_fkey"
+            foreignKeyName: "fk_profiles_members"
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "members"
@@ -344,15 +394,15 @@ export type Database = {
       }
       roles: {
         Row: {
-          id: number
+          id: string
           name: string
         }
         Insert: {
-          id?: number
+          id?: string
           name: string
         }
         Update: {
-          id?: number
+          id?: string
           name?: string
         }
         Relationships: []
@@ -416,6 +466,12 @@ export type Database = {
           num_players: number
         }[]
       }
+      verify_user_password: {
+        Args: {
+          password: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       day_of_week_enum:
@@ -434,7 +490,7 @@ export type Database = {
         | "forever-gm"
       game_interval_enum:
         | "weekly"
-        | "bimonthly"
+        | "biweekly"
         | "monthly"
         | "yearly"
         | "custom"

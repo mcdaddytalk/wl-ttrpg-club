@@ -44,7 +44,7 @@ export default function Login() {
         setLoading(false);
     };
   return (
-    <div className="flex h-screen w-full items-center justify-center px-4">
+    <section className="flex items-center justify-center p-6">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
@@ -56,11 +56,12 @@ export default function Login() {
           <form className="space-y-4">
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</Label>
+                <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full"
@@ -89,7 +90,7 @@ export default function Login() {
             <Button onClick={handleEmailLogin} disabled={loading}
                 className="w-full bg-green-500 hover:bg-green-600 text-white"
               >
-                Send Magic Link
+                Sign In with Email
             </Button>
           </form>
           {/* Google Sign-in Button */}
@@ -97,7 +98,7 @@ export default function Login() {
             onClick={() => handleProviderLogin('google')}
             disabled={loading}
             variant="outline"  // Adjust variant as desired
-            className="flex items-center justify-center w-full mb-4 text-gray-600 dark:text-gray-200 dark:bg-gray-700"
+            className="flex items-center justify-center w-full mt-4 mb-4 text-slate-600 dark:text-slate-200 dark:bg-slate-700"
           >
             <FcGoogle className="text-2xl mr-2" />
             Sign in with Google
@@ -113,7 +114,7 @@ export default function Login() {
           </Button>
         </CardContent>
         <CardFooter>
-          <div className="mt-4 text-center text-sm">
+          <div className="text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="underline">
               Sign up
@@ -121,6 +122,6 @@ export default function Login() {
           </div>
         </CardFooter>
       </Card>
-    </div>    
+    </section>    
   );
 }

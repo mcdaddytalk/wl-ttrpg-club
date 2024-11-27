@@ -2,6 +2,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { type NextRequest, type NextResponse } from "next/server"
 import { cookies } from "next/headers"
+import { Database } from "@/lib/types/supabase"
 
 
 
@@ -9,9 +10,9 @@ import { cookies } from "next/headers"
 export async function createSupabaseServerClient(component: boolean = false) {
   const cookieStore = await cookies()
 
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
     {
       cookies: {
         getAll() {
@@ -47,7 +48,7 @@ export async function createSupabaseReqResClient(
   cookieStore.getAll();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
     {
       cookies: {
         getAll() {

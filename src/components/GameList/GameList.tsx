@@ -3,17 +3,17 @@ import { GMGameData } from '@/lib/types/custom';
 import { format } from 'date-fns';
 
 type GameListProps = {
-  games: GMGameData[];}
+  games: GMGameData[] | null;}
 
 const GameList = ({ games }: GameListProps): React.ReactElement => {
-  if (games.length === 0) {
+  if (!games || games.length === 0) {
     return <p>No games found. Create your first game!</p>;
   }
 
   return (
     <div className="space-y-4">
       {games.map((game) => {
-        const nextGameDate = game.scheduled_for ? format(new Date(game.scheduled_for), 'MMM dd, yyyy at h:mm a') : 'N/A';
+        const nextGameDate = game.scheduled_next ? format(new Date(game.scheduled_next), 'MMM dd, yyyy at h:mm a') : 'N/A';
         return (
         <Card key={game.id}>
           <CardHeader>
@@ -22,7 +22,7 @@ const GameList = ({ games }: GameListProps): React.ReactElement => {
           </CardHeader>
           <CardContent>
             <p>System: {game.system}</p>
-            <p>Seats: {game.seats}/{game.maxSeats}</p>
+            <p>Seats: {game.registered}/{game.maxSeats}</p>
             <p>Next Game Date: {nextGameDate}</p>
           </CardContent>
         </Card>

@@ -1,43 +1,86 @@
-import { QueryError } from "@supabase/supabase-js";
+import { SupabaseClient, QueryError } from "@supabase/supabase-js";
+import type { Database } from "./supabase";
+
+export type TypedSupabaseClient = SupabaseClient<Database>
 
 export type Provider = 'google' | 'discord';
 
-export type RoleData = {
-  roles: { name: string }
-}
-export type SupabaseRoleResponse = {
+type SupabaseDataResponse<T> = {
   error: QueryError | null;
-  data: RoleData[];
+  data: T[];
   count: number | null;
   status: number;
   statusText: string;
 }
+
+type SupabaseDataResponseSingle<T> = {
+  error: QueryError | null;
+  data: T;
+  count: number | null;
+  status: number;
+  statusText: string;
+}
+
+export type RoleData = {
+  roles: RoleDO;
+}
+
+export type RoleDO = {
+  id: string;
+  name: string;
+}
+
+export type SupabaseRoleResponse = SupabaseDataResponse<RoleData>
 
 export type ProfileData = {
-  given_name: string;
-  surname: string;
-  phone: string | null;
+  id?: string;
+  given_name: string | null;
+  surname: string | null;
   birthday: string | null;
+  phone: string | null;
   bio: string | null;
   avatar: string | null;
+  experience_level: ExperienceLevel;
 }
 
-export type SupabaseProfileResponse = {
-  error: QueryError | null;
-  data: ProfileData;
-  count: number | null;
-  status: number;
-  statusText: string;
+export type SupabaseProfileResponse = SupabaseDataResponseSingle<ProfileData>
+
+export type GameRegistration = {
+  game_id: string;
+  member_id: string;
+  members: MemberData;  
 }
+
+export type EmailInvite = {
+  email: string;
+  given_name: string;
+  surname: string;
+  is_minor: boolean;
+}
+export type MemberData = {
+  id: string;
+  email: string;
+  phone?: string;
+  provider?: string;
+  is_admin: boolean;
+  is_minor: boolean;
+  profiles: ProfileData;
+  member_roles: RoleData[];
+}
+
+export type SupabaseMemberResponse = SupabaseDataResponseSingle<MemberData>
+export type SupabaseMemberListResponse = SupabaseDataResponse<MemberData>
+
+export type SupabaseGameRegistrationResponse = SupabaseDataResponse<GameRegistration>
 
 export type RegisteredGame = {
   id: string;
   title: string;
   description: string;
   system: string;
-  scheduled_for: Date;
+  scheduled_for: Date | null;
   status: string;
-  registration_date: Date;
+  registration_date: Date | null;
   num_players: number;
   gm_name: string;
   gm_member_id: string;
@@ -60,47 +103,72 @@ export type UpcomingGame = {
   title: string;
   description: string;
   system: string;
-  scheduled_for: Date;
+  scheduled_for: Date | null;
   status: string;
   num_players: number;
   gm_name: string;
   gm_member_id: string;
 }
 
-export type SupabaseUpcomingGamesResponse = {
-  error: QueryError | null;
-  data: GameData[];
-  count: number | null;
-  status: number;
-  statusText: string;
-}
-
 export type GameData = {
+  id: string;
   game_id: string;
-  game_name: string;
+  status: GameStatus;
+  interval: GameInterval;
+  firstGameDate: Date; // or Date if you convert the date
+  nextGameDate: Date; // or Date if you convert the date
+  location: string;
+  dayOfWeek: DOW;
+  title: string;
   description: string;
   system: string;
+  maxSeats: number;
+  currentSeats: number;
+  favorite: boolean;
+  registered?: boolean;
   gamemaster_id: string;
   gm_given_name: string;
   gm_surname: string;
-  status: string;
-  first_game_date: Date; // or Date if you convert the date
-  last_game_date: Date | null; // or Date if you convert the date
-  registered_at: Date;
-  num_players: number;
 }
+
+export type SupaGameScheduleData = {
+  id: string;
+  game_id: string;
+  status: GameStatus;
+  interval: GameInterval;
+  first_game_date: Date; // or Date if you convert the date
+  next_game_date: Date; // or Date if you convert the date
+  location: string;
+  day_of_week: DOW;
+  games: SupaGameData;
+}
+
+export type SupaGameData = {
+  id: string;
+  title: string;
+  description: string;
+  system: string;
+  max_seats: number;
+  gamemaster_id: string;
+  members: MemberData;
+}
+  
+
+export type SupabaseGameDataResponse = SupabaseDataResponse<SupaGameScheduleData>
+
+export type SupabaseUpcomingGamesResponse = SupabaseDataResponse<GameData>
 
 export type GMGameData = {
   id: string;
   title: string;
   description: string;
   system: string;
-  scheduled_for: Date;
+  scheduled_next: Date;
   interval: GameInterval;
-  day_of_week: DOW;
+  dow: DOW;
   maxSeats: number;
   status: GameStatus;
-  seats: number;
+  registered: number;
 }
 
 export type NewContact = {
@@ -114,7 +182,7 @@ export type NewContact = {
   parentEmail?: string;
   parentPhone?: string;
   experienceLevel: ExperienceLevel;
-  gamemasterInterest: string;
+  gamemasterInterest: GMInterest;
   preferredSystem: string;
   availability: string;
   agreeToRules: boolean;
@@ -137,36 +205,28 @@ export type GameRegistrant = {
   member_id: string;
   given_name: string;
   surname: string;
+  isMinor: boolean;
+  experienceLevel: ExperienceLevel;
 }
 
 export type Player = {
   id: string;
   email: string;
-  phoneNumber: string;
+  phoneNumber: string | null;
   givenName: string;
   surname: string;
-  avatar: string;
+  avatar: string | null;
   isMinor: boolean;
   experienceLevel: ExperienceLevel;
 }
 
-export type SupaGameData = {
-  id: string;
-  name: string;
-}
-
-export type SupaProfileData = {
-  id: string;
-  given_name: string;
-  surname: string;
-}
-
-export type SupaGameRegistrationData = {
+export type GameRegistrationData = {
   member_id: string;
-  profiles: SupaProfileData[];
+  members: MemberData;
+  profiles: ProfileData;
 }
 
-export type SupabaseGameScheduleData = {
+export type SupabaseGameScheduleWithRegistrantsData = {
   id: string;
   game_id: string;
   interval: string;
@@ -175,29 +235,19 @@ export type SupabaseGameScheduleData = {
   next_game_date: Date;
   last_game_date: Date;
   status: string;
-  games: SupaGameData[];
-  game_registrations: SupaGameRegistrationData[];
+  games: GameData;
+  game_registrations: GameRegistrationData[];
 };
 
-type DOW = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+export type DOW = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
 
-type GameStatus = 'active' | 'scheduled' | 'completed' | 'awaiting-players' | 'full' | 'cancelled';
+export type GameStatus = 'active' | 'scheduled' | 'completed' | 'awaiting-players' | 'full' | 'canceled';
 
-type ExperienceLevel = 'new' | 'novice' | 'seasoned' | 'player-gm' | 'forever-gm';
+export type ExperienceLevel = 'new' | 'novice' | 'seasoned' | 'player-gm' | 'forever-gm';
 
-type GameInterval = 'weekly' | 'bimonthly' | 'monthly' | 'yearly' | 'custom';
+export type GameInterval = 'weekly' | 'biweekly' | 'monthly' | 'yearly' | 'custom';
 
-export type GMGameSchedule = {
-  id: string;
-  title: string;
-  system: string;
-  interval: GameInterval;
-  dow: DOW;
-  scheduled_next: Date;
-  maxSeats: number;
-  registered: number;
-  status: GameStatus;
-}
+export type GMInterest = 'no' | 'maybe' | 'yes';
 
 export type SupaGameSchedule = {
   gm_id: string;
