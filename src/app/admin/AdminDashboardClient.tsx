@@ -8,7 +8,7 @@ import { fetchMembersFull, fetchRoles } from "@/queries/fetchMembers";
 import { redirect } from "next/navigation";
 import { AdminDrawer } from "@/components/AdminDrawer";
 import { AdminMembersTable } from "@/components/AdminMembersTable";
-import { MemberData, RoleDO } from "@/lib/types/custom";
+import { MemberData } from "@/lib/types/custom";
 
 export default function AdminDashboardClient(): React.ReactElement {
   const supabase = useSupabaseBrowserClient();

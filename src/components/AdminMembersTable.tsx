@@ -7,12 +7,19 @@ import {
     TableHead,
   } from '@/components/ui/table'
   import { Button } from '@/components/ui/button'
-import { EmailInvite, MemberData, RoleDO } from '@/lib/types/custom';
-import { addRoles, removeRoles, removeUser, sendInviteEmail, sendPasswordResetEmail } from '@/server/authActions';
+import { 
+    // EmailInvite, 
+    MemberData, 
+    RoleDO 
+} from '@/lib/types/custom';
+import { 
+    removeUser, 
+    // sendInviteEmail, 
+    sendPasswordResetEmail 
+} from '@/server/authActions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { ManageRolesModal } from './ManageRolesModal';
-import { useMutation } from '@tanstack/react-query';
 
   interface AdminMembersTableProps {
     members: MemberData[] | null;
@@ -22,15 +29,15 @@ import { useMutation } from '@tanstack/react-query';
     const [selectedMember, setSelectedMember] = useState<MemberData | null>(null); // For modal
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleSendInvite = async (data: EmailInvite) => {
-        try {
-          await sendInviteEmail(data);
-          toast.success("Invite sent successfully.");
-        } catch (err) {
-          console.error("Error sending invite:", err);
-          toast.error((err as Error).message || "Failed to send invite.");
-        }
-    };
+    // const handleSendInvite = async (data: EmailInvite) => {
+    //     try {
+    //       await sendInviteEmail(data);
+    //       toast.success("Invite sent successfully.");
+    //     } catch (err) {
+    //       console.error("Error sending invite:", err);
+    //       toast.error((err as Error).message || "Failed to send invite.");
+    //     }
+    // };
 
     const handlePasswordReset = async (email: string) => {
         try {
@@ -52,23 +59,7 @@ import { useMutation } from '@tanstack/react-query';
         }
     };
     
-    const handleUpdateRoles = async (memberId: string, selectedRoles: string[], currentRoles: string[]) => {
-        try {
-            const rolesToAdd = selectedRoles.filter(role => !currentRoles.includes(role));
-            const rolesToRemove = currentRoles.filter(role => !selectedRoles.includes(role));
-            // Example: Update roles logic
-            if (rolesToAdd.length > 0) {
-                await addRoles(memberId, rolesToAdd);
-            }
-            if (rolesToRemove.length > 0) {
-                await removeRoles(memberId, rolesToRemove);
-            }
-        } catch (err) {
-            throw new Error((err as Error).message || "Failed to update roles.");
-        }
-    };
     
-
     const openModal = (member: MemberData) => {
         setSelectedMember(member);
         setIsModalOpen(true);
