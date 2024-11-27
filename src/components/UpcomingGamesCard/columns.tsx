@@ -5,15 +5,19 @@ import { UpcomingGame } from "@/lib/types/custom"
 
 export const columns: ColumnDef<UpcomingGame>[] = [
     {
-        accessorKey: "name",
-        header: "Name",
+        accessorKey: "title",
+        header: "Title",
     },
     {
-        accessorKey: "time",
-        header: "Time",
+        accessorKey: "description",
+        header: "Description",
     },
     {
-        accessorKey: "date",
-        header: "Date",
+        accessorKey: "system",
+        header: "System",
+    },
+    {
+        accessorKey: "scheduled_for",
+        header: "Game Date",
     },
 ]

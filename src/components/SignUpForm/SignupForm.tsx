@@ -18,11 +18,12 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import RulesList from "../RulesList/page"
 import { formSchema } from "./schema"
 // import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner"
 import { useState } from "react"
-import Router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -63,6 +64,7 @@ export const SignupForm = () => {
     const [currentStep, setCurrentStep] = useState(0)
     const delta = currentStep - previousStep
     const [minor, setMinor] = useState(false);
+    const router = useRouter();
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -110,7 +112,7 @@ export const SignupForm = () => {
                 throw new Error(error.message);
             }
         } else {
-            Router.push('/login');
+            router.push('/login');
         }
         
         // form.reset()
@@ -138,35 +140,35 @@ export const SignupForm = () => {
     }
 
     return (
-        <section className='inset-0 flex flex-col justify-between p-18'>
+        <section className='inset-0 flex flex-col justify-between'>
             {/* steps */}
             <nav aria-label='Progress'>
                 <ol role='list' className='space-y-4 md:flex md:space-x-8 md:space-y-0'>
                 {steps.map((step, index) => (
                     <li key={step.name} className='md:flex-1'>
                     {currentStep > index ? (
-                        <div className='group flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
-                        <span className='text-sm font-medium text-sky-600 transition-colors '>
+                        <div className='group flex w-full flex-col border-l-4 border-sky-400 dark:border-sky-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
+                        <span className='text-sm font-medium text-sky-400 dark:text-sky-600 transition-colors '>
                             {step.id}
                         </span>
-                        <span className='text-sm font-medium'>{step.name}</span>
+                        <span className='text-sm font-medium text-white'>{step.name}</span>
                         </div>
                     ) : currentStep === index ? (
                         <div
-                        className='flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'
+                        className='flex w-full flex-col border-l-4 border-sky-400 dark:border-sky-600 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'
                         aria-current='step'
                         >
-                        <span className='text-sm font-medium text-sky-600'>
+                        <span className='text-sm font-medium text-sky-400 dark:text-sky-600'>
                             {step.id}
                         </span>
-                        <span className='text-sm font-medium'>{step.name}</span>
+                        <span className='text-sm font-medium text-white'>{step.name}</span>
                         </div>
                     ) : (
-                        <div className='group flex w-full flex-col border-l-4 border-gray-200 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
-                        <span className='text-sm font-medium text-gray-500 transition-colors'>
+                        <div className='group flex w-full flex-col border-l-4 border-slate-200 dark:border-slate-300 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
+                        <span className='text-sm font-medium text-slate-300 dark:text-slate-400 transition-colors'>
                             {step.id}
                         </span>
-                        <span className='text-sm font-medium'>{step.name}</span>
+                        <span className='text-sm font-medium text-slate-200 dark:text-slate-300'>{step.name}</span>
                         </div>
                     )}
                     </li>
@@ -181,7 +183,7 @@ export const SignupForm = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
                         <FormField
@@ -266,7 +268,7 @@ export const SignupForm = () => {
                         {minor && (
                             <>
                             <div>
-                                <h2 className='text-base font-semibold leading-7 text-gray-600 dark:text-gray-400'>
+                                <h2 className='text-base font-semibold leading-7 text-slate-600 dark:text-slate-400'>
                                     Parent Information
                                 </h2>
                             </div>
@@ -337,7 +339,7 @@ export const SignupForm = () => {
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
         
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
 
@@ -429,34 +431,11 @@ export const SignupForm = () => {
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
         
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
                         <div className="max-w-3xl mx-auto p-6">
-                            <p className="mb-4">
-                                By completing this form for the TTRPG Group, you agree to abide by the following rules and responsibilities to ensure a safe, respectful, and enjoyable experience for everyone:
-                            </p>
-
-                            <h3 className="text-xl font-semibold mt-6 mb-2">General Rules:</h3>
-                            <ul className="list-disc list-inside space-y-2">
-                                <li><strong>Respect All Participants:</strong> Treat your fellow players and the Game Master (GM) with respect and courtesy, both in and out of character.</li>
-                                <li><strong>Zero Tolerance for Discrimination or Harassment:</strong> Discrimination or harassment of any kind will not be tolerated.</li>
-                                <li><strong>Consent and Safety:</strong> Respect boundaries and content limits agreed upon by the group.</li>
-                                <li><strong>Stay in Character:</strong> Keep your focus on the game, and minimize out-of-character distractions unless necessary.</li>
-                                <li><strong>Avoid Metagaming:</strong> Use only the knowledge your character would reasonably have. Don’t let out-of-game information influence your decisions.</li>
-                                <li><strong>Share the Spotlight:</strong> Everyone deserves their time to shine. Support your fellow players and avoid monopolizing the game.</li>
-                                <li><strong>Follow the GM&apos;s Decisions:</strong> The GM has the final say on all rules and disputes during gameplay. Save any disagreements or questions for after the session.</li>
-                            </ul>
-
-                            <h3 className="text-xl font-semibold mt-6 mb-2">Player Responsibilities:</h3>
-                            <ul className="list-disc list-inside space-y-2">
-                                <li><strong>Be Prepared:</strong> Bring your character sheet, dice, and other materials. Familiarize yourself with your character’s abilities and the basic rules of they system you are playing in.</li>
-                                <li><strong>Arrive on Time:</strong> Respect the group’s time by arriving promptly. If you expect to be late or absent, notify the GM as soon as possible.</li>
-                                <li><strong>Stay Focused and Engaged:</strong> Avoid using your phone or engaging in unrelated side conversations during the game.</li>
-                                <li><strong>Work as a Team:</strong> D&D and other RPGs are collaborative games. Cooperate with the party and contribute to the group’s goals, even if your character has personal motivations.</li>
-                                <li><strong>Respect the Game World and NPCs:</strong> The DM works hard to create an immersive world. Engage with the story respectfully, and treat NPCs as part of that world.</li>
-                                <li><strong>Resolve Conflicts Maturely:</strong> Address any disagreements or issues calmly and respectfully, preferably outside of game time.</li>
-                            </ul>
+                            <RulesList />
                             <FormField
                                 control={form.control}
                                 name="agreeToRules"
@@ -482,7 +461,7 @@ export const SignupForm = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
                         <FormField 
@@ -520,7 +499,7 @@ export const SignupForm = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
                         <h3>Review your information:</h3>

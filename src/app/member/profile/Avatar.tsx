@@ -1,32 +1,36 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { createSupabaseBrowserClient } from '@/utils/supabase/client'
+import useSupabaseBrowserClient from '@/utils/supabase/client'
 import Image from 'next/image'
+
+interface AvatarProps {
+  uid: string | null
+  url: string | null
+  size: number
+  onUpload: (url: string) => void
+}
 
 export default function Avatar({
   uid,
   url,
   size,
   onUpload,
-}: {
-  uid: string | null
-  url: string | null
-  size: number
-  onUpload: (url: string) => void
-}) {
-  const supabase = createSupabaseBrowserClient()
+}: AvatarProps) {
+  const supabase = useSupabaseBrowserClient()
   const [avatarUrl, setAvatarUrl] = useState<string | null>(url)
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     async function downloadImage(path: string) {
       try {
-        const { data, error } = await supabase.storage.from('avatars').download(path)
-        if (error) {
-          throw error
+        let url = path;
+        if (!path.includes('http')) {
+          const { data, error } = await supabase.storage.from('avatars').download(path)
+          if (error) {
+            throw error
+          }
+          url = URL.createObjectURL(data)
         }
-
-        const url = URL.createObjectURL(data)
         setAvatarUrl(url)
       } catch (error) {
         console.error('Error downloading image: ')
@@ -74,6 +78,7 @@ export default function Avatar({
           alt="Avatar"
           className="avatar image"
           style={{ height: size, width: size }}
+          priority
         />
       ) : (
         <div className="avatar no-image" style={{ height: size, width: size }} />

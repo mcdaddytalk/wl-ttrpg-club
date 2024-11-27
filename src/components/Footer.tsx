@@ -17,7 +17,7 @@ export default function Footer() {
           </Link>
         </div>
       </div>
-      <div className="mt-2 text-center text-sm text-gray-400">
+      <div className="mt-2 text-center text-sm text-slate-400">
         <p>Powered by NextJS | Hosting by Vercel</p>
       </div>
     </footer>

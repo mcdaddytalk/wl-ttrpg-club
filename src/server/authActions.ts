@@ -1,7 +1,8 @@
 "use server"
-import { Provider, SupabaseProfileResponse, SupabaseRoleResponse } from "@/lib/types/custom";
+import { EmailInvite, Provider, SupabaseProfileResponse, SupabaseRoleResponse } from "@/lib/types/custom";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { 
+    AuthApiError,
     AuthError,
     AuthOtpResponse,
     AuthTokenResponsePassword,
@@ -12,37 +13,39 @@ import {
     SignInWithPasswordlessCredentials, 
     User 
 } from "@supabase/supabase-js";
-import { headers, cookies } from "next/headers";
+import { 
+    headers, 
+//    cookies 
+} from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import useToastStore from "@/store/toastStore";
 
-export const getInitialSession = async (): Promise<{ session: Session | null; user: User | null }> => {
+export const getInitialSession = async (): Promise<{ session: Session | null; user: User | null; error: AuthError | null }> => {
     const supabase = await createSupabaseServerClient();
-    const { data: { session } } = await supabase.auth.getSession();
-    return { session, user: session?.user ?? null };
+    const { data: { session }, error } = await supabase.auth.getSession();
+    return { session, user: session?.user ?? null, error };
 };
 
 export const getUser = async (): Promise<User | null> => {
     const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null
-    const { data: profileData , error: profileError } = await supabase.from('profiles').select('*').limit(1).eq('id', user.id).maybeSingle() as unknown as SupabaseProfileResponse;
+    const { data: profile, error: profileError } = await supabase.from('profiles').select('*').limit(1).eq('id', user.id).maybeSingle() as unknown as SupabaseProfileResponse;
     if (profileError) return null
-    const profile = profileData;
-    const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
+    const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
     if (roleError) return null
-    let avatar_url = profile?.avatar ?? user?.user_metadata?.avatar_url ?? null
+    let avatar_url = profile.avatar ?? user.user_metadata.avatar_url ?? null
     if (avatar_url && !avatar_url.startsWith('https://')) {
         avatar_url = supabase.storage.from('avatars').getPublicUrl(avatar_url).data.publicUrl;
     }
     user.user_metadata = {
         ...user.user_metadata,
         roles: roleData.map((role) => role.roles.name) ?? [],
-        email: user?.email ?? null,
-        phone: profile?.phone ?? null,
-        given_name: profile?.given_name ?? null,
-        surname: profile?.surname ?? null,
+        email: user.email ?? null,
+        phone: profile.phone ?? null,
+        given_name: profile.given_name ?? null,
+        surname: profile.surname ?? null,
         avatar_url
     }
     return user
@@ -52,7 +55,7 @@ export const getUserRoles = async (): Promise<string[]> => {
     const supabase = await createSupabaseServerClient();
     const user = await getUser();
     if (!user) return []
-    const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
+    const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
     if (roleError) {
         console.error(roleError)
         if (roleError.message) throw new Error(roleError.message)
@@ -63,12 +66,12 @@ export const getUserRoles = async (): Promise<string[]> => {
 
 export async function signOut(): Promise<{ error: AuthError | null }> {
     const supabase = await createSupabaseServerClient();
-    const cookieStore = await cookies()
+    // const cookieStore = await cookies()
     const { error } = await supabase.auth.signOut();
     if (error) throw new Error(error.message)
     // useToastStore.getState().setToast('sign-out','success','You have been signed out!')
-    const accessToken = cookieStore.get('sb-access-token')
-    if (accessToken) cookieStore.set('sb-access-token', '', { expires: new Date(0) })
+    // const accessToken = cookieStore.get('sb-access-token')
+    // if (accessToken) cookieStore.set('sb-access-token', '', { expires: new Date(0) })
     revalidatePath('/', 'layout')
     redirect('/')
 }
@@ -113,11 +116,61 @@ export async function signInWithOTP(email: string): Promise<AuthOtpResponse> {
             emailRedirectTo: `${origin}/member/dashboard`
         }
     };
-    const { error } = await supabase.auth.signInWithOtp(credentials);
-    if (error) throw new Error(error.message)
-    else {
-        useToastStore.getState().setToast('email-otp','success','Check your email for a login link!');
-    }
     
+    const { error } = await supabase.auth.signInWithOtp(credentials);
+    if (error) {
+        if (error instanceof AuthApiError && error.status === 422) {
+            console.error('Throwing new AuthApiError');
+            throw new AuthApiError(error.message,  error.status, error.code);
+        }
+        throw new Error(error.message);
+    }
+    useToastStore.getState().setToast('email-otp','success','Check your email for a login link!');
     redirect(`/?email-otp=true`)
+}
+
+export async function sendPasswordResetEmail(email: string) {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) throw new Error(error.message)
+}
+
+export async function sendInviteEmail({email, given_name, surname, is_minor}: EmailInvite): Promise<void> {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.admin.inviteUserByEmail(email, {
+        data: {
+            given_name,
+            surname,
+            displayName: `${given_name} ${surname}`,
+            is_minor
+        },
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`
+    });
+
+    if (error) throw new Error(error.message)
+}
+
+export async function removeUser(id: string): Promise<void> {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.admin.deleteUser(id, true);
+    if (error) throw new Error(error.message)
+}
+
+export async function addRoles(user_id: string, roles: string[]): Promise<void> {
+    const supabase = await createSupabaseServerClient();
+    const newRoles = roles.map((roleId: string) => ({
+        member_id: user_id,
+        role_id: roleId
+    }))
+    const { error } = await supabase.from('member_roles').insert(newRoles);
+    if (error) throw new Error(error.message)
+}
+
+export async function removeRoles(user_id: string, roles: string[]): Promise<void> {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.from('member_roles')
+        .delete()
+        .in('role_id', roles)
+        .eq('member_id', user_id);
+    if (error) throw new Error(error.message)
 }

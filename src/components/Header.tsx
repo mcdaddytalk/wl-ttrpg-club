@@ -11,7 +11,7 @@ export default function Header() {
         <div className="w-full flex h-14 flex-row center-stretch">
             <nav className="flex flex-grow items-center space-x-4 lg:space-x-6">
                 <Link href="/" className="flex items-center space-x-2">
-                    <div className='w-fit p-6'>
+                    <div className='w-fit pl-6'>
                         <Image 
                             src='https://kthrpfzafznkkvalszoi.supabase.co/storage/v1/object/public/images/wl-ttrpg-club-logo2-transformed.png' 
                             alt='logo' 

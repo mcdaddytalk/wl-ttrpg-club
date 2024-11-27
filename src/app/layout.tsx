@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import ToastHandler from "@/components/ToastHandler";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import QueryProviderWrapper from "@/providers/QueryProvider";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -41,33 +42,33 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
   return (
-      <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
-        <body
-          className="bg-background text-foreground bg-banner bg-no-repeat bg-cover"
-        >
-            <Analytics />
-            <ThemeProvider 
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <Header />
-              <Toaster position="top-right" />
-              <Suspense fallback="<div>Loading...</div>">
-                <ToastHandler />
-              </Suspense>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body
+        className="bg-background text-foreground bg-banner bg-no-repeat bg-cover"
+      >
+          <Analytics />
+          <ThemeProvider 
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Header />
+            <Toaster position="top-right" />
+            <Suspense fallback="<div>Loading...</div>">
+              <ToastHandler />
+            </Suspense>
+            <QueryProviderWrapper>
               <div className="dark:bg-black-overlay bg-white-overlay">
                 <main className="container w-full md:h-[88vh] overflow-auto">
                   {children}
                 </main>
               </div>
-              <Footer />
-            </ThemeProvider>
-        </body>
-      </html>
-    
+            </QueryProviderWrapper>
+            <Footer />
+          </ThemeProvider>
+      </body>
+    </html>    
   );
 }
