@@ -1,9 +1,9 @@
 // app/api/contacts/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { Database } from '@/lib/types/supabase';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const { email, ...contactData } = await request.json();
 
   const supabase = await createSupabaseServerClient();

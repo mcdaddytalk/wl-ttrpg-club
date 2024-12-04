@@ -3,137 +3,66 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ScheduledGamesCard from "@/components/ScheduledGamesCard/ScheduledGamesCard";
-import { GameRegistration, GMGameData, Player } from "@/lib/types/custom";
-import useSupabaseBrowserClient from "@/utils/supabase/client";
+import { GMGameData, Player } from "@/lib/types/custom";
 import useSession from "@/utils/supabase/use-session";
 import GameRegistrantsCard from "@/components/GameRegistrantsCard/GameRegistrantsCard";
 import SelectedGameCard from "@/components/SelectedGameCard/page";
-import { SupabaseClient, User } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
-async function fetchGames(supabase: SupabaseClient, gamemasterId: string): Promise<GMGameData[]> {
-    const { data: gamesData, error: gamesError } = await supabase
-      .from('games')
-      .select(`
-        id, 
-        title, 
-        description,
-        system, 
-        max_seats, 
-        game_schedule(
-          id,
-          interval,
-          day_of_week,
-          first_game_date,
-          next_game_date,
-          last_game_date,
-          status        
-        )    
-      `)
-      .eq('gamemaster_id', gamemasterId);
-
-    if (gamesError) {
-      console.log(gamesError);
-    } else {
-      console.log(gamesData);
+async function fetchGames(gamemasterId: string): Promise<GMGameData[]> {
+  const response = await fetch(`/api/gamemaster/${gamemasterId}/games`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     }
-    
-    const gameIds = gamesData?.map((game) => game.id) ?? [];
+  );
 
-    const { data: registrations, error: registrationsError } = await supabase
-      .from('game_registrations')
-      .select(`
-        game_id,
-        member_id
-      `)
-      //.eq('games.gamemaster_id', user.id);
-      .in('game_id', gameIds);
-    
-    if (registrationsError) {
-      console.error(registrationsError);
-    } else {
-      console.log(registrations);
-    }
-
-    const seatCounts = registrations?.reduce((acc, reg) => {
-    const game = gamesData?.find((game) => game.id === reg.game_id);
-      if (game) {
-        acc[reg.game_id] = (acc[reg.game_id] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
-
-    const combinedData: GMGameData[] = gamesData?.map(game => ({
-      id: game.id,
-      title: game.title,
-      description: game.description,
-      system: game.system,
-      scheduled_next: game.game_schedule[0]?.next_game_date,
-      interval: game.game_schedule[0]?.interval,
-      dow: game.game_schedule[0]?.day_of_week,
-      maxSeats: game.max_seats,
-      status: game.game_schedule[0]?.status,
-      registered: seatCounts![game.id] || 0,
-    })) ?? [];
-    // const combinedData = mockScheduledGames;
-
-    return combinedData;
-};
-
-async function fetchPlayers (supabase: SupabaseClient, id: string): Promise<Player[]> {
-  const { data: playersData, error: playersError } = await supabase
-    .from('game_registrations')
-    .select(`
-      game_id,
-      member_id,
-      members(
-        id,
-        email,
-        is_minor,
-        profiles (
-          given_name,
-          surname,
-          phone,
-          experience_level,
-          avatar
-        )
-      )        
-    `)
-    .eq('game_id', id)
-    
-  if (playersError) {
-    console.error(playersError);
-  } else {
-    console.log(playersData);
+  switch (response.status) {
+    case 500:
+      toast.error("Error fetching games");
+      return [];   
+    case 404:
+      toast.error("Games not found");
+      return [];
+    case 200:
+      const games = await response.json();
+      return games;
+    default:
+      toast.error("Error fetching games");
+      return [];
   }
-
-  const players: Player[] = (playersData as unknown as GameRegistration[])?.map((player) => {
-    return {
-      id: player.member_id,
-      email: player.members.email,
-      phoneNumber: player.members.profiles.phone,
-      givenName: player.members.profiles.given_name ?? "",
-      surname: player.members.profiles.surname ?? "",
-      avatar: player.members.profiles.avatar,
-      isMinor: player.members.is_minor,
-      experienceLevel: player.members.profiles.experience_level,
-    }
-  }) ?? [];
-
-  // const gameRegistrants = mockRegisteredPlayers;
-
-  // const players = gameRegistrants
-  //   .filter((registrant) => registrant.game_id === id)
-  //   .map((registrant) => 
-  //     mockPlayers.find((player) => player.id === registrant.member_id)
-  //   ).filter((player): player is Player => !!player) ?? [];
-
-  return players
 };
-  
-  
+
+const fetchPlayers = async (gameId: string): Promise<Player[]> => {
+  const response = await fetch(`/api/games/${gameId}/registrants`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  switch (response.status) {
+    case 500:
+      toast.error("Error fetching players");
+      return [];   
+    case 404:
+      toast.error("Players not found");
+      return [];
+    case 200:
+      const players = await response.json();
+      return players;
+    default:
+      toast.error("Error fetching players");
+      return [];
+  }
+}
 
 export default function GamemasterDashboard(): React.ReactElement {
-  const supabase = useSupabaseBrowserClient();
   const queryClient = useQueryClient();
   const session = useSession();
   const user: User = (session?.user as User) ?? null;
@@ -142,35 +71,44 @@ export default function GamemasterDashboard(): React.ReactElement {
   const gamemasterId = user?.id;
 
   const { data: games, isLoading } = useQuery<GMGameData[], Error>({
-    queryKey: ['games', supabase, gamemasterId],
-    queryFn: () => fetchGames(supabase, gamemasterId),
+    queryKey: ['games', gamemasterId, 'gm', 'full'],
+    queryFn: () => fetchGames(gamemasterId),
+    initialData: [],
     enabled: !!gamemasterId,
   });
 
   const { data: players } = useQuery<Player[], Error>({
-    queryKey: ['players', supabase, selectedGame?.id],
-    queryFn: () => fetchPlayers(supabase, selectedGame?.id as string),
+    queryKey: ['players', user?.id as string, selectedGame?.id],
+    queryFn: () => fetchPlayers(selectedGame?.id as string),
     initialData: [],
     enabled: !!selectedGame?.id,
   });
   
   const gameMutation = useMutation({
-    mutationFn: () => fetchGames(supabase, gamemasterId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['games', gamemasterId] });
+    mutationFn: () => fetchGames(gamemasterId),
+    onSuccess: (updatedData) => {
+      console.log('Games updated', updatedData);
+      // Invalidate the `games` query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['games', gamemasterId, 'gm', 'full'] });      
     }
   })
 
   const playersMutation = useMutation({
-    mutationFn: () => fetchPlayers(supabase, selectedGame?.id as string),
+    mutationFn: () => fetchPlayers(selectedGame?.id as string),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['players'] });
+      console.log('Players updated');
+      // Invalidate the `players` query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['players', user?.id, selectedGame?.id] });
     }
   })
   
-  const onSelectGame = (game: GMGameData) => {
+  const onShowDetails = (game: GMGameData) => {
     setSelectedGame(game);
     playersMutation.mutate();
+  };
+
+  const onGameEdit = () => {
+    gameMutation.mutate();
   };
 
   const handleGameAdded = () => {
@@ -188,7 +126,7 @@ export default function GamemasterDashboard(): React.ReactElement {
   return (
     <section className="items-center justify-center">
       <div className="space-y-2 p-2">
-        <ScheduledGamesCard onGameAdded={handleGameAdded} onSelectGame={onSelectGame} scheduledGames={games} gamemaster_id={gamemasterId} />        
+        <ScheduledGamesCard onGameAdded={handleGameAdded} onShowDetails={onShowDetails} onGameEdit={onGameEdit} scheduledGames={games} gamemaster_id={gamemasterId} />        
       </div>
       {/* <div className="flex flex-wrap space-y-4 border-4 border-green-500 p-2"> */}
       <div className="grid grid-cols-1  sm:grid-cols-4 gap-2  p-2">

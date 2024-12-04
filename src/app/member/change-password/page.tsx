@@ -5,6 +5,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import useSession from "@/utils/supabase/use-session";
+import { redirect } from "next/navigation";
 
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState("");
@@ -12,6 +14,12 @@ const ChangePassword = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<null | string>(null);
+  //const supabase = useSupabaseBrowserClient();
+  //const queryClient = useQueryClient();
+  const session = useSession();
+  if (!session) {
+    redirect('/unauthorized');
+  }
 
   const handleChangePassword = async () => {
     setLoading(true);

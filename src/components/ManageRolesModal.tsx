@@ -51,6 +51,7 @@ export const ManageRolesModal = ({ member, allRoles, isOpen, onClose }: RoleMana
         );
     };
 
+    console.log('Roles: ', allRoles);
 
 
     return (

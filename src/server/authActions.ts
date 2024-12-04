@@ -1,5 +1,5 @@
 "use server"
-import { EmailInvite, Provider, SupabaseProfileResponse, SupabaseRoleResponse } from "@/lib/types/custom";
+import { EmailInvite, Provider, SupabaseMemberResponse, SupabaseRoleListResponse } from "@/lib/types/custom";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { 
     AuthApiError,
@@ -29,12 +29,36 @@ export const getInitialSession = async (): Promise<{ session: Session | null; us
 
 export const getUser = async (): Promise<User | null> => {
     const supabase = await createSupabaseServerClient();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null
-    const { data: profile, error: profileError } = await supabase.from('profiles').select('*').limit(1).eq('id', user.id).maybeSingle() as unknown as SupabaseProfileResponse;
-    if (profileError) return null
-    const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
-    if (roleError) return null
+    // const { data: profile, error: profileError } = await supabase.from('profiles').select('*').limit(1).eq('id', user.id).maybeSingle() as unknown as SupabaseProfileResponse;
+    // if (profileError) return null
+    // const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleListResponse;
+    // if (roleError) return null
+    const { data: member, error: memberError } = await supabase.from('members')
+        .select(`
+            *,
+            profiles(
+                given_name,
+                surname,
+                avatar,
+                phone,
+                bio,
+                birthday,
+                experience_level
+            ),
+            member_roles(
+                roles(
+                    id,
+                    name
+                )
+            )`)
+        .eq('id', user.id)
+        .maybeSingle() as SupabaseMemberResponse;
+    if (memberError) return null
+    if (!member) return null
+    const { profiles: profile, member_roles: roleData } = member
     let avatar_url = profile.avatar ?? user.user_metadata.avatar_url ?? null
     if (avatar_url && !avatar_url.startsWith('https://')) {
         avatar_url = supabase.storage.from('avatars').getPublicUrl(avatar_url).data.publicUrl;
@@ -55,7 +79,7 @@ export const getUserRoles = async (): Promise<string[]> => {
     const supabase = await createSupabaseServerClient();
     const user = await getUser();
     if (!user) return []
-    const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
+    const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleListResponse;
     if (roleError) {
         console.error(roleError)
         if (roleError.message) throw new Error(roleError.message)

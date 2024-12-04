@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -54,21 +54,21 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <QueryProviderWrapper>
             <Header />
             <Toaster position="top-right" />
             <Suspense fallback="<div>Loading...</div>">
               <ToastHandler />
             </Suspense>
-            <QueryProviderWrapper>
               <div className="dark:bg-black-overlay bg-white-overlay">
                 <main className="container w-full md:h-[88vh] overflow-auto">
                   {children}
                 </main>
               </div>
-            </QueryProviderWrapper>
             <Footer />
+            </QueryProviderWrapper>
           </ThemeProvider>
       </body>
-    </html>    
+    </html> 
   );
 }

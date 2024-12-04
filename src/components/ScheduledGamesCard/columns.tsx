@@ -5,7 +5,7 @@ import { GMGameData } from "@/lib/types/custom"
 import { Button } from "@/components/ui/button"
 
 
-export const columns = (onSelectGame: (game: GMGameData) => void): ColumnDef<GMGameData>[] => [
+export const columns: ColumnDef<GMGameData>[] = [
     {
         accessorKey: "title",
         header: "Title",
@@ -69,13 +69,22 @@ export const columns = (onSelectGame: (game: GMGameData) => void): ColumnDef<GMG
         cell: ({ row }) => {
           const game = row.original; 
           return (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onSelectGame(game)}
-            >
-              Show Details
-            </Button>
+            <div className="flex space-x-2">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => game.onEditGame?.(game)}
+                >
+                    Edit
+                </Button>
+                <Button
+                variant="outline"
+                size="sm"
+                onClick={() => game.onShowDetails?.(game)}
+                >
+                Show Details
+                </Button>
+            </div>
           );
         },
       },

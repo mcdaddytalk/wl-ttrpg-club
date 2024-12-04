@@ -12,9 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from './ui/textarea';
-
-const daysOfWeek: DOW[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-const intervals: GameInterval[] = ['weekly', 'biweekly', 'monthly', 'yearly', 'custom'];
+import { calculateNextGameDate, daysOfWeek, intervals } from '@/utils/helpers';
 
 interface NewModalProps {
     isOpen: boolean;
@@ -48,13 +46,13 @@ export default function NewGameModal({
 
         const nextGameDate = calculateNextGameDate(dayOfWeek, interval);
 
-        const response = await fetch('/api/games/add-new', { 
+        const response = await fetch(`/api/gamemaster/${gamemaster_id}/games`,
+          {
             method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            
-                body: JSON.stringify({
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
                     title,
                     description,
                     system,
@@ -79,28 +77,7 @@ export default function NewGameModal({
     }
   };
 
-  const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval) => {
-    const today = new Date();
-    const targetDay = daysOfWeek.indexOf(dayOfWeek);
-    const currentDay = today.getDay();
-    const daysUntilNext = (targetDay - currentDay + 7) % 7 || 7; // Ensure it's at least the next occurrence
-    const nextDate = new Date(today);
-    nextDate.setDate(today.getDate() + daysUntilNext);
-
-    if (interval === 'weekly') {
-      return nextDate.toISOString();
-    }
-    if (interval === 'biweekly') {
-      nextDate.setDate(nextDate.getDate() + 14);
-      return nextDate.toISOString();
-    }
-    if (interval === 'monthly') {
-      nextDate.setMonth(nextDate.getMonth() + 1);
-      return nextDate.toISOString();
-    }
-
-    return nextDate.toISOString();
-  };
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

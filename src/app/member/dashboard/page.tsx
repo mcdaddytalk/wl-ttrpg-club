@@ -78,6 +78,8 @@ export default function MemberDashboard(): React.ReactElement {
   // const queryClient = useQueryClient();
   const session = useSession();
   const user: User = (session?.user as User) ?? {};
+  console.log('Session:  ', session);
+  console.log('User:  ', user);
 
   const today = new Date().toISOString();
   console.log('Date filter:', today);
