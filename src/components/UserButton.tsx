@@ -4,33 +4,23 @@ import React, { useState, useEffect } from 'react';
 // import Image from 'next/image';
 import { Button } from './ui/button';
 import UserAvatar from './UserAvatar';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { User } from '@supabase/supabase-js';
-import { getUser, signOut } from '@/server/authActions';
-// import { User } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { MessageData, MessageDO } from '@/lib/types/custom';
+import { fetchMessages } from '@/queries/fetchMessages';
+import useSupabaseBrowserClient from '@/utils/supabase/client';
 
-// import { createClient } from '@/utils/supabase/client';
+interface UserButtonProps {
+  user: User;
+}
 
-const UserButton: React.FC = () => {
+const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  // const [roles, setRoles] = useState<string[]>([]);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getUser();
-      // const roles = await getUserRoles();
-      if (!user) {
-        router.push('/');
-      }
-      setUser(user);
-      // setRoles(roles);
-    };
-    fetchUser();
-  }, [router]);
-
+  const [unreadCount, setUnreadCount] = useState(0);
+  const supabase = useSupabaseBrowserClient();
+  
   const menuLinks = [
     { href: '/member/change-password', label: 'Change Password', roles: ['member'] },
     { href: '/member/profile', label: 'Profile', roles: ['member'] },
@@ -46,9 +36,22 @@ const UserButton: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    await signOut(); //
-    setDropdownOpen(false);
-    router.push('/');
+    fetch(
+      '/auth/signout',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    ).then(() => {
+      toast.success('Logout successful');
+    }).catch((error) => {
+      toast.error(`Logout failed - ${error.message}`);
+    }).finally(() => {
+      window.location.reload();
+      setDropdownOpen(false);
+    })
   };
 
   const userName = user?.user_metadata?.given_name 
@@ -69,6 +72,53 @@ const UserButton: React.FC = () => {
     };
   }, []);
 
+  const { data: receivedMessages, isLoading: messagesLoading, isError: messagesHasError, error: messagesError } = useQuery<MessageDO[]>({
+    queryKey: ['messages', 'unread', user.id],
+    queryFn: () => fetchMessages(user.id, 'unread'),    
+    initialData: [],
+    enabled: !!user?.id,
+  });
+
+  if (messagesHasError) {
+    console.error(messagesError);
+  }
+
+  
+  useEffect(() => {
+    if (receivedMessages) {
+      const unreadMessages = receivedMessages.filter(message => !message.is_read);
+      setUnreadCount(unreadMessages.length);
+    }
+
+    const subscription = supabase
+      .channel('messages')
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' }, 
+        (payload: { new: MessageData; }) => {
+          const message = payload.new as MessageData;
+          if (message.recipient_id === user?.id && message.is_read === false) {
+            setUnreadCount(prev => prev + 1);
+          }
+        })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+
+  }, [receivedMessages, supabase, user?.id]);
+
+  
+  if (messagesLoading) {
+    return (
+      <div className="user-button relative">
+        <Button onClick={toggleDropdown} className="flex items-center bg-slate-800 hover:bg-slate-500 dark:bg-slate-400 hover:dark:bg-slate-200">
+          <span className="ml-2">Loading...</span>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="user-button relative">
       <Button onClick={toggleDropdown} className="flex items-center bg-slate-800 hover:bg-slate-500 dark:bg-slate-400 hover:dark:bg-slate-200">
@@ -81,6 +131,11 @@ const UserButton: React.FC = () => {
         )} */}
         { user ? ( 
           <>
+            { unreadCount > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-2">
+                {unreadCount}
+              </span>
+            )}
             <UserAvatar avatarUrl={userAvatar} fullName={userName} /> 
             <span className="ml-2">{userName}</span>  
           </>
@@ -89,7 +144,7 @@ const UserButton: React.FC = () => {
             <span className="ml-2">Logging in...</span>
           </>
         )}        
-      </Button>
+      </Button>      
       {isDropdownOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md">
           {menuLinks.map(link => (
@@ -104,6 +159,16 @@ const UserButton: React.FC = () => {
               </Link>
             )
           ))}
+          <Button asChild className='block w-full bg-blue-600 hover:bg-blue-500 dark:bg-blue-400 hover:dark:bg-blue-200'>
+            <Link key="messages" href="/member/messages" onClick={() => toggleDropdown()}>
+              Messages
+              { unreadCount > 0 && (
+                <span className="top-0 right-0 bg-red-500 text-white text-xs rounded-full px-2 ml-2">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
+          </Button>
           <Button onClick={handleLogout} className="block w-full text-left px-4 py-2  bg-slate-800 hover:bg-slate-500 dark:bg-slate-400 hover:dark:bg-slate-200">Logout</Button>
         </div>
       )}

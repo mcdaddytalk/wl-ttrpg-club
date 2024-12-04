@@ -47,12 +47,12 @@ export default function ContactUs(): React.ReactElement {
                 body: JSON.stringify(values),
             });
 
+            const { error } = await response.json();
             if (response.ok) {
                 toast.success("Message sent successfully!");
                 form.reset(); // Reset form on success
             } else {
-                const data = await response.json();
-                toast.error(data.error);
+                toast.error(error);
             }
         } catch (error) {
             console.error(error);

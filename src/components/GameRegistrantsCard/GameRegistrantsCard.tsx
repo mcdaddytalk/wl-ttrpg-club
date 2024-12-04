@@ -11,7 +11,6 @@ type GameRegistrantsCardProps = {
 }
 
 const GameRegistrantsCard= ({ registrants, className }: GameRegistrantsCardProps): React.ReactElement => {
-    console.log('Registrants', registrants)
     return (
         <Card className={className}>
         <CardHeader>

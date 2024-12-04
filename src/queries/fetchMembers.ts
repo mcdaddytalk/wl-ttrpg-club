@@ -5,12 +5,26 @@ export function getMembers(supabase: TypedSupabaseClient) {
         .select("*");
 }
 
+export function fetchContactList(supabase: TypedSupabaseClient) {
+    return supabase
+        .from("members")
+        .select(`
+            id,
+            profiles!inner(
+                given_name,
+                surname
+            )  
+        `)
+        .order("profiles.surname", { ascending: false });
+}
+
 export function fetchMembersFull(supabase: TypedSupabaseClient) {
     return supabase
         .from("members")
         .select(`
             *,
             profiles(
+                id,
                 given_name,
                 surname,
                 avatar,

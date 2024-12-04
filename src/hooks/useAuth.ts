@@ -10,10 +10,8 @@ import {
     signInWithProvider,
     signInWithOTP,
     signOut,
-    getUserRoles
+    getInitialSession
 } from '@/server/authActions';
-// import { createClient } from '@/utils/supabase/client';
-// import { useRouter } from 'next/router';
 
 interface AuthContext {
     session: Session | null;
@@ -37,12 +35,10 @@ export function useAuth(): AuthContext {
     // const router = useRouter();
     
     const refreshSession = useCallback(async () => {
-        //const { session, user } = await getInitialSession();
-        //setSession(session);
+        const { session } = await getInitialSession();
+        setSession(session);
         const user = await getUser();
-        const roles = await getUserRoles();
         setUser(user);
-        setRoles(roles);
     }, [])
 
     useEffect(() => {

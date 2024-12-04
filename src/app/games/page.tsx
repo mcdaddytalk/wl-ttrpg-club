@@ -4,101 +4,36 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import GameCarousel from "@/components/GameCarousel";
 import GameDetails from "@/components/GameDetails";
-import { GameData, SupaGameScheduleData } from "@/lib/types/custom";
+import { GameData } from "@/lib/types/custom";
 import useSupabaseBrowserClient from "@/utils/supabase/client";
 import useSession from "@/utils/supabase/use-session";
 import { Session, SupabaseClient, User } from "@supabase/supabase-js";
 import { useQueryClient } from "@/hooks/useQueryClient";
-import { fetchRegistrants } from "@/queries/fetchRegistrants";
+// import { fetchRegistrants } from "@/queries/fetchRegistrants";
 
-async function fetchGames(supabase: SupabaseClient, user: User): Promise<GameData[]> {
-  const { data: gamesData, error: gamesError } = await supabase
-      .from("game_schedule")
-      .select(`
-        id,
-        game_id,
-        status,
-        interval,
-        first_game_date,
-        next_game_date,
-        location,
-        day_of_week,
-        games (
-          title,
-          description,
-          system,
-          max_seats,
-          members!fk_games_members (
-            id,
-            profiles (
-              given_name,
-              surname,
-              avatar
-            )
-          )
-        )        
-      `)
-      .eq("status", "scheduled")
+async function fetchGames(userId: string): Promise<GameData[]> {
+  const response = await fetch(`/api/games?member_id=${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
-    if (gamesError) throw gamesError
-    // const gameIds = gamesData?.map((game) => game.id) ?? [];
+  if (!response.ok) {
+    throw new Error("Error fetching games");
+  }
 
-    const { data: registrations, error: registrationsError } = await fetchRegistrants(supabase);
-    console.log(registrations);
-    if (registrationsError) throw registrationsError
-    if (!registrations) throw new Error("Registrations not found")
-    const seatCounts = registrations?.filter((reg) => {
-      return reg.game_id !== null && reg.member_id !== null
-    }).reduce((acc, reg) => {
-      const game = gamesData?.find((game) => game.game_id === reg.game_id);
-        if (game) {
-          acc[reg.game_id] = (acc[reg.game_id] || 0) + 1;
-        }
-        return acc;
-      }, {} as Record<string, number>);
-
-    console.log(seatCounts);
-
-    const { data: favorites, error: favoritesError } = await supabase
-      .from('game_favorites')
-      .select(`
-        game_id,
-        member_id
-      `)
-      .eq('member_id', user.id);
-    
-    if (favoritesError) {
-      console.error(favoritesError);
-    }
-
-    console.log(favorites);
-
-    const scheduledGames: GameData[] = (gamesData as unknown as SupaGameScheduleData[]).map((gameSchedule) => {
-      return {
-        id: gameSchedule.id,
-        game_id: gameSchedule.game_id,
-        status: gameSchedule.status,
-        interval: gameSchedule.interval,
-        firstGameDate: gameSchedule.first_game_date,
-        nextGameDate: gameSchedule.next_game_date,
-        location: gameSchedule.location,
-        dayOfWeek: gameSchedule.day_of_week,
-        title: gameSchedule.games.title,
-        description: gameSchedule.games.description,
-        system: gameSchedule.games.system,
-        maxSeats: gameSchedule.games.max_seats,
-        currentSeats: seatCounts![gameSchedule.game_id] || 0,
-        favorite: favorites?.some((favorite) => favorite.game_id === gameSchedule.game_id) || false,
-        registered: registrations?.some((reg) => reg.game_id === gameSchedule.game_id && reg.member_id === user.id) || false,
-        gamemaster_id: gameSchedule.games.members.id,
-        gm_given_name: gameSchedule.games.members.profiles.given_name ?? "",
-        gm_surname: gameSchedule.games.members.profiles.surname ?? "",
-      }
-    }) ?? [];
-
-    if (gamesError) throw gamesError
-
-    return scheduledGames
+  switch (response.status) {
+    case 500:
+      throw new Error("Error fetching games");
+    case 404:
+      throw new Error("Games not found");
+    case 200:
+      const games = await response.json();
+      return games;
+    default:
+      throw new Error("Error fetching games");
+  }
 }
 
 interface ToggleFavoriteVariables {
@@ -134,9 +69,10 @@ export default function GamesDashboard(): React.ReactElement {
   
   const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
 
-  const { data: games, isLoading } = useQuery<GameData[], Error>({
-    queryKey: ['games', user, supabase],
-    queryFn: () => fetchGames(supabase, user),
+  const { data: games, isLoading: gamesLoading } = useQuery<GameData[], Error>({
+    queryKey: ['games', user?.id, 'full'],
+    queryFn: () => fetchGames(user?.id),
+    initialData: [],
     enabled: !!user
   })
 
@@ -145,16 +81,16 @@ export default function GamesDashboard(): React.ReactElement {
   const toggleFavoriteMutation = useMutation<void, Error, ToggleFavoriteVariables>({
     mutationFn:       toggleFavorite,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['games'] });
+        queryClient.invalidateQueries({ queryKey: ['games', user?.id, 'full'] });
     }}
   );
 
   const handleToggleFavorite = (gameId: string, currentFavorite: boolean) => {
-    toggleFavoriteMutation.mutate({userId: user.id, gameId, currentFavorite, supabase});
+    toggleFavoriteMutation.mutate({userId: user?.id, gameId, currentFavorite, supabase});
   }
 
   if (!user) return <div>Please log in to access the dashboard.</div>;
-  if (isLoading) return <div>Loading games...</div>;
+  if (gamesLoading) return <div>Loading games...</div>;
   if (!games) return <div>No games found.</div>;
 
   return (<section className="flex flex-col bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-200 opacity-50 mt-4">

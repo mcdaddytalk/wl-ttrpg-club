@@ -13,7 +13,7 @@ const GameList = ({ games }: GameListProps): React.ReactElement => {
   return (
     <div className="space-y-4">
       {games.map((game) => {
-        const nextGameDate = game.scheduled_next ? format(new Date(game.scheduled_next), 'MMM dd, yyyy at h:mm a') : 'N/A';
+        const nextGameDate = game.scheduled_next ? format(new Date(game.scheduled_next), 'MMM dd, yyyy @ h:mm a') : 'N/A';
         return (
         <Card key={game.id}>
           <CardHeader>

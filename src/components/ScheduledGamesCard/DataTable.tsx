@@ -23,14 +23,12 @@ import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 
 interface DataTableProps<TData, TValue> {
-  columns: (onSelectGame: (game: TData) => void) => ColumnDef<TData, TValue>[];
+  columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onSelectGame: (game: TData) => void; // Add onSelectGame as a prop
 }
 export function DataTable<TData, TValue>({
   columns,
-  data,
-  onSelectGame
+  data
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -41,7 +39,7 @@ export function DataTable<TData, TValue>({
 
   const table = useReactTable({
     data,
-    columns: columns(onSelectGame),
+    columns: columns,
     state: {
         sorting,
         rowSelection,
@@ -99,7 +97,7 @@ export function DataTable<TData, TValue>({
           {/* Fill empty rows to maintain table height */}
           {Array.from({ length: emptyRowsCount }).map((_, index) => (
             <TableRow key={`empty-${index}`} className="bg-white">
-              {columns(onSelectGame).map((_, colIndex) => (
+              {columns.map((_, colIndex) => (
                 <TableCell key={`empty-cell-${colIndex}`}>
                   <Skeleton className="h-8 w-full" />
                 </TableCell>

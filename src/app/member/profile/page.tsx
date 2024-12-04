@@ -1,19 +1,20 @@
 import { redirect } from "next/navigation";
 import ProfileForm from './ProfileForm';
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
-import { prefetchQuery } from '@supabase-cache-helpers/postgrest-react-query';
-import { createSupabaseServerClient } from '@/utils/supabase/server';
+//import { prefetchQuery } from '@supabase-cache-helpers/postgrest-react-query';
+//import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { getUser } from "@/server/authActions";
+//import { fetchProfile } from "@/queries/fetchProfile";
 
 const ProfilePage = async () => {
     const queryClient = new QueryClient();
-    const supabase = await createSupabaseServerClient();
+    // const supabase = await createSupabaseServerClient();
     const user = await getUser();
     if (!user) {
         redirect('/unauthorized');
     }
     
-    await prefetchQuery(queryClient, supabase.from('profiles').select('*').eq('id', user.id));
+    // await prefetchQuery(queryClient, fetchProfile(supabase, user.id));
     
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>

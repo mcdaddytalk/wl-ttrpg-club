@@ -1,7 +1,7 @@
 import { NextRequest , NextResponse} from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
 import { createSupabaseReqResClient } from "./utils/supabase/server"
-import { RoleData, SupabaseRoleResponse } from "./lib/types/custom";
+import { RoleData, SupabaseRoleListResponse } from "./lib/types/custom";
 
 export async function middleware(request: NextRequest) {
   await updateSession(request)
@@ -14,8 +14,9 @@ export async function middleware(request: NextRequest) {
   const supabase = await createSupabaseReqResClient(request, response)
 
   const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
-  if (error || !user) {
+  if (error || !user || !session) {
       // if (error) console.error('AUTH ERROR ', error)
       // if (!user) console.error('NO USER DATA ')
       return NextResponse.next()
@@ -23,7 +24,7 @@ export async function middleware(request: NextRequest) {
   
   const url = request.nextUrl;
   
-  const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
+  const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleListResponse;
   if (roleError) {
     console.error('ROLE ERROR ', roleError)
   }
@@ -67,10 +68,5 @@ export const config = {
      * Feel free to modify this pattern to include more paths.
      */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-    "/member/:path*",
-    "/games/:path*",
-    "/gamemaster/:path*",
-    "/admin/:path*",
-    "/account/:path*",
   ],
 }

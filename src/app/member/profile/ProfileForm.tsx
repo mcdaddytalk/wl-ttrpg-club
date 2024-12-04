@@ -4,6 +4,7 @@ import { useState } from 'react'
 import useSupabaseBrowserClient from '@/utils/supabase/client'
 import { type User } from '@supabase/supabase-js'
 import { useMutation, useQuery } from '@tanstack/react-query'
+// import { useQuery, useUpdateMutation, useUpsertMutation } from '@supabase-cache-helpers/postgrest-react-query'
 import Avatar from './Avatar'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,7 @@ import { ProfileData, ExperienceLevel, TypedSupabaseClient } from '@/lib/types/c
 import { redirect } from 'next/navigation'
 import { Label } from '@/components/ui/label'
 import { useQueryClient } from '@/hooks/useQueryClient'
+// import { fetchProfile } from '@/queries/fetchProfile'
 
 const fetchProfile = async (supabase: TypedSupabaseClient, userId: string): Promise<ProfileData> => {
   const { data, error } = await supabase
@@ -39,6 +41,7 @@ export default function ProfileForm({ user }: { user: User }) {
     queryFn: () => fetchProfile(supabase, user?.id),
     enabled: !!user,
   });
+  // const { data: profile, isLoading: profileLoading, isError } = useQuery(fetchProfile(supabase, user?.id));
 
   // Mutation to update profile
   const updateProfile = useMutation({
@@ -65,6 +68,24 @@ export default function ProfileForm({ user }: { user: User }) {
       toast.error(error.message || "Failed to update profile.");
     },
   })
+
+  // const { mutate: updateProfile } = useUpsertMutation(
+  //   supabase.from("profiles"),
+  //   ["id"],
+  //   "*",
+  //   {
+  //     onSuccess: (data, updatedProfile, context) => {
+  //       console.log('Updated profile:', data);
+  //       console.log('Updated profile:', updatedProfile);
+  //       console.log('Context: ', context);
+  //       queryClient.setQueryData(["profiles", supabase, user?.id], updatedProfile);
+  //       toast.success("Profile updated successfully!");
+  //     },
+  //     onError: (error: Error) => {
+  //       toast.error(error.message || "Failed to update profile.");
+  //     }
+  //   }
+  // )
   // Local state for detecting changes
   const [localProfile, setLocalProfile] = useState<ProfileData | null>(null);
   const [hasChanges, setHasChanges] = useState(false);

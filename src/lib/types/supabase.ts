@@ -115,18 +115,24 @@ export type Database = {
           id: string
           member_id: string
           registered_at: string
+          status: Database["public"]["Enums"]["registrant_status_enum"]
+          status_note: string | null
         }
         Insert: {
           game_id: string
           id?: string
           member_id: string
           registered_at?: string
+          status?: Database["public"]["Enums"]["registrant_status_enum"]
+          status_note?: string | null
         }
         Update: {
           game_id?: string
           id?: string
           member_id?: string
           registered_at?: string
+          status?: Database["public"]["Enums"]["registrant_status_enum"]
+          status_note?: string | null
         }
         Relationships: [
           {
@@ -338,6 +344,71 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_archived: boolean
+          is_read: boolean
+          recipient_id: string
+          sender_id: string
+          subject: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_archived?: boolean
+          is_read?: boolean
+          recipient_id: string
+          sender_id: string
+          subject?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_archived?: boolean
+          is_read?: boolean
+          recipient_id?: string
+          sender_id?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messgaes_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "messgaes_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messgaes_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "messgaes_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar: string | null
@@ -392,6 +463,35 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          function: Database["public"]["Enums"]["app_function"]
+          id: number
+          permission: Database["public"]["Enums"]["app_permission"]
+          role_id: string
+        }
+        Insert: {
+          function: Database["public"]["Enums"]["app_function"]
+          id?: number
+          permission: Database["public"]["Enums"]["app_permission"]
+          role_id: string
+        }
+        Update: {
+          function?: Database["public"]["Enums"]["app_function"]
+          id?: number
+          permission?: Database["public"]["Enums"]["app_permission"]
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       roles: {
         Row: {
           id: string
@@ -426,6 +526,12 @@ export type Database = {
       }
     }
     Functions: {
+      custom_access_token_hook: {
+        Args: {
+          event: Json
+        }
+        Returns: Json
+      }
       get_scheduled_games_with_counts: {
         Args: {
           member_id: string
@@ -474,6 +580,8 @@ export type Database = {
       }
     }
     Enums: {
+      app_function: "games" | "members" | "schedules" | "messages"
+      app_permission: "create" | "read" | "update" | "delete"
       day_of_week_enum:
         | "sunday"
         | "monday"
@@ -495,6 +603,7 @@ export type Database = {
         | "yearly"
         | "custom"
       game_status_enum:
+        | "draft"
         | "active"
         | "scheduled"
         | "awaiting-players"
@@ -502,6 +611,7 @@ export type Database = {
         | "completed"
         | "canceled"
       gamemaster_interest_enum: "yes" | "no" | "maybe"
+      registrant_status_enum: "awaiting-approval" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
