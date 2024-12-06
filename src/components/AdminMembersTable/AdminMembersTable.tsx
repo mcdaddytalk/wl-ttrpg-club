@@ -9,8 +9,8 @@ import { MemberData } from "@/lib/types/custom";
 import { ManageRolesModal } from "../ManageRolesModal";
 import { columns } from "./columns";
 import { 
-    // useQuery, 
-    useSuspenseQuery 
+    useQuery,
+    // useSuspenseQuery,
 } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import { ConfirmationModal } from "../ConfirmationModal";
@@ -25,8 +25,8 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
     const session = useSession();
     const user: User = (session?.user as User) ?? null;
     
-    const { data: members, isLoading: isLoadingMembers, error: errorMembers } = useSuspenseQuery(fetchMembersFull());
-    const { data: allRoles, isLoading: isLoadingRoles, error: errorRoles } = useSuspenseQuery(fetchRoles());
+    const { data: members, isLoading: isLoadingMembers, isError: errorMembers } = useQuery(fetchMembersFull());
+    const { data: allRoles, isLoading: isLoadingRoles, isError: errorRoles } = useQuery(fetchRoles());
 
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [isManageRolesModalOpen, setManageRolesModalOpen] = useState(false);
@@ -59,7 +59,7 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
         setManageRolesModalOpen(true);
     };
 
-    const enhancedMembers = (members as unknown as MemberData[]).map((member) => ({
+    const enhancedMembers = (members as unknown as MemberData[])?.map((member) => ({
         ...member,
         onManageRoles: handleManageRoles,
         onResetPassword: (email: string) => {
@@ -106,8 +106,7 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
         }
     }));
     
-    if (errorMembers) {
-        console.error("Error fetching members:", errorMembers);
+    if (errorMembers || errorRoles) {
         redirect("/error");
     }
 
@@ -155,7 +154,7 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
             {selectedMember && (
                 <ManageRolesModal
                     member={selectedMember}
-                    allRoles={allRoles}
+                    allRoles={allRoles || []}
                     isOpen={isManageRolesModalOpen}
                     onClose={() => setManageRolesModalOpen(false)}
                 />

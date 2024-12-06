@@ -6,7 +6,7 @@ import GameCarousel from "@/components/GameCarousel";
 import GameDetails from "@/components/GameDetails";
 import { GameData, GameFavorite } from "@/lib/types/custom";
 import useSession from "@/utils/supabase/use-session";
-import { Session, SupabaseClient, User } from "@supabase/supabase-js";
+import { Session, User } from "@supabase/supabase-js";
 import { useQueryClient } from "@/hooks/useQueryClient";
 
 async function fetchFavorites(userId: string): Promise<GameFavorite[]> {
@@ -129,7 +129,7 @@ export default function GamesDashboard(): React.ReactElement {
         registered: game.registrations.some((registration) => registration.member_id === user?.id) || false
       })))
     }
-  }, [games, favorites]);
+  }, [games, favorites, user]);
 
   
   const toggleFavoriteMutation = useMutation<void, Error, ToggleFavoriteVariables>({

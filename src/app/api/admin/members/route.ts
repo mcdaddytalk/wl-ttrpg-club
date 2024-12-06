@@ -33,7 +33,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .order("created_at", { ascending: false });
 
     if (memberError) {
-        console.error(memberError)
+        console.error('Error fetching members:', memberError)
         return NextResponse.json({ error: memberError.message }, { status: 500 });
     }
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`
     });
     if (error) {
-        console.error(error)
+        console.error('Error sending email invite:',   error)
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 

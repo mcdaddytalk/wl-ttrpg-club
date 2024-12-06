@@ -1,13 +1,17 @@
 import AdminDashboarClient from "./AdminDashboardClient";
-import { dehydrate, HydrationBoundary, QueryClient, queryOptions } from "@tanstack/react-query";
-import { createSupabaseServerClient } from "@/utils/supabase/server";
-import { fetchMembersFull, fetchRoles } from "@/queries/fetchMembers";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+// import { fetchMembersFull, fetchRoles } from "@/queries/fetchMembers";
 
 export default async function AdminDashboard() {
     const queryClient = new QueryClient();
-    queryClient.prefetchQuery(fetchMembersFull());
-    queryClient.prefetchQuery(fetchRoles());
-
+    
+    // try {
+    //     await queryClient.prefetchQuery(fetchMembersFull());
+    //     await queryClient.prefetchQuery(fetchRoles());
+    // } catch (error) {
+    //     console.error('Error prefetching queries:', error);
+    // }
+    
     return (<HydrationBoundary state={dehydrate(queryClient)}>
         <AdminDashboarClient />
     </HydrationBoundary>);
