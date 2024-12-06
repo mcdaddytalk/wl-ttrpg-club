@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import React from 'react'
+import Icon from './Icon';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   return (
     <footer className="z-10 sticky bottom-0 mx-auto w-full dark:bg-slate-900 dark:text-white bg-slate-50 text-slate-600 pt-2 pr-4 pl-4 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex flex-col text-center md:flex-row justify-between items-center">
+      <div className="flex flex-col text-center md:flex-row justify-between items-center ">
         <div className="text-center text-sm md:text-left text-slate-400">
           <p>&copy; {currentYear} Western Loudoun Table Top Roleplaying Game Club. All rights reserved.</p>
         </div>
@@ -17,8 +18,20 @@ export default function Footer() {
           </Link>
         </div>
       </div>
-      <div className="mt-2 text-center text-sm text-slate-400">
-        <p>Powered by NextJS | Hosting by Vercel</p>
+      <div className="mt-2 text-center text-sm text-slate-400 flex justify-center items-center gap-2">
+        <span className="flex items-center gap-1">
+          Powered by{" "}
+          <Link href="https://nextjs.org" target="_blank" rel="noopener noreferrer">
+            <Icon type="nextjs" size={24} />
+          </Link>
+        </span>
+        <span>&nbsp;|&nbsp;</span>
+        <span className="flex items-center gap-1">
+          Hosting by{" "}
+          <Link href="https://vercel.com" target="_blank" rel="noopener noreferrer">
+            <Icon type="vercel" size={24} />
+          </Link>
+        </span>
       </div>
     </footer>
   )

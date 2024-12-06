@@ -44,7 +44,9 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
     
     const { mutate: markMessageAsRead } = useMutation({
         mutationFn: async (messageId: string) => {
-            return await fetch(`/api/messages/${messageId}`, {
+            console.log('Marking message as read:', messageId);
+            console.log('SelectedMessage:  ', selectedMessage);
+            const response = await fetch(`/api/messages/${messageId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,9 +55,15 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
                     is_read: !selectedMessage?.is_read
                 }),
             });
+            if (!response.ok) {
+                throw new Error('Failed to mark message as read');
+            }
+            return response.json();
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
+            console.log('Message marked as read:', data);
             queryClient.invalidateQueries({ queryKey: ['messages', 'unread', user?.id] });
+            queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
         },
         onError: () => {
             console.error('Error marking message as read');
@@ -73,7 +81,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
             });            
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['messages', 'unread', user?.id] });
+            queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
         },
         onError: () => {
             console.error('Error archiving message');
@@ -95,7 +103,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
             return response.json();
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['messages', 'unread', user?.id] });
+            queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
         }
     })    
     
@@ -114,7 +122,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
             return response.json();
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['messages', 'unread', user?.id] });
+            queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
         },
     })
 
@@ -126,8 +134,8 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
     })
 
     const { data: receivedMessages, isLoading: messagesLoading, isError: messagesError} = useQuery<MessageDO[]>({
-        queryKey: ['messages', 'unread', user?.id],
-        queryFn: () => fetchMessages(user?.id, 'unread'),
+        queryKey: ['messages', 'all', user?.id],
+        queryFn: () => fetchMessages(user?.id, 'all'),
         initialData: [],
         enabled: !!user?.id,
     });
@@ -155,20 +163,26 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
             <span className="ml-2">Loading...</span>
         );
     }
-    
-    if (!receivedMessages || receivedMessages.length === 0) {
-        return (
-            <span className="ml-2">No messages found.</span>
-        );
-    }
-
+        
     const enhancedMessages = receivedMessages.map((message) => {
         return {
             ...message,
-            onArchive: () => archiveMessage(message.id),
-            onMarkAsRead: () => markMessageAsRead(message.id),
-            onReply: () => handleReplyMessage(message),
-            onForward: () => handleForwardMessage(message),
+            onArchive: () => {
+                setSelectedMessage(message);
+                archiveMessage(message.id)
+            },
+            onMarkRead: () => {
+                setSelectedMessage(message);
+                markMessageAsRead(message.id)
+            },
+            onReply: () => {
+                setSelectedMessage(message);
+                handleReplyMessage(message)
+            },
+            onForward: () => {
+                setSelectedMessage(message);
+                handleForwardMessage(message);
+            },
         };
     });
     

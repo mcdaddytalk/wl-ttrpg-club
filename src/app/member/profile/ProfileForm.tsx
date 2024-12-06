@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import useSupabaseBrowserClient from '@/utils/supabase/client'
 import { type User } from '@supabase/supabase-js'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation,  useQuery } from '@tanstack/react-query'
 // import { useQuery, useUpdateMutation, useUpsertMutation } from '@supabase-cache-helpers/postgrest-react-query'
 import Avatar from './Avatar'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
@@ -11,38 +11,50 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner'
-import { ProfileData, ExperienceLevel, TypedSupabaseClient } from '@/lib/types/custom'
+import { ProfileData, ExperienceLevel } from '@/lib/types/custom'
 import { redirect } from 'next/navigation'
 import { Label } from '@/components/ui/label'
 import { useQueryClient } from '@/hooks/useQueryClient'
+// import { fetchUserProfile } from '@/queries/fetchProfile'
 // import { fetchProfile } from '@/queries/fetchProfile'
 
-const fetchProfile = async (supabase: TypedSupabaseClient, userId: string): Promise<ProfileData> => {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userId)
-    .single();
-  if (error) throw new Error(error.message); // Throw the error;
-  return data as ProfileData;
-};
+type ProfileFormProps = {
+  user: User
+}
 
-export default function ProfileForm({ user }: { user: User }) {
+export default function ProfileForm({ user }: ProfileFormProps): React.ReactElement {
   const supabase = useSupabaseBrowserClient()
   const queryClient = useQueryClient()
 
   // Query to fetch profile
-  const { 
-    data: profile, 
-    isLoading: profileLoading, 
-    isError
-  } = useQuery({
-    queryKey: ["profiles", supabase, user?.id],
-    queryFn: () => fetchProfile(supabase, user?.id),
+  // const { 
+  //   data: profile, 
+  //   isLoading: profileLoading, 
+  //   isError
+  // } = useQuery({
+  //   queryKey: ["profiles", supabase, user?.id],
+  //   queryFn: () => fetchProfile(supabase, user?.id),
+  //   enabled: !!user,
+  // });
+  const { data: profile, isLoading: profileLoading, isError, error } = useQuery({
+    queryKey: ["profiles", user.id],
+    queryFn: async () => {
+      const userId = user.id;
+      const response =  await fetch(`/api/members/${userId}/profile`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile');
+      }
+      const data = await response.json();
+      console.log('Profile Response: ', data);
+      return data;
+    },
     enabled: !!user,
+    initialData: {}
   });
-  // const { data: profile, isLoading: profileLoading, isError } = useQuery(fetchProfile(supabase, user?.id));
-
+  
+  // const profile = profileData.data as ProfileData;
+  if (error) console.error(error)
+  
   // Mutation to update profile
   const updateProfile = useMutation({
     mutationFn: async (updatedProfile: ProfileData) => {
@@ -61,7 +73,7 @@ export default function ProfileForm({ user }: { user: User }) {
       console.log('Updated profile:', data);
       console.log('Updated profile:', updatedProfile);
       console.log('Context: ', context);
-      queryClient.setQueryData(["profiles", supabase, user?.id], updatedProfile);
+      queryClient.setQueryData(["profiles", user?.id], updatedProfile);
       toast.success("Profile updated successfully!");
     },
     onError: (error: Error) => {

@@ -27,8 +27,9 @@ const fetchMembers = async (): Promise<MemberData[]> => {
         }
     );
     if (!response.ok) throw new Error("Failed to fetch members");
-    const { data } = await response.json();
-    return data.members as MemberData[];
+    const data = await response.json();
+    console.log('Fetched Members: ', data);
+    return data as MemberData[];
   };
   
   const fetchRoles = async (): Promise<RoleDO[]> => {
@@ -39,8 +40,9 @@ const fetchMembers = async (): Promise<MemberData[]> => {
       },
     });
     if (!response.ok) throw new Error("Failed to fetch roles");
-    const { data } = await response.json();
-    return data.roles as RoleDO[];
+    const data = await response.json();
+    console.log('Fetched Roles: ', data);
+    return data as RoleDO[];
   };
 
 const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactElement => {
