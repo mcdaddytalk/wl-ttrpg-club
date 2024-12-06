@@ -54,17 +54,19 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <QueryProviderWrapper>
-            <Header />
-            <Toaster position="top-right" />
-            <Suspense fallback="<div>Loading...</div>">
-              <ToastHandler />
-            </Suspense>
-              <div className="dark:bg-black-overlay bg-white-overlay">
-                <main className="container w-full md:h-[88vh] overflow-auto">
-                  {children}
-                </main>
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <Toaster position="top-right" />
+                <Suspense fallback="<div>Loading...</div>">
+                  <ToastHandler />
+                </Suspense>
+                  <div className="flex-grow dark:bg-black-overlay bg-white-overlay">
+                    <main className="container w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 overflow-auto">
+                      {children}
+                    </main>
+                  </div>
+                <Footer />
               </div>
-            <Footer />
             </QueryProviderWrapper>
           </ThemeProvider>
       </body>

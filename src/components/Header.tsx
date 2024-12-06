@@ -7,7 +7,7 @@ import SignInButton from './SignInButton'
 
 export default function Header() {
   return (
-    <header className="z-10 sticky w-full top-0 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="z-50 sticky w-full top-0 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="w-full flex h-14 flex-row center-stretch">
             <nav className="flex flex-grow items-center space-x-4 lg:space-x-6">
                 <Link href="/" className="flex items-center space-x-2">

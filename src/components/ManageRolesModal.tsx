@@ -51,9 +51,6 @@ export const ManageRolesModal = ({ member, allRoles, isOpen, onClose }: RoleMana
         );
     };
 
-    console.log('Roles: ', allRoles);
-
-
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent>

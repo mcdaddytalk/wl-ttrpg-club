@@ -130,13 +130,12 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
         queryKey: ['members', 'contact_list', user?.id],
         queryFn: () => fetchContactList(),
         initialData: [],
-        enabled: !!user?.id,
+        // enabled: !!user?.id,
     })
 
     const { data: receivedMessages, isLoading: messagesLoading, isError: messagesError} = useQuery<MessageDO[]>({
         queryKey: ['messages', 'all', user?.id],
         queryFn: () => fetchMessages(user?.id, 'all'),
-        initialData: [],
         enabled: !!user?.id,
     });
 
@@ -164,7 +163,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
         );
     }
         
-    const enhancedMessages = receivedMessages.map((message) => {
+    const enhancedMessages = receivedMessages?.map((message) => {
         return {
             ...message,
             onArchive: () => {
@@ -204,7 +203,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
                             <SendHorizonal className="mr-2 h-4 w-4" /><span>New Message</span>
                         </Button>
                     </div>
-                    <DataTable<MessageDO, unknown> columns={columns} data={enhancedMessages} />
+                    <DataTable<MessageDO, unknown> columns={columns} data={enhancedMessages || []} />
                 </CardContent>
             </Card>
             {/* MODALS GO HERE */}

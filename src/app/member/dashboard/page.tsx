@@ -89,14 +89,14 @@ export default function MemberDashboard(): React.ReactElement {
     queryKey: ['upcoming-games', supabase, user.id],
     queryFn: () => fetchUpcomingGames(supabase, user.id),
     initialData: [],
-    enabled: !!user.id,
+    // enabled: !!user.id,
   });
 
   const { data: registeredGames, error: registeredGamesError } = useQuery<RegisteredGame[] | null>({
     queryKey: ['registered-games', supabase, user.id],
     queryFn: () => fetchRegisteredGames(supabase, user.id),
     initialData: [],
-    enabled: !!user.id,
+    // enabled: !!user.id,
   })
     
   if (upcomingGamesError || registeredGamesError) {

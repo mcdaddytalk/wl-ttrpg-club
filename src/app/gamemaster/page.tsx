@@ -55,7 +55,7 @@ const fetchPlayers = async (gameId: string): Promise<Player[]> => {
       return [];
     case 200:
       const players = await response.json();
-      return players;
+      return players as Player[] || [];
     default:
       toast.error("Error fetching players");
       return [];
@@ -73,14 +73,12 @@ export default function GamemasterDashboard(): React.ReactElement {
   const { data: games, isLoading } = useQuery<GMGameData[], Error>({
     queryKey: ['games', gamemasterId, 'gm', 'full'],
     queryFn: () => fetchGames(gamemasterId),
-    initialData: [],
     enabled: !!gamemasterId,
   });
 
   const { data: players } = useQuery<Player[], Error>({
     queryKey: ['players', user?.id as string, selectedGame?.id],
     queryFn: () => fetchPlayers(selectedGame?.id as string),
-    initialData: [],
     enabled: !!selectedGame?.id,
   });
   
@@ -134,7 +132,7 @@ export default function GamemasterDashboard(): React.ReactElement {
           <SelectedGameCard game={selectedGame} />
         </div>
         <div className="sm:col-span-3 bg-white shadow-md rounded-lg p-4">
-          <GameRegistrantsCard registrants={players} />
+          <GameRegistrantsCard registrants={players || []} />
         </div>
       </div>
     </section>

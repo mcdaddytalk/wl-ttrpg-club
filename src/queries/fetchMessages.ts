@@ -5,7 +5,6 @@ export const fetchMessages = async (userId: string, method = 'unread') => {
       throw new Error('Failed to fetch messages');
     }
     const data = await response.json();
-    console.log('Data:  ', data)
     return data;
   };
   

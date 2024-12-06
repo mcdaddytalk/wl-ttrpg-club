@@ -1,5 +1,4 @@
 import { RoleDO } from "@/lib/types/custom";
-import { fetchRoles } from "@/queries/fetchMembers";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,7 +9,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
     
     const supabase = await createSupabaseServerClient();
-    const { data: roleData, error: rolesError } = await fetchRoles(supabase);
+    const { data: roleData, error: rolesError } = await supabase
+        .from('roles')
+        .select('*')
+        .order('name', { ascending: true });
 
     if (rolesError) {
         console.error(rolesError)
