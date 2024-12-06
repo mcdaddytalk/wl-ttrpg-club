@@ -11,7 +11,7 @@ import { Toaster } from "sonner";
 import Footer from "@/components/Footer";
 import ToastHandler from "@/components/ToastHandler";
 import { Suspense } from "react";
-import { Analytics } from "@vercel/analytics/react";
+// import { Analytics } from "@vercel/analytics/react";
 import QueryProviderWrapper from "@/providers/QueryProvider";
 
 // const geistSans = localFont({
@@ -47,7 +47,6 @@ export default async function RootLayout({
       <body
         className="bg-background text-foreground bg-banner bg-no-repeat bg-cover"
       >
-          <Analytics />
           <ThemeProvider 
             attribute="class"
             defaultTheme="system"

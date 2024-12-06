@@ -171,9 +171,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                     is_archived,
                     created_at
                 `)
-                .or(
-                    `sender_id.eq.${userId},recipient_id.eq.${userId}`
-                )
+                // .or(
+                //     `sender_id.eq.${userId},recipient_id.eq.${userId}`
+                // )
+                .eq('recipient_id', userId)
                 .eq('is_archived', false)
                 .is('deleted_at', null)
                 .order('created_at', { ascending: false }) as unknown as SupabaseMessageListResponse;

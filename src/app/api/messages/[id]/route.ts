@@ -108,16 +108,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const supabase = await createSupabaseServerClient();
 
-    const { error: messageError } = await supabase
+    const { data: messageData, error: messageError } = await supabase
         .from('messages')
         .update(body)
-        .eq('id', id);
+        .eq('id', id)
+        .select().single();
 
     if (messageError) {
         console.error(messageError)
         return NextResponse.json({ message: messageError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ message: 'Message updated'}, { status: 200 });
+    return NextResponse.json(messageData, { status: 200 });
 }
 
