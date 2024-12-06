@@ -1,4 +1,5 @@
-import { TypedSupabaseClient } from "@/lib/types/custom";
+import { MemberData, RoleDO, TypedSupabaseClient } from "@/lib/types/custom";
+import { queryOptions } from "@tanstack/react-query";
 export function getMembers(supabase: TypedSupabaseClient) {
     return supabase
         .from("members")
@@ -18,33 +19,40 @@ export function fetchContactList(supabase: TypedSupabaseClient) {
         .order("profiles.surname", { ascending: false });
 }
 
-export function fetchMembersFull(supabase: TypedSupabaseClient) {
-    return supabase
-        .from("members")
-        .select(`
-            *,
-            profiles(
-                id,
-                given_name,
-                surname,
-                avatar,
-                experience_level,
-                bio,
-                birthday,
-                phone
-            ),
-            member_roles(
-                roles(
-                    id,
-                    name
-                )
-            )
-        `)
-        .order("created_at", { ascending: false });
+export const fetchMembersFull = () => {
+    return queryOptions({
+        queryKey: ['admin', 'members', 'full'],
+        queryFn: async () => {
+            const response = await fetch("/api/admin/members",
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            if (!response.ok) throw new Error("Failed to fetch members");
+            const data = await response.json();
+            return data as MemberData[];
+        }
+    })
 }
 
-export function fetchRoles(supabase: TypedSupabaseClient) {
-    return supabase
-        .from("roles")
-        .select("*");
+export const fetchRoles = () => {
+    return queryOptions({
+        queryKey: ['all', 'roles'],
+        queryFn: async () => {
+            const response = await fetch("/api/roles",
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            if (!response.ok) throw new Error("Failed to fetch roles");
+            const data = await response.json();
+            return data as RoleDO[];
+        }
+    })
 }

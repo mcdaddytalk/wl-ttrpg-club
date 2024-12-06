@@ -1,4 +1,4 @@
-import { GameData, SupaGameScheduleData } from "@/lib/types/custom";
+import { GameData, GameRegistration, SupaGameScheduleData } from "@/lib/types/custom";
 import { fetchRegistrants } from "@/queries/fetchRegistrants";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,13 +10,6 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('member_id');
-
-    if (!userId) {
-      return NextResponse.json({ message: `User ID is required` }, { status: 403 })
-    }
-    
     const supabase = await createSupabaseServerClient();
     const { data: gamesData, error: gamesError } = await supabase
       .from("game_schedule")
@@ -33,6 +26,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
           title,
           description,
           system,
+          image,
           max_seats,
           members!fk_games_members (
             id,
@@ -45,6 +39,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         )        
       `)
       .neq("status", "draft")
+      .order("next_game_date", { ascending: true });
 
       if (gamesError) {
         console.error(gamesError)
@@ -53,12 +48,13 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
     
     // const gameIds = gamesData?.map((game) => game.id) ?? [];
 
-    const { data: registrations, error: registrationsError } = await fetchRegistrants(supabase);
+    const { data: registrationData, error: registrationsError } = await fetchRegistrants(supabase);
+    const registrations = registrationData ? registrationData as GameRegistration[] : [];
     console.log(registrations);
     if (registrationsError) throw registrationsError
     if (!registrations) throw new Error("Registrations not found")
 
-    const seatCounts = registrations?.filter((reg) => {
+    const seatCounts = registrations.filter((reg) => {
       return reg.game_id !== null && reg.member_id !== null
     }).reduce((acc, reg) => {
       const game = gamesData?.find((game) => game.game_id === reg.game_id);
@@ -70,19 +66,19 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
 
     console.log(seatCounts);
 
-    const { data: favorites, error: favoritesError } = await supabase
-      .from('game_favorites')
-      .select(`
-        game_id,
-        member_id
-      `)
-      .eq('member_id', userId);
+    // const { data: favorites, error: favoritesError } = await supabase
+    //   .from('game_favorites')
+    //   .select(`
+    //     game_id,
+    //     member_id
+    //   `)
+    //   .eq('member_id', userId);
     
-    if (favoritesError) {
-      console.error(favoritesError);
-    }
+    // if (favoritesError) {
+    //   console.error(favoritesError);
+    // }
 
-    console.log(favorites);
+    // console.log(favorites);
 
     const scheduledGames: GameData[] = (gamesData as unknown as SupaGameScheduleData[]).map((gameSchedule) => {
       return {
@@ -97,10 +93,12 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         title: gameSchedule.games.title,
         description: gameSchedule.games.description,
         system: gameSchedule.games.system,
+        image: gameSchedule.games.image,
         maxSeats: gameSchedule.games.max_seats,
         currentSeats: seatCounts![gameSchedule.game_id] || 0,
-        favorite: favorites?.some((favorite) => favorite.game_id === gameSchedule.game_id) || false,
-        registered: registrations?.some((reg) => reg.game_id === gameSchedule.game_id && reg.member_id === userId) || false,
+        favorite: false,
+        registered: false,
+        registrations: registrations.filter((reg) => reg.game_id === gameSchedule.game_id),
         gamemaster_id: gameSchedule.games.members.id,
         gm_given_name: gameSchedule.games.members.profiles.given_name ?? "",
         gm_surname: gameSchedule.games.members.profiles.surname ?? "",

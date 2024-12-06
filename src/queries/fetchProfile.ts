@@ -18,7 +18,7 @@ export const fetchUserProfile = (userId: string) => {
             console.log('Profile Response: ', profileData);
             return profileData;
         },
-        enabled: !!userId,
+        // enabled: !!userId,
         initialData: {}
     });
 }

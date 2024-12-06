@@ -1,5 +1,4 @@
 import { MemberData } from "@/lib/types/custom";
-import { fetchMembersFull } from "@/queries/fetchMembers";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,10 +9,31 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const supabase = await createSupabaseServerClient();
-    const { data: memberData, error: memberError } = await fetchMembersFull(supabase);
+    const { data: memberData, error: memberError } = await supabase
+        .from("members")
+        .select(`
+            *,
+            profiles(
+                id,
+                given_name,
+                surname,
+                avatar,
+                experience_level,
+                bio,
+                birthday,
+                phone
+            ),
+            member_roles(
+                roles(
+                    id,
+                    name
+                )
+            )
+        `)
+        .order("created_at", { ascending: false });
 
     if (memberError) {
-        console.error(memberError)
+        console.error('Error fetching members:', memberError)
         return NextResponse.json({ error: memberError.message }, { status: 500 });
     }
 
@@ -41,7 +61,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`
     });
     if (error) {
-        console.error(error)
+        console.error('Error sending email invite:',   error)
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 

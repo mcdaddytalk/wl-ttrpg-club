@@ -41,7 +41,7 @@ export const useUpdateRoles = () => {
     },
     onSuccess: () => {
       // Invalidate the `members` query to refresh the data
-      queryClient.invalidateQueries({ queryKey: ['members', 'admin', 'full'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'members', 'full'] });
     },
     onError: (error) => {
       console.error('Error updating roles:', error);
