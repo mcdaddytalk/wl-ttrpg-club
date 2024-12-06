@@ -1,7 +1,7 @@
 import { NextRequest , NextResponse} from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
 import { createSupabaseReqResClient } from "./utils/supabase/server"
-import { RoleData, SupabaseRoleResponse } from "./lib/types/custom";
+import { RoleData, SupabaseRoleListResponse } from "./lib/types/custom";
 
 export async function middleware(request: NextRequest) {
   await updateSession(request)
@@ -13,48 +13,33 @@ export async function middleware(request: NextRequest) {
 
   const supabase = await createSupabaseReqResClient(request, response)
 
-/*
-  if (request.nextUrl.pathname === "/" 
-    || request.nextUrl.pathname === "/join-the-club"
-    || request.nextUrl.pathname === "/login"
-  ) {
-    return NextResponse.next();
-  }
-  */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
-  /*
-  if (error || !data.user) {
-      if (error) console.error('AUTH ERROR ', error)
-      if (!data.user) console.error('NO USER DATA ', data)
-        return NextResponse.redirect(new URL('/login', request.nextUrl.origin))
+  if (error || !user || !session) {
+      // if (error) console.error('AUTH ERROR ', error)
+      // if (!user) console.error('NO USER DATA ')
+      return NextResponse.next()
   }
-  */
+  
   const url = request.nextUrl;
   
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(name)').eq('member_id', user?.id) as unknown as SupabaseRoleResponse;
-  /*
+  const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleListResponse;
   if (roleError) {
     console.error('ROLE ERROR ', roleError)
-    return NextResponse.redirect(new URL('/', url))
   }
-
   if (!roleData) {
     console.error('NO ROLE DATA ', roleData)
-     return NextResponse.redirect(new URL('/', url))
   }
-*/
+  
   const roles = roleData ? (roleData as RoleData[])?.map((role) => role.roles.name) : [];
-  // console.log('ROLES', roles)
-
+  
   // Role based redirect
   // Array of restricted paths and role requirements
   const restrictedPaths = [
     { path: '/member', role: 'member' },
-    { path: '/games', role: ['member', 'gamemaster'] },
-    { path: '/gamemaster', role: 'gamemaster' },
+    { path: '/games', role: ['member', 'gamemaster', 'admin'] },
+    { path: '/gamemaster', role: ['admin', 'gamemaster'] },
     { path: '/admin', role: 'admin' },
     { path: '/account', role: 'superadmin' }
   ];
@@ -70,17 +55,6 @@ export async function middleware(request: NextRequest) {
     }
   }
   
-  /*
-  if (url.pathname.startsWith('/profile') && !roles.includes('member')) {
-      return NextResponse.redirect(new URL('/unauthorized', url))
-  } else if (url.pathname.startsWith('/admin') &&!roles.includes('admin')) {
-      return NextResponse.redirect(new URL('/unauthorized', url))
-  } else if (url.pathname.startsWith('/games') &&!roles.includes('member') && !roles.includes('gamemaster')) {
-      return NextResponse.redirect(new URL('/unauthorized', url));
-  } else if (url.pathname.startsWith('/account') && !roles.includes('superadmin')) {
-      return NextResponse.redirect(new URL('/unauthorized', url))
-  }
-      */
   return NextResponse.next();
 }
 
@@ -94,11 +68,5 @@ export const config = {
      * Feel free to modify this pattern to include more paths.
      */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-    "/admin-portal/:path*",
-    "/dashboard/:path*",
-    "/members/:path*",
-    "/profile/:path*",
-    "/games/:path*",
-    "/login/:path*",
   ],
 }

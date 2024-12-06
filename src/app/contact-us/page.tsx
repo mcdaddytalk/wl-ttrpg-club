@@ -1,6 +1,8 @@
+"use client"
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Textarea } from "@/components/ui/textarea"
 import React from "react"
 import { toast } from "sonner"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 const ContactFormSchema = z.object({
     name: z.string().min(2, {
@@ -33,10 +36,10 @@ export default function ContactUs(): React.ReactElement {
         },
     });
 
-    async function onSubmit(values: ContactFormValues) {
+    const onSubmit: SubmitHandler<ContactFormValues> = async (values: ContactFormValues): Promise<void> => {
         try {
             // Send the form data to your backend API
-            const response = await fetch("/api/contact-us", {
+            const response = await fetch("/api/email/contact-us", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -44,12 +47,12 @@ export default function ContactUs(): React.ReactElement {
                 body: JSON.stringify(values),
             });
 
+            const { error } = await response.json();
             if (response.ok) {
                 toast.success("Message sent successfully!");
                 form.reset(); // Reset form on success
             } else {
-                const data = await response.json();
-                toast.error(data.error);
+                toast.error(error);
             }
         } catch (error) {
             console.error(error);
@@ -63,55 +66,67 @@ export default function ContactUs(): React.ReactElement {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex flex-col items-center justify-center h-screen"
+            className="flex flex-col items-center min-h-screen p-8"
         >
-            <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Your Name" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Email</FormLabel>
-                                <FormControl>
-                                    <Input type="email" placeholder="your email" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="message"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Message</FormLabel>
-                            <FormControl>
-                            <Textarea placeholder="Your Message" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Card className="w-full max-w-md rounded-md shadow-md">
+                <CardHeader>
+                    <CardTitle className="text-3xl font-bold text-center">Contact Us</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Your Name" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input type="email" placeholder="your email" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="message"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Message</FormLabel>
+                                    <FormControl>
+                                    <Textarea placeholder="Your Message" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                        </form>
+                    </Form>
+                </CardContent>
+                <CardFooter className="flex justify-center">
+                    <Button
+                        type="submit"
+                        onClick={form.handleSubmit(onSubmit)}
+                        disabled={form.formState.isSubmitting}
+                    >
                         {form.formState.isSubmitting ? "Sending..." : "Send Message"}
                     </Button>
-                </form>
-            </Form>
+                </CardFooter>
+            </Card>
         </motion.div>
         
     )

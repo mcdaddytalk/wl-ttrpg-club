@@ -18,11 +18,12 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import RulesList from "../RulesList/page"
 import { formSchema } from "./schema"
 // import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner"
 import { useState } from "react"
-import Router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -63,6 +64,7 @@ export const SignupForm = () => {
     const [currentStep, setCurrentStep] = useState(0)
     const delta = currentStep - previousStep
     const [minor, setMinor] = useState(false);
+    const router = useRouter();
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -110,7 +112,7 @@ export const SignupForm = () => {
                 throw new Error(error.message);
             }
         } else {
-            Router.push('/login');
+            router.push('/login');
         }
         
         // form.reset()
@@ -138,35 +140,35 @@ export const SignupForm = () => {
     }
 
     return (
-        <section className='inset-0 flex flex-col justify-between p-18'>
+        <section className='inset-0 flex flex-col justify-between'>
             {/* steps */}
             <nav aria-label='Progress'>
                 <ol role='list' className='space-y-4 md:flex md:space-x-8 md:space-y-0'>
                 {steps.map((step, index) => (
                     <li key={step.name} className='md:flex-1'>
                     {currentStep > index ? (
-                        <div className='group flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
-                        <span className='text-sm font-medium text-sky-600 transition-colors '>
+                        <div className='group flex w-full flex-col border-l-4 border-sky-400 dark:border-sky-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
+                        <span className='text-sm font-medium text-sky-400 dark:text-sky-600 transition-colors '>
                             {step.id}
                         </span>
-                        <span className='text-sm font-medium'>{step.name}</span>
+                        <span className='text-sm font-medium text-white'>{step.name}</span>
                         </div>
                     ) : currentStep === index ? (
                         <div
-                        className='flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'
+                        className='flex w-full flex-col border-l-4 border-sky-400 dark:border-sky-600 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'
                         aria-current='step'
                         >
-                        <span className='text-sm font-medium text-sky-600'>
+                        <span className='text-sm font-medium text-sky-400 dark:text-sky-600'>
                             {step.id}
                         </span>
-                        <span className='text-sm font-medium'>{step.name}</span>
+                        <span className='text-sm font-medium text-white'>{step.name}</span>
                         </div>
                     ) : (
-                        <div className='group flex w-full flex-col border-l-4 border-gray-200 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
-                        <span className='text-sm font-medium text-gray-500 transition-colors'>
+                        <div className='group flex w-full flex-col border-l-4 border-slate-200 dark:border-slate-300 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
+                        <span className='text-sm font-medium text-slate-300 dark:text-slate-400 transition-colors'>
                             {step.id}
                         </span>
-                        <span className='text-sm font-medium'>{step.name}</span>
+                        <span className='text-sm font-medium text-slate-200 dark:text-slate-300'>{step.name}</span>
                         </div>
                     )}
                     </li>
@@ -181,7 +183,7 @@ export const SignupForm = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
                         <FormField
@@ -266,7 +268,7 @@ export const SignupForm = () => {
                         {minor && (
                             <>
                             <div>
-                                <h2 className='text-base font-semibold leading-7 text-gray-600 dark:text-gray-400'>
+                                <h2 className='text-base font-semibold leading-7 text-slate-600 dark:text-slate-400'>
                                     Parent Information
                                 </h2>
                             </div>
@@ -337,7 +339,7 @@ export const SignupForm = () => {
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
         
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
 
@@ -429,25 +431,27 @@ export const SignupForm = () => {
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
         
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
-                        <p>Please agree to the rules and responsibilities:</p>
-                        <FormField
-                            control={form.control}
-                            name="agreeToRules"
-                            render={({ field }) => (
-                                <FormItem className="space-y-2">
-                                    <FormLabel>Do you agree to abide by the rules and responsibilities?</FormLabel>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                    <FormMessage />
-                                </FormItem>                    
-                            )}
-                        />
-                        {form.formState.errors.agreeToRules && <span>{form.formState.errors.agreeToRules.message}</span>}
+                        <div className="max-w-3xl mx-auto p-6">
+                            <RulesList />
+                            <FormField
+                                control={form.control}
+                                name="agreeToRules"
+                                render={({ field }) => (
+                                    <FormItem className="mt-6 space-y-2">
+                                        <FormLabel>Do you agree to abide by the rules and responsibilities?</FormLabel>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                        <FormMessage />
+                                    </FormItem>                    
+                                )}
+                            />
+                            {form.formState.errors.agreeToRules && <span>{form.formState.errors.agreeToRules.message}</span>}
+                        </div>
                     </motion.div>
                 )}
 
@@ -457,7 +461,7 @@ export const SignupForm = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
                         <FormField 
@@ -495,7 +499,7 @@ export const SignupForm = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
                         <h3>Review your information:</h3>

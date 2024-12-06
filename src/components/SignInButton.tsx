@@ -10,6 +10,7 @@ import {
 } from '@/server/authActions';
 import { OAuthButtons } from './OAuthButtons';
 import PasswordlessButton from './PasswordlessButton';
+import { useRouter } from 'next/navigation';
 
 interface SignInButtonProps {
   mode?: 'modal' | 'inline'; // Accept mode prop
@@ -19,11 +20,21 @@ interface SignInButtonProps {
 
 const SignInButton: React.FC<SignInButtonProps> = ({ mode = 'inline' }) => {
   const [isModalOpen, setModalOpen] = useState(false);
- 
+  const router = useRouter();
+  
   const handleSignInWithEmail = async (formData: FormData) => {
     const email = formData.get('email') as string;
-    await signInWithOTP(email);    
-    setModalOpen(false); // Close modal after sign-in attempt
+    try {
+      await signInWithOTP(email);
+    } catch (error: Error | unknown) {
+      if (error instanceof Error && error.message.includes('Signups not allowed')) {
+        router.push('/signup');
+      } else {
+        router.push('/');
+      }      
+    } finally {
+      setModalOpen(false); // Close modal after sign-in attempt
+    }      
   };
 
   // const handleSignInWithGoogle = async () => {
@@ -49,7 +60,7 @@ const SignInButton: React.FC<SignInButtonProps> = ({ mode = 'inline' }) => {
   const SignupText = "Need an account? Sign Up"
 
   return (
-    <div className="flex flex-col items-center mt-1">
+    <div className="flex flex-col items-center">
       {mode === 'inline' ? (
         <>
           <PasswordlessButton useLabel handleSignInWithEmail={handleSignInWithEmail} />
@@ -76,13 +87,18 @@ const SignInButton: React.FC<SignInButtonProps> = ({ mode = 'inline' }) => {
             <h2 className="text-lg font-semibold dark:text-slate-800 text-slate-100">Sign In</h2>
             <PasswordlessButton handleSignInWithEmail={handleSignInWithEmail} />
             <OAuthButtons setModalOpen={setModalOpen} />
-            <Link
-              href="/signup"
-              onClick={closeModal}
-              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              {SignupText}
-            </Link>
+            <Button asChild className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-800">
+              <Link
+                href="/signup"
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent default to ensure `closeModal` logic runs.
+                  setModalOpen(false);
+                  window.location.href = "/signup"; // Redirect to signup after modal close.
+                }}
+              >
+                {SignupText}
+              </Link>
+            </Button>
           </div>
         </Modal>
       )}

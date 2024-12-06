@@ -1,17 +1,18 @@
+"use client"
+
 import UserButton from './UserButton'; // Import UserButton for signed-in users
-import { User } from '@supabase/supabase-js';
-import { getUser } from '@/server/authActions';
+import { useAuth } from '@/hooks/useAuth';
 
 type SignedOutProps = {
     children: React.ReactNode;
 }
-const SignedOut: React.FC<SignedOutProps> = async ({children}) => {
-  const user: User | null = await getUser();
-  
+const SignedOut: React.FC<SignedOutProps> = ({children}) => {
+  //const user: User | null = await getUser();
+  const { user, session } = useAuth();
   return (
     <div className="app-container">
-        {user ? (
-            <UserButton />
+        {session && user ? (
+            <UserButton user={user}/>
         ) : (
             <>
             {children}

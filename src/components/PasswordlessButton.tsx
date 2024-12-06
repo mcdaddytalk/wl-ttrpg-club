@@ -20,7 +20,7 @@ export default function PasswordlessButton({ handleSignInWithEmail, useLabel = f
                     placeholder='Enter your email' 
                     autoComplete="email"
                     required 
-                    className="w-full text-slate-800 dark:text-slate-800"
+                    className="w-full text-slate-100 dark:text-slate-800"
                 />
               </div>
               <Button

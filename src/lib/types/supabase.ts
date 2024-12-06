@@ -69,59 +69,88 @@ export type Database = {
         }
         Relationships: []
       }
-      game_registrations: {
+      game_favorites: {
         Row: {
-          game_id: string | null
-          id: number
-          member_id: string | null
-          registered_at: string | null
-          updated_at: string | null
+          created_at: string
+          game_id: string
+          member_id: string
         }
         Insert: {
-          game_id?: string | null
-          id?: number
-          member_id?: string | null
-          registered_at?: string | null
-          updated_at?: string | null
+          created_at?: string
+          game_id?: string
+          member_id?: string
         }
         Update: {
-          game_id?: string | null
-          id?: number
-          member_id?: string | null
-          registered_at?: string | null
-          updated_at?: string | null
+          created_at?: string
+          game_id?: string
+          member_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "game_registrations_game_id_fkey"
+            foreignKeyName: "game_favorites_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "games"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "game_registrations_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "scheduled_games_view"
-            referencedColumns: ["game_id"]
-          },
-          {
-            foreignKeyName: "game_registrations_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "upcoming_games_view"
-            referencedColumns: ["game_id"]
-          },
-          {
-            foreignKeyName: "game_registrations_member_id_fkey"
+            foreignKeyName: "game_favorites_member_id_fkey"
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "is_admin"
             referencedColumns: ["member_id"]
           },
           {
-            foreignKeyName: "game_registrations_member_id_fkey"
+            foreignKeyName: "game_favorites_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_registrations: {
+        Row: {
+          game_id: string
+          id: string
+          member_id: string
+          registered_at: string
+          status: Database["public"]["Enums"]["registrant_status_enum"]
+          status_note: string | null
+        }
+        Insert: {
+          game_id: string
+          id?: string
+          member_id: string
+          registered_at?: string
+          status?: Database["public"]["Enums"]["registrant_status_enum"]
+          status_note?: string | null
+        }
+        Update: {
+          game_id?: string
+          id?: string
+          member_id?: string
+          registered_at?: string
+          status?: Database["public"]["Enums"]["registrant_status_enum"]
+          status_note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_game_registrations_games"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_game_registrations_members"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "fk_game_registrations_members"
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "members"
@@ -132,139 +161,125 @@ export type Database = {
       game_schedule: {
         Row: {
           created_at: string | null
+          day_of_week: Database["public"]["Enums"]["day_of_week_enum"] | null
+          deleted_at: string | null
           first_game_date: string
           game_id: string | null
-          id: number
+          id: string
           interval: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date: string | null
+          location: string | null
+          next_game_date: string | null
           status: Database["public"]["Enums"]["game_status_enum"]
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          day_of_week?: Database["public"]["Enums"]["day_of_week_enum"] | null
+          deleted_at?: string | null
           first_game_date: string
           game_id?: string | null
-          id?: number
+          id?: string
           interval: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date?: string | null
+          location?: string | null
+          next_game_date?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          day_of_week?: Database["public"]["Enums"]["day_of_week_enum"] | null
+          deleted_at?: string | null
           first_game_date?: string
           game_id?: string | null
-          id?: number
+          id?: string
           interval?: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date?: string | null
+          location?: string | null
+          next_game_date?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "game_schedule_game_id_fkey"
+            foreignKeyName: "fk_game_schedule_games"
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "games"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "game_schedule_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "scheduled_games_view"
-            referencedColumns: ["game_id"]
-          },
-          {
-            foreignKeyName: "game_schedule_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "upcoming_games_view"
-            referencedColumns: ["game_id"]
           },
         ]
       }
       games: {
         Row: {
           created_at: string | null
+          deleted_at: string | null
           description: string | null
           gamemaster_id: string | null
           id: string
-          name: string
+          max_seats: number | null
           system: string | null
-          updated_at: string | null
+          title: string
+          updated_at: string
         }
         Insert: {
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           gamemaster_id?: string | null
           id?: string
-          name: string
+          max_seats?: number | null
           system?: string | null
-          updated_at?: string | null
+          title: string
+          updated_at?: string
         }
         Update: {
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           gamemaster_id?: string | null
           id?: string
-          name?: string
+          max_seats?: number | null
           system?: string | null
-          updated_at?: string | null
+          title?: string
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "games_gamemaster_id_fkey"
+            foreignKeyName: "fk_games_members"
             columns: ["gamemaster_id"]
             isOneToOne: false
             referencedRelation: "is_admin"
             referencedColumns: ["member_id"]
           },
           {
-            foreignKeyName: "games_gamemaster_id_fkey"
+            foreignKeyName: "fk_games_members"
             columns: ["gamemaster_id"]
             isOneToOne: false
             referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_profiles_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
       member_roles: {
         Row: {
-          id: number
-          member_id: string | null
-          role_id: number | null
+          assigned_at: string
+          id: string
+          member_id: string
+          role_id: string
         }
         Insert: {
-          id?: number
-          member_id?: string | null
-          role_id?: number | null
+          assigned_at?: string
+          id?: string
+          member_id: string
+          role_id: string
         }
         Update: {
-          id?: number
-          member_id?: string | null
-          role_id?: number | null
+          assigned_at?: string
+          id?: string
+          member_id?: string
+          role_id?: string
         }
         Relationships: [
           {
@@ -293,6 +308,8 @@ export type Database = {
       members: {
         Row: {
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           email: string
           id: string
           is_admin: boolean
@@ -303,6 +320,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           email: string
           id?: string
           is_admin?: boolean
@@ -313,6 +332,8 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string
           id?: string
           is_admin?: boolean
@@ -323,12 +344,78 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_archived: boolean
+          is_read: boolean
+          recipient_id: string
+          sender_id: string
+          subject: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_archived?: boolean
+          is_read?: boolean
+          recipient_id: string
+          sender_id: string
+          subject?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_archived?: boolean
+          is_read?: boolean
+          recipient_id?: string
+          sender_id?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messgaes_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "messgaes_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messgaes_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "messgaes_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar: string | null
           bio: string | null
           birthday: string | null
           created_at: string | null
+          experience_level: Database["public"]["Enums"]["experience_level_enum"]
           given_name: string | null
           id: string
           phone: string | null
@@ -340,6 +427,7 @@ export type Database = {
           bio?: string | null
           birthday?: string | null
           created_at?: string | null
+          experience_level?: Database["public"]["Enums"]["experience_level_enum"]
           given_name?: string | null
           id: string
           phone?: string | null
@@ -351,6 +439,7 @@ export type Database = {
           bio?: string | null
           birthday?: string | null
           created_at?: string | null
+          experience_level?: Database["public"]["Enums"]["experience_level_enum"]
           given_name?: string | null
           id?: string
           phone?: string | null
@@ -359,28 +448,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_member"
+            foreignKeyName: "fk_profiles_members"
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "is_admin"
             referencedColumns: ["member_id"]
           },
           {
-            foreignKeyName: "fk_member"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "profiles_id_fkey"
+            foreignKeyName: "fk_profiles_members"
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "members"
@@ -388,17 +463,46 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          function: Database["public"]["Enums"]["app_function"]
+          id: number
+          permission: Database["public"]["Enums"]["app_permission"]
+          role_id: string
+        }
+        Insert: {
+          function: Database["public"]["Enums"]["app_function"]
+          id?: number
+          permission: Database["public"]["Enums"]["app_permission"]
+          role_id: string
+        }
+        Update: {
+          function?: Database["public"]["Enums"]["app_function"]
+          id?: number
+          permission?: Database["public"]["Enums"]["app_permission"]
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       roles: {
         Row: {
-          id: number
+          id: string
           name: string
         }
         Insert: {
-          id?: number
+          id?: string
           name: string
         }
         Update: {
-          id?: number
+          id?: string
           name?: string
         }
         Relationships: []
@@ -420,112 +524,14 @@ export type Database = {
         }
         Relationships: []
       }
-      scheduled_games_view: {
-        Row: {
-          description: string | null
-          first_game_date: string | null
-          game_id: string | null
-          gamemaster_id: string | null
-          gm_given_name: string | null
-          gm_surname: string | null
-          last_game_date: string | null
-          name: string | null
-          registered_at: string | null
-          status: Database["public"]["Enums"]["game_status_enum"] | null
-          system: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "games_gamemaster_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gamemaster_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_profiles_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      upcoming_games_view: {
-        Row: {
-          description: string | null
-          first_game_date: string | null
-          game_id: string | null
-          gamemaster_id: string | null
-          gm_given_name: string | null
-          gm_surname: string | null
-          last_game_date: string | null
-          name: string | null
-          registered_at: string | null
-          status: Database["public"]["Enums"]["game_status_enum"] | null
-          system: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "games_gamemaster_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gamemaster_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "is_admin"
-            referencedColumns: ["member_id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "games_gm_id_profiles_fkey"
-            columns: ["gamemaster_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Functions: {
+      custom_access_token_hook: {
+        Args: {
+          event: Json
+        }
+        Returns: Json
+      }
       get_scheduled_games_with_counts: {
         Args: {
           member_id: string
@@ -541,6 +547,7 @@ export type Database = {
           status: string
           first_game_date: string
           last_game_date: string
+          user_id: string
           registered_at: string
           num_players: number
         }[]
@@ -560,25 +567,51 @@ export type Database = {
           status: string
           first_game_date: string
           last_game_date: string
+          user_id: string
           registered_at: string
           num_players: number
         }[]
       }
+      verify_user_password: {
+        Args: {
+          password: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_function: "games" | "members" | "schedules" | "messages"
+      app_permission: "create" | "read" | "update" | "delete"
+      day_of_week_enum:
+        | "sunday"
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
       experience_level_enum:
         | "new"
         | "novice"
         | "seasoned"
         | "player-gm"
         | "forever-gm"
-      game_interval_enum: "weekly" | "bimonthly" | "monthly"
+      game_interval_enum:
+        | "weekly"
+        | "biweekly"
+        | "monthly"
+        | "yearly"
+        | "custom"
       game_status_enum:
+        | "draft"
+        | "active"
         | "scheduled"
         | "awaiting-players"
+        | "full"
         | "completed"
         | "canceled"
       gamemaster_interest_enum: "yes" | "no" | "maybe"
+      registrant_status_enum: "awaiting-approval" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never

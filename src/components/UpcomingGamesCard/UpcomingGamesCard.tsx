@@ -13,7 +13,14 @@ import { UpcomingGame } from "@/lib/types/custom"
 import { format } from "date-fns"
 
 type UpcomingGamesCardProps = {
-    upcomingGames: UpcomingGame[]
+    upcomingGames: UpcomingGame[] | null
+}
+
+const formatDate = (date: Date | null) => {
+    if (date) {
+      return format(date, 'MMM dd, yyyy at h:mm a');
+    }
+    return 'No date available';
 }
 
 const UpcomingGamesCard = ({ upcomingGames }: UpcomingGamesCardProps): React.ReactElement => {
@@ -24,10 +31,10 @@ const UpcomingGamesCard = ({ upcomingGames }: UpcomingGamesCardProps): React.Rea
       </CardHeader>
       <CardContent>
         <ul>
-          {upcomingGames.length > 0 ? (
+          {upcomingGames && upcomingGames.length > 0 ? (
             upcomingGames.map((game) => (
               <li key={game.id}>
-                <strong>{game.title}</strong> on {format(new Date(game.scheduled_for), 'MMM dd, yyyy at h:mm a')}
+                <strong>{game.title}</strong> on {formatDate(game.scheduled_for)}
               </li>
             ))
           ) : (

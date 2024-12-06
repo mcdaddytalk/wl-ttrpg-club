@@ -8,7 +8,17 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-  	extend: {
+	extend: {
+		screens: {
+			"md-lg": "1024px",
+			"lg-sm": "1152px",
+			"lg": "1280px",
+			'xl': '1440px',      // Extra large screens
+			'2xl': '1600px',     // Ultra-wide screens
+			'3xl': '1920px',     // Full HD screens
+			'4xl': '2560px',     // QHD screens
+			'5xl': '3840px',     // 4K displays
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -65,9 +75,23 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+		fontFamily: {
+			sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+			mono: ['var(--font-geist-mono)', 'monospace']
+		},
+		backgroundImage: {
+			'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+			'gradient-conic':
+				'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+			'gradient-radial-2': 'radial-gradient(circle, var(--tw-gradient-stops))',
+			banner: "url('/images/WLTTRPG.webp')",
+			'black-overlay': 'linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8) 50%)',
+			'white-overlay': 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8) 50%)',
+		}
   	}
   },
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   plugins: [require("tailwindcss-animate")],
 };
 export default config;

@@ -1,95 +1,142 @@
-import GameList from "@/components/GameList/GameList";
-import { Button } from "@/components/ui/button";
-import { 
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent
-} from "@/components/ui/card";
-import { GMGameData } from "@/lib/types/custom";
-import { getUser } from "@/server/authActions";
-import { createSupabaseBrowserClient } from "@/utils/supabase/client";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+"use client"
 
-export default async function GamemasterDashboard() {
-  const supabase = createSupabaseBrowserClient();
-  const user = await getUser();
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import ScheduledGamesCard from "@/components/ScheduledGamesCard/ScheduledGamesCard";
+import { GMGameData, Player } from "@/lib/types/custom";
+import useSession from "@/utils/supabase/use-session";
+import GameRegistrantsCard from "@/components/GameRegistrantsCard/GameRegistrantsCard";
+import SelectedGameCard from "@/components/SelectedGameCard/page";
+import { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
-  if (!user) {
-    redirect('/login')
-  }
-
-  const { data: gamesData, error: gamesError } = await supabase
-    .from('games')
-    .select(`
-      id, 
-      title, 
-      description,
-      system, 
-      max_seats, 
-      game_schedule(
-        first_game_date,
-        interval,
-        status,
-        next_game_date
-      )    
-    `)
-    .eq('gamemaster_id', user.id);
-
-  const gameIds = gamesData?.map((game) => game.id) ?? [];
-
-  const { data: registrations, error: registrationsError } = await supabase
-    .from('game_registrations')
-    .select(`
-      game_id,
-      member_id
-    `)
-    //.eq('games.gamemaster_id', user.id);
-    .in('game_id', gameIds);
-    
-  if (gamesError) {
-    console.error(gamesError);
-  } else {
-    console.log(gamesData);
-  }
-  if (registrationsError) {
-    console.error(registrationsError);
-  } else {
-    console.log(registrations);
-  }
-
-  const seatCounts = registrations?.reduce((acc, reg) => {
-    const game = gamesData?.find((game) => game.id === reg.game_id);
-    if (game) {
-      acc[reg.game_id] = (acc[reg.game_id] || 0) + 1;
+async function fetchGames(gamemasterId: string): Promise<GMGameData[]> {
+  const response = await fetch(`/api/gamemaster/${gamemasterId}/games`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     }
-    return acc;
-  }, {} as Record<string, number>);
+  );
 
-  const combinedData: GMGameData[] = gamesData?.map(game => ({
-    id: game.id,
-    title: game.title,
-    description: game.description,
-    system: game.system,
-    scheduled_for: game.game_schedule[0]?.next_game_date,
-    interval: game.game_schedule[0]?.interval,
-    maxSeats: game.max_seats,
-    status: game.game_schedule[0]?.status,
-    seats: seatCounts![game.id] || 0,
-  })) ?? [];
+  switch (response.status) {
+    case 500:
+      toast.error("Error fetching games");
+      return [];   
+    case 404:
+      toast.error("Games not found");
+      return [];
+    case 200:
+      const games = await response.json();
+      return games;
+    default:
+      toast.error("Error fetching games");
+      return [];
+  }
+};
+
+const fetchPlayers = async (gameId: string): Promise<Player[]> => {
+  const response = await fetch(`/api/games/${gameId}/registrants`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  switch (response.status) {
+    case 500:
+      toast.error("Error fetching players");
+      return [];   
+    case 404:
+      toast.error("Players not found");
+      return [];
+    case 200:
+      const players = await response.json();
+      return players;
+    default:
+      toast.error("Error fetching players");
+      return [];
+  }
+}
+
+export default function GamemasterDashboard(): React.ReactElement {
+  const queryClient = useQueryClient();
+  const session = useSession();
+  const user: User = (session?.user as User) ?? null;
+
+  const [selectedGame, setSelectedGame] = useState<GMGameData | null>(null);
+  const gamemasterId = user?.id;
+
+  const { data: games, isLoading } = useQuery<GMGameData[], Error>({
+    queryKey: ['games', gamemasterId, 'gm', 'full'],
+    queryFn: () => fetchGames(gamemasterId),
+    initialData: [],
+    enabled: !!gamemasterId,
+  });
+
+  const { data: players } = useQuery<Player[], Error>({
+    queryKey: ['players', user?.id as string, selectedGame?.id],
+    queryFn: () => fetchPlayers(selectedGame?.id as string),
+    initialData: [],
+    enabled: !!selectedGame?.id,
+  });
   
+  const gameMutation = useMutation({
+    mutationFn: () => fetchGames(gamemasterId),
+    onSuccess: (updatedData) => {
+      console.log('Games updated', updatedData);
+      // Invalidate the `games` query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['games', gamemasterId, 'gm', 'full'] });      
+    }
+  })
+
+  const playersMutation = useMutation({
+    mutationFn: () => fetchPlayers(selectedGame?.id as string),
+    onSuccess: () => {
+      console.log('Players updated');
+      // Invalidate the `players` query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['players', user?.id, selectedGame?.id] });
+    }
+  })
+  
+  const onShowDetails = (game: GMGameData) => {
+    setSelectedGame(game);
+    playersMutation.mutate();
+  };
+
+  const onGameEdit = () => {
+    gameMutation.mutate();
+  };
+
+  const handleGameAdded = () => {
+    gameMutation.mutate();
+  };
+
+  // const handleGameDeleted = () => {
+  //   fetchGames();
+  // };
+
+  if (!user) return <div>Please log in to access the dashboard.</div>;
+  if (isLoading) return <div>Loading Gamemaster Games...</div>;
+  if (!games) return <div>No Scheduled Gamemaster games found.</div>;
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">GM Dashboard</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Button variant="default">
-          <Link href="/gamemaster/add-game">Create New Game</Link>
-        </Button>
-        <GameList games={combinedData} />
-      </CardContent>
-    </Card>     
+    <section className="items-center justify-center">
+      <div className="space-y-2 p-2">
+        <ScheduledGamesCard onGameAdded={handleGameAdded} onShowDetails={onShowDetails} onGameEdit={onGameEdit} scheduledGames={games} gamemaster_id={gamemasterId} />        
+      </div>
+      {/* <div className="flex flex-wrap space-y-4 border-4 border-green-500 p-2"> */}
+      <div className="grid grid-cols-1  sm:grid-cols-4 gap-2  p-2">
+        <div className="sm:col-span-1 bg-white shadow-md rounded-lg p-2">
+          <SelectedGameCard game={selectedGame} />
+        </div>
+        <div className="sm:col-span-3 bg-white shadow-md rounded-lg p-4">
+          <GameRegistrantsCard registrants={players} />
+        </div>
+      </div>
+    </section>
   );
 }

@@ -22,6 +22,7 @@ import { formSchema } from "./schema"
 import { toast } from "sonner"
 import { useState } from "react"
 import { useRouter } from 'next/navigation';
+import RulesList from "../RulesList/page"
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -82,7 +83,7 @@ export const ContactForm = () => {
     
     const processForm: SubmitHandler<FormValues> = async (data) => {
         console.log('Data received')
-        console.log(data)
+        //console.log(data)
         console.log('Sending to server...')
 
         const contactResponse = await fetch('/api/contacts', {
@@ -97,25 +98,25 @@ export const ContactForm = () => {
 
         if (!contactResponse.ok) {
             if (contactResponse.status === 409) {
+                setComplete(false)
                 toast.error('Email Already In Use.  Please use a different email address.')
             } else {
                 const { error } = contactData
                 throw new Error(error.message);
             }
         } else {
+            await fetch('/api/email/new-contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            // await emailResponse.json();
             toast.success("Your contact information has been saved.")
             setComplete(true)
-        }
-        
-        const emailResponse = await fetch('/api/email/new-contact', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        await emailResponse.json();
+        }                    
         // form.reset()
     }
 
@@ -160,35 +161,35 @@ export const ContactForm = () => {
     // };
 
     return (
-        <section className='inset-0 flex flex-col justify-between p-18'>
+        <section className='inset-0 flex flex-col justify-between'>
             {/* steps */}
             <nav aria-label='Progress'>
                 <ol role='list' className='space-y-4 md:flex md:space-x-8 md:space-y-0'>
                 {steps.map((step, index) => (
                     <li key={step.name} className='md:flex-1'>
                     {currentStep > index ? (
-                        <div className='group flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
-                        <span className='text-sm font-medium text-sky-600 transition-colors '>
+                        <div className='group flex w-full flex-col border-l-4 border-sky-400 dark:border-sky-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
+                        <span className='text-sm font-medium text-sky-400 dark:text-sky-600 transition-colors '>
                             {step.id}
                         </span>
-                        <span className='text-sm font-medium'>{step.name}</span>
+                        <span className='text-sm font-medium text-white'>{step.name}</span>
                         </div>
                     ) : currentStep === index ? (
                         <div
-                        className='flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'
+                        className='flex w-full flex-col border-l-4 border-sky-400 dark:border-sky-600 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'
                         aria-current='step'
                         >
-                        <span className='text-sm font-medium text-sky-600'>
+                        <span className='text-sm font-medium text-sky-400 dark:text-sky-600'>
                             {step.id}
                         </span>
-                        <span className='text-sm font-medium'>{step.name}</span>
+                        <span className='text-sm font-medium text-white'>{step.name}</span>
                         </div>
                     ) : (
-                        <div className='group flex w-full flex-col border-l-4 border-gray-200 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
-                        <span className='text-sm font-medium text-gray-500 transition-colors'>
+                        <div className='group flex w-full flex-col border-l-4 border-slate-200 dark:border-slate-300 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4'>
+                        <span className='text-sm font-medium text-slate-300 dark:text-slate-400 transition-colors'>
                             {step.id}
                         </span>
-                        <span className='text-sm font-medium'>{step.name}</span>
+                        <span className='text-sm font-medium text-slate-200 dark:text-slate-300'>{step.name}</span>
                         </div>
                     )}
                     </li>
@@ -203,7 +204,7 @@ export const ContactForm = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-100 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
                         <FormField
@@ -211,9 +212,9 @@ export const ContactForm = () => {
                             name='firstName'
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
-                                <FormLabel>First Name</FormLabel>
+                                <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">First Name</FormLabel>
                                 <FormControl>
-                                    <Input autoComplete="cc-given-name" placeholder="New" {...field} />
+                                    <Input autoComplete="cc-given-name" placeholder="New" {...field} className="text-white"/>
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -225,7 +226,7 @@ export const ContactForm = () => {
                             name="surname"
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
-                                    <FormLabel>Last Name</FormLabel>
+                                    <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Last Name</FormLabel>
                                     <FormControl>
                                     <Input type="text" autoComplete="cc-family-name" placeholder="Contact" {...field} />
                                     </FormControl>
@@ -239,7 +240,7 @@ export const ContactForm = () => {
                             name="email"
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
-                                    <FormLabel>Email</FormLabel>
+                                    <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Email</FormLabel>
                                     <FormControl>
                                         <Input type="email" autoComplete="email" placeholder="no-contact@email.com" {...field} />
                                     </FormControl>
@@ -256,7 +257,7 @@ export const ContactForm = () => {
                             name="phoneNumber"
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
-                                    <FormLabel>Phone Number</FormLabel>
+                                    <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Phone Number</FormLabel>
                                     <FormControl>
                                         <Input type="tel" autoComplete="tel" placeholder="+1 (000) 000-0000" {...field} />
                                     </FormControl>
@@ -273,7 +274,7 @@ export const ContactForm = () => {
                             name="isMinor"
                             render={({ field }) => (
                                 <FormItem className="space-y-2">
-                                    <FormLabel>Are You A Minor? *Parent Information will be required </FormLabel>
+                                    <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Are You A Minor? *Parent Information will be required </FormLabel>
                                     <Checkbox
                                         checked={minor || field.value}
                                         onCheckedChange={(value) => {
@@ -288,7 +289,7 @@ export const ContactForm = () => {
                         {minor && (
                             <>
                             <div>
-                                <h2 className='text-base font-semibold leading-7 text-gray-600 dark:text-gray-400'>
+                                <h2 className='text-base font-semibold leading-7 text-slate-100 dark:text-slate-400'>
                                     Parent Information
                                 </h2>
                             </div>
@@ -297,7 +298,7 @@ export const ContactForm = () => {
                                 name="parentFirstName"
                                 render={({ field }) => (
                                     <FormItem className="space-y-2">
-                                    <FormLabel>First Name</FormLabel>
+                                    <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">First Name</FormLabel>
                                     <FormControl>
                                         <Input autoComplete="cc-given-name" placeholder="New" {...field} />
                                     </FormControl>
@@ -311,7 +312,7 @@ export const ContactForm = () => {
                                 name="parentSurname"
                                 render={({ field }) => (
                                     <FormItem className="space-y-2">
-                                        <FormLabel>Last Name</FormLabel>
+                                        <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Last Name</FormLabel>
                                         <FormControl>
                                         <Input type="text" autoComplete="cc-family-name" placeholder="Contact" {...field} />
                                         </FormControl>
@@ -325,7 +326,7 @@ export const ContactForm = () => {
                                 name="parentEmail"
                                 render={({ field }) => (
                                     <FormItem>
-                                    <FormLabel>Parent Email</FormLabel>
+                                    <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Parent Email</FormLabel>
                                     <FormControl>
                                         <Input type="email" autoComplete="email" placeholder="me@example.com" {...field} />
                                     </FormControl>
@@ -339,7 +340,7 @@ export const ContactForm = () => {
                                 name="parentPhone"
                                 render={({ field }) => (
                                     <FormItem>
-                                    <FormLabel>Parent Phone Number</FormLabel>
+                                    <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Parent Phone Number</FormLabel>
                                     <FormControl>
                                         <Input type="tel" autoComplete="tel" placeholder="+1 (000) 000-0000" {...field} />
                                     </FormControl>
@@ -359,7 +360,7 @@ export const ContactForm = () => {
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
         
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
 
@@ -368,7 +369,7 @@ export const ContactForm = () => {
                             name="experienceLevel"
                             render={({ field }) => (
                                 <FormItem className="space-y-2">
-                                <FormLabel>Experience Level</FormLabel>
+                                <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Experience Level</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <SelectTrigger>
                                         <SelectValue {...field} placeholder="Experience Level" />
@@ -390,7 +391,7 @@ export const ContactForm = () => {
                             name="gamemasterInterest"
                             render={({ field }) => (
                             <FormItem className="space-y-2">
-                                <FormLabel>Gamemaster Interest</FormLabel>
+                                <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Gamemaster Interest</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <SelectTrigger>
                                     <SelectValue {...field} placeholder="Interested in Gamemastering?" />
@@ -412,7 +413,7 @@ export const ContactForm = () => {
                             name="preferredSystem"
                             render={({ field }) => (
                             <FormItem className="space-y-2">
-                                <FormLabel>Preferred System</FormLabel>
+                                <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Preferred System</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <SelectTrigger>
                                     <SelectValue {...field} placeholder="Preferred System" />
@@ -435,7 +436,7 @@ export const ContactForm = () => {
                             name="availability"
                             render={({ field }) => (
                             <FormItem className="space-y-2">
-                                <FormLabel>Availability</FormLabel>
+                                <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Availability</FormLabel>
                                 <Input {...field} placeholder="Your availability (e.g., Every Weekend, Sundays, Saturdays?)" />
                                 <FormMessage />
                             </FormItem>
@@ -451,25 +452,27 @@ export const ContactForm = () => {
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
         
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
-                        <p>Please agree to the rules and responsibilities:</p>
-                        <FormField
-                            control={form.control}
-                            name="agreeToRules"
-                            render={({ field }) => (
-                                <FormItem className="space-y-2">
-                                    <FormLabel>Do you agree to abide by the rules and responsibilities?</FormLabel>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                    <FormMessage />
-                                </FormItem>                    
-                            )}
-                        />
-                        {form.formState.errors.agreeToRules && <span>{form.formState.errors.agreeToRules.message}</span>}
+                        <div className="max-w-3xl mx-auto p-6">
+                            <RulesList />
+                            <FormField
+                                control={form.control}
+                                name="agreeToRules"
+                                render={({ field }) => (
+                                    <FormItem className="mt-6 space-y-2">
+                                        <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Do you agree to abide by the rules and responsibilities?</FormLabel>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                        <FormMessage />
+                                    </FormItem>                    
+                                )}
+                            />
+                            {form.formState.errors.agreeToRules && <span>{form.formState.errors.agreeToRules.message}</span>}
+                        </div>
                     </motion.div>
                 )}
 
@@ -479,18 +482,18 @@ export const ContactForm = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <h2 className='text-base font-semibold leading-7 text-gray-800 dark:text-gray-400'>
+                        <h2 className='text-base font-semibold leading-7 text-slate-800 dark:text-slate-400'>
                             {steps[currentStep].id}: {steps[currentStep].name}
                         </h2>
                         <p>Thank you for signing up! Review your information:</p>
                         <pre>{JSON.stringify(form.getValues(), null, 2)}</pre>
-                        <Button type="reset" onClick={complete}>Complete</Button>
+                        <Button type="reset" disabled={!isComplete} onClick={complete}>Complete</Button>
                     </motion.div>
                 )}
                 </form>
             </Form>
             {/* Navigation */}
-            <div className='mt-5 pt-5'>
+            <div className='pt-5'>
                 <div className='flex justify-between'>
                     <Button
                         type='button'
