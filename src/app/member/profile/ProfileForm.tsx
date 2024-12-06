@@ -26,18 +26,8 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
   const supabase = useSupabaseBrowserClient()
   const queryClient = useQueryClient()
 
-  // Query to fetch profile
-  // const { 
-  //   data: profile, 
-  //   isLoading: profileLoading, 
-  //   isError
-  // } = useQuery({
-  //   queryKey: ["profiles", supabase, user?.id],
-  //   queryFn: () => fetchProfile(supabase, user?.id),
-  //   enabled: !!user,
-  // });
   const { data: profile, isLoading: profileLoading, isError, error } = useQuery({
-    queryKey: ["profiles", user.id],
+    queryKey: ["members", "profile", user.id],
     queryFn: async () => {
       const userId = user.id;
       const response =  await fetch(`/api/members/${userId}/profile`);
@@ -48,8 +38,7 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
       console.log('Profile Response: ', data);
       return data;
     },
-    enabled: !!user,
-    initialData: {}
+    enabled: !!user.id,
   });
   
   // const profile = profileData.data as ProfileData;
@@ -73,31 +62,14 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
       console.log('Updated profile:', data);
       console.log('Updated profile:', updatedProfile);
       console.log('Context: ', context);
-      queryClient.setQueryData(["profiles", user?.id], updatedProfile);
+      queryClient.setQueryData(["members", "profile", user?.id], updatedProfile);
       toast.success("Profile updated successfully!");
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to update profile.");
     },
   })
-
-  // const { mutate: updateProfile } = useUpsertMutation(
-  //   supabase.from("profiles"),
-  //   ["id"],
-  //   "*",
-  //   {
-  //     onSuccess: (data, updatedProfile, context) => {
-  //       console.log('Updated profile:', data);
-  //       console.log('Updated profile:', updatedProfile);
-  //       console.log('Context: ', context);
-  //       queryClient.setQueryData(["profiles", supabase, user?.id], updatedProfile);
-  //       toast.success("Profile updated successfully!");
-  //     },
-  //     onError: (error: Error) => {
-  //       toast.error(error.message || "Failed to update profile.");
-  //     }
-  //   }
-  // )
+  
   // Local state for detecting changes
   const [localProfile, setLocalProfile] = useState<ProfileData | null>(null);
   const [hasChanges, setHasChanges] = useState(false);

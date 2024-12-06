@@ -179,10 +179,12 @@ export type GameData = {
   title: string;
   description: string;
   system: string;
+  image: string;
   maxSeats: number;
   currentSeats: number;
   favorite: boolean;
-  registered?: boolean;
+  registered: boolean;
+  registrations: GameRegistration[];
   gamemaster_id: string;
   gm_given_name: string;
   gm_surname: string;
@@ -205,14 +207,13 @@ export type SupaGameData = {
   title: string;
   description: string;
   system: string;
+  image: string;
   max_seats: number;
   gamemaster_id: string;
   members: MemberData;
 }
-  
 
 export type SupabaseGameDataListResponse = SupabaseDataResponse<SupaGameScheduleData>
-
 export type SupabaseUpcomingGamesListResponse = SupabaseDataResponse<GameData>
 
 export type GMGameData = {
@@ -230,6 +231,14 @@ export type GMGameData = {
   onShowDetails?: (game: GMGameData) => void;
   onEditGame?: (game: GMGameData) => void;
 }
+
+export type GameFavorite = {
+  game_id: string;
+  member_id: string;
+  created_at: Date;
+}
+
+export type SupabaseGameFavoriteListResponse = SupabaseDataResponse<GameFavorite>
 
 export type NewContact = {
   firstName: string;

@@ -5,63 +5,28 @@ import { toast } from "sonner";
 import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
 import { useState } from "react";
-import { MemberData, RoleDO } from "@/lib/types/custom";
+import { MemberData } from "@/lib/types/custom";
 import { ManageRolesModal } from "../ManageRolesModal";
 import { columns } from "./columns";
-import { useQuery } from "@tanstack/react-query";
+import { 
+    // useQuery, 
+    useSuspenseQuery 
+} from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import { ConfirmationModal } from "../ConfirmationModal";
 import { AddMemberModal } from "../AddMemberModal";
+import { fetchMembersFull, fetchRoles } from "@/queries/fetchMembers";
 
 interface AdminMembersTableProps {
     className?: string
 }
-
-const fetchMembers = async (): Promise<MemberData[]> => {
-    const response = await fetch("/api/admin/members",
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }
-    );
-    if (!response.ok) throw new Error("Failed to fetch members");
-    const data = await response.json();
-    console.log('Fetched Members: ', data);
-    return data as MemberData[];
-  };
-  
-  const fetchRoles = async (): Promise<RoleDO[]> => {
-    const response = await fetch("/api/roles", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (!response.ok) throw new Error("Failed to fetch roles");
-    const data = await response.json();
-    console.log('Fetched Roles: ', data);
-    return data as RoleDO[];
-  };
-
+ 
 const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactElement => {
     const session = useSession();
     const user: User = (session?.user as User) ?? null;
     
-    const { data: members, isLoading: loadingMembers, isError: errorMembers } = useQuery({
-        queryKey: ['members', 'admin', 'full'],        
-        queryFn: () => fetchMembers(),
-        initialData: [],
-        enabled: !!user,
-    });
-
-    const { data: allRoles, isLoading: loadingRoles } = useQuery({
-        queryKey: ['roles', 'admin', 'full'],
-        queryFn: () => fetchRoles(),
-        initialData: [],
-        enabled: !!user,
-    });
+    const { data: members, isLoading: isLoadingMembers, error: errorMembers } = useSuspenseQuery(fetchMembersFull());
+    const { data: allRoles, isLoading: isLoadingRoles, error: errorRoles } = useSuspenseQuery(fetchRoles());
 
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [isManageRolesModalOpen, setManageRolesModalOpen] = useState(false);
@@ -146,7 +111,7 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
         redirect("/error");
     }
 
-    if (loadingMembers || loadingRoles) return <div>Loading...</div>;
+    if (isLoadingMembers || isLoadingRoles) return <div>Loading...</div>;
 
     
     return (

@@ -50,7 +50,7 @@ export default function GameDetails({ game }: GameDetailsProps): React.ReactElem
                 </p>
                 <p>Location: {game.location}</p>
                 <p>Status: {game.status}</p>
-                <p>Seats Available: {seatsAvailable(game)}</p>
+                <p>Seats Filled: {seatsAvailable(game)}</p>
             </CardContent>
         </Card>
         <div className="flex flex-col gap-2">

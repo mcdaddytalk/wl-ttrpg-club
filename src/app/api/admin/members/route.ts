@@ -1,5 +1,4 @@
 import { MemberData } from "@/lib/types/custom";
-import { fetchMembersFull } from "@/queries/fetchMembers";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,7 +9,28 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const supabase = await createSupabaseServerClient();
-    const { data: memberData, error: memberError } = await fetchMembersFull(supabase);
+    const { data: memberData, error: memberError } = await supabase
+        .from("members")
+        .select(`
+            *,
+            profiles(
+                id,
+                given_name,
+                surname,
+                avatar,
+                experience_level,
+                bio,
+                birthday,
+                phone
+            ),
+            member_roles(
+                roles(
+                    id,
+                    name
+                )
+            )
+        `)
+        .order("created_at", { ascending: false });
 
     if (memberError) {
         console.error(memberError)

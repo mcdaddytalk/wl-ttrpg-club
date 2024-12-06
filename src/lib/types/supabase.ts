@@ -218,6 +218,7 @@ export type Database = {
           description: string | null
           gamemaster_id: string | null
           id: string
+          image: string
           max_seats: number | null
           system: string | null
           title: string
@@ -229,6 +230,7 @@ export type Database = {
           description?: string | null
           gamemaster_id?: string | null
           id?: string
+          image?: string
           max_seats?: number | null
           system?: string | null
           title: string
@@ -240,6 +242,7 @@ export type Database = {
           description?: string | null
           gamemaster_id?: string | null
           id?: string
+          image?: string
           max_seats?: number | null
           system?: string | null
           title?: string
@@ -380,28 +383,28 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "messgaes_recipient_id_fkey"
+            foreignKeyName: "messages_recipient_id_fkey"
             columns: ["recipient_id"]
             isOneToOne: false
             referencedRelation: "is_admin"
             referencedColumns: ["member_id"]
           },
           {
-            foreignKeyName: "messgaes_recipient_id_fkey"
+            foreignKeyName: "messages_recipient_id_fkey"
             columns: ["recipient_id"]
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "messgaes_sender_id_fkey"
+            foreignKeyName: "messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "is_admin"
             referencedColumns: ["member_id"]
           },
           {
-            foreignKeyName: "messgaes_sender_id_fkey"
+            foreignKeyName: "messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "members"

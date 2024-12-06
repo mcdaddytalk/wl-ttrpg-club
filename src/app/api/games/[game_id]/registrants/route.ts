@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
-import { GameRegistration, Player } from "@/lib/types/custom";
+import { GameRegistration, Player, SupabaseGameRegistrationListResponse } from "@/lib/types/custom";
 
 type RegistrantsParams = {
   game_id: string;
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Re
         )
       )        
     `)
-    .eq('game_id', game_id)
+    .eq('game_id', game_id) as unknown as SupabaseGameRegistrationListResponse
 
   if (playerError) {
     console.error('Error fetching players:', playerError);

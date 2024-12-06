@@ -75,7 +75,6 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
   const { data: receivedMessages, isLoading: messagesLoading, isError: messagesHasError, error: messagesError } = useQuery<MessageDO[]>({
     queryKey: ['messages', 'unread', user.id],
     queryFn: () => fetchMessages(user.id, 'unread'),    
-    initialData: [],
     enabled: !!user?.id,
   });
 

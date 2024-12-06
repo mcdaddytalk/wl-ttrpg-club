@@ -1,4 +1,4 @@
-import { type MessageDO } from "@/lib/types/custom";
+import { SupabaseMessageResponse, type MessageDO } from "@/lib/types/custom";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
             created_at
         `)
         .eq('id', id)
-        .maybeSingle();
+        .maybeSingle() as unknown as SupabaseMessageResponse;
 
     if (messageError) {
         console.error(messageError)
@@ -54,15 +54,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         id: messageData.id,
         sender_id: messageData.sender_id,
         sender: {
-            id: messageData.sender[0].id,
-            given_name: messageData.sender[0].profiles?.given_name ?? "",
-            surname: messageData.sender[0].profiles?.surname ?? "",
+            id: messageData.sender.id,
+            given_name: messageData.sender.profiles?.given_name ?? "",
+            surname: messageData.sender.profiles?.surname ?? "",
         },
         recipient_id: messageData.recipient_id,
         recipient: {
-            id: messageData.recipient[0].id,
-            given_name: messageData.recipient[0].profiles?.given_name ?? "",
-            surname: messageData.recipient[0].profiles?.surname ?? "",
+            id: messageData.recipient.id,
+            given_name: messageData.recipient.profiles?.given_name ?? "",
+            surname: messageData.recipient.profiles?.surname ?? "",
         },
         subject: messageData.subject ?? "",
         content: messageData.content  ?? "",
