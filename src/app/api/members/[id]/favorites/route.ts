@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Fa
         return NextResponse.json({ message: favoriteError.message }, { status: 500 });
     }
 
-    console.log('Favorite Data:', favoriteData)
+  // console.log('Favorite Data:', favoriteData)
 
     return NextResponse.json(favoriteData, { status: 200 })
 }

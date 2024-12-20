@@ -35,7 +35,7 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
         throw new Error('Failed to fetch profile');
       }
       const data = await response.json();
-      console.log('Profile Response: ', data);
+    // console.log('Profile Response: ', data);
       return data;
     },
     enabled: !!user.id,
@@ -59,9 +59,9 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
       return data;
     },
     onSuccess: (data, updatedProfile, context) => {
-      console.log('Updated profile:', data);
-      console.log('Updated profile:', updatedProfile);
-      console.log('Context: ', context);
+      console.debug('Updated profile:', data);
+      console.debug('Updated profile:', updatedProfile);
+      console.debug('Context: ', context);
       queryClient.setQueryData(["members", "profile", user?.id], updatedProfile);
       toast.success("Profile updated successfully!");
     },
@@ -123,9 +123,9 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-6">
             <div>
-              <Label htmlFor="givenName" className="block text-sm font-medium text-slate-700">Given Name <span className="text-red-500">*</span></Label>
+              <Label htmlFor="given_name" className="block text-sm font-medium text-slate-700">Given Name <span className="text-red-500">*</span></Label>
               <Input
-                id="givenName"
+                id="given_name"
                 type="text"
                 value={localProfile?.given_name || profile?.given_name || ''}
                 className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -191,7 +191,7 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
               size={150}
               onUpload={(url) => {
                 handleFieldChange('avatar', url);
-                // updateProfile({ givenName, surname, phone, birthday, bio, avatarUrl: url });
+                // updateProfile({ given_name, surname, phone, birthday, bio, avatarUrl: url });
               }}
             />
             <div className="flex-1">

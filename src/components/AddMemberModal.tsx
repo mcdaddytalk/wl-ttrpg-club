@@ -16,13 +16,13 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({ isOpen, onCancel
     const { mutate: addMember, isPending } = useAddMember();
 
     const [email, setEmail] = React.useState("");
-    const [givenName, setGivenName] = React.useState("");
+    const [given_name, setGivenName] = React.useState("");
     const [surname, setSurname] = React.useState("");
     const [isMinor, setIsMinor] = React.useState(false);
     
     const handleSubmit = async () => {
         addMember(
-            {email, given_name: givenName, surname: surname, is_minor: isMinor},
+            {email, given_name: given_name, surname: surname, is_minor: isMinor},
             {
                 onSuccess: () => {
                     toast.success("Member added successfully.");
@@ -52,8 +52,8 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({ isOpen, onCancel
                             <input type="email" id="email" className="col-span-3" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <label htmlFor="givenName" className="text-right">Given Name</label>
-                            <input type="text" id="givenName" className="col-span-3" value={givenName} onChange={(e) => setGivenName(e.target.value)} />
+                            <label htmlFor="given_name" className="text-right">Given Name</label>
+                            <input type="text" id="given_name" className="col-span-3" value={given_name} onChange={(e) => setGivenName(e.target.value)} />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <label htmlFor="surname" className="text-right">Surname</label>

@@ -1,4 +1,4 @@
-import { SupabaseMemberResponse } from "@/lib/types/custom";
+import { MemberDO, SupabaseMemberResponse } from "@/lib/types/custom";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -17,9 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
     const { data: memberData, error: memberError } = await supabase
         .from('members')
         .select(`
-            id,
-            email,
-            is_minor,
+            *,
             profiles (
                 id,
                 given_name,
@@ -27,7 +25,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
                 phone,
                 experience_level,
                 avatar
-            )        
+            ),
+            member_roles (
+                roles (
+                    id,
+                    name
+                )
+            )
         `)
         .eq('id', id)
         .single() as unknown as SupabaseMemberResponse;
@@ -40,6 +44,25 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
     if (!memberData) {
         return NextResponse.json({ message: `Member not found` }, { status: 404 })
     }
+
+    const memberDO: MemberDO = {
+        id: memberData.id,
+        provider: memberData.provider || '',
+        given_name: memberData.profiles.given_name ?? '',
+        surname: memberData.profiles.surname ?? '',
+        displayName: `${memberData.profiles.given_name} ${memberData.profiles.surname}`,
+        email: memberData.email,
+        phone: memberData.phone || '',
+        birthday: memberData.profiles.birthday ? new Date(memberData.profiles.birthday) : null,
+        experienceLevel: memberData.profiles.experience_level,
+        isAdmin: memberData.is_admin,
+        isMinor: memberData.is_minor,
+        created_at: memberData.created_at,
+        updated_at: memberData.updated_at,
+        bio: memberData.profiles.bio ?? '',
+        avatar: memberData.profiles.avatar ?? '',        
+        roles: memberData.member_roles.map(role => role.roles)
+    }
     
-    return NextResponse.json(memberData, { status: 200 })
+    return NextResponse.json(memberDO, { status: 200 })
 }   

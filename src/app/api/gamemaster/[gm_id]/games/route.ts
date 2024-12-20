@@ -12,7 +12,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
   }
 
   const { gm_id } = await params;    
-  console.log('GM ID:', gm_id);
+  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }
@@ -24,8 +24,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         id, 
         title, 
         description,
-        system, 
-        max_seats, 
+        system,
+        image, 
+        max_seats,
+        starting_seats, 
         game_schedule(
           id,
           interval,
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
     .eq('gamemaster_id', gm_id);
 
     if (gamesError) {
-      console.log(gamesError);
+      console.error(gamesError);
       return NextResponse.json({ message: gamesError.message }, { status: 500 })
     }
 
@@ -66,7 +68,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
       .from('game_registrations')
       .select(`
         game_id,
-        member_id
+        member_id,
+        status
       `)
       //.eq('games.gamemaster_id', user.id);
       .in('game_id', gameIds);
@@ -77,12 +80,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
     }
 
     const seatCounts = registrations?.reduce((acc, reg) => {
-    const game = gamesData?.find((game) => game.id === reg.game_id);
-      if (game) {
-        acc[reg.game_id] = (acc[reg.game_id] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
+      const game = gamesData?.find((game) => game.id === reg.game_id && reg.status === 'approved');
+        if (game) {
+          acc[reg.game_id] = (acc[reg.game_id] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
+
+    const pending = registrations?.reduce((acc, reg) => {
+      const game = gamesData?.find((game) => game.id === reg.game_id && reg.status === 'pending');
+        if (game) {
+          acc[reg.game_id] = (acc[reg.game_id] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
 
     const combinedData: GMGameData[] = gamesData?.map(game => ({
       id: game.id,
@@ -93,8 +104,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
       interval: game.game_schedule[0]?.interval,
       dow: game.game_schedule[0]?.day_of_week as DOW,
       maxSeats: game.max_seats as number,
+      startingSeats: game.starting_seats as number,
       status: game.game_schedule[0]?.status,
       location: game.game_schedule[0]?.location ?? '',
+      pending: pending![game.id] || 0,
       registered: seatCounts![game.id] || 0,
     })) ?? [];
     // const combinedData = mockScheduledGames;
@@ -109,15 +122,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<G
 
   const { gm_id } = await params;
   const body = await request.json();
-  console.log(body)
-  console.log('GM ID:', gm_id);
+  // console.log(body)
+  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }
 
   const supabase = await createSupabaseServerClient();
 
-  const { title, description, system, interval, dayOfWeek, nextGameDate, maxSeats } = body;
+  const { title, description, system, interval, dayOfWeek, nextGameDate, maxSeats, startingSeats } = body;
 
   try {
     const { data, error } = await supabase.from('games').insert({
@@ -125,6 +138,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<G
       description,
       system,
       max_seats: maxSeats,
+      starting_seats: startingSeats || 0,
       gamemaster_id: gm_id
     }).select('id');
 
@@ -162,8 +176,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   const { gm_id } = await params;
   const body = await request.json();
-  console.log(body)
-  console.log('GM ID:', gm_id);
+  // console.log(body)
+  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }  
@@ -210,8 +224,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
 
   const { gm_id } = await params;
   const body = await request.json();
-  console.log(body)
-  console.log('GM ID:', gm_id);
+  // console.log(body)
+  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }  
@@ -224,6 +238,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
     description,
     system,
     maxSeats,
+    startingSeats,
     status,
     location,
     nextGameDate,
@@ -239,6 +254,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
         description,
         system,
         max_seats: maxSeats,
+        starting_seats: startingSeats,
         updated_at: new Date().toISOString()
       })
       .eq('id', id);
@@ -279,8 +295,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const { gm_id } = await params;
   const body = await request.json();
-  console.log(body)
-  console.log('GM ID:', gm_id);
+  // console.log(body)
+  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }  

@@ -220,6 +220,7 @@ export type Database = {
           id: string
           image: string
           max_seats: number | null
+          starting_seats: number | null
           system: string | null
           title: string
           updated_at: string
@@ -232,6 +233,7 @@ export type Database = {
           id?: string
           image?: string
           max_seats?: number | null
+          starting_seats?: number | null
           system?: string | null
           title: string
           updated_at?: string
@@ -244,6 +246,7 @@ export type Database = {
           id?: string
           image?: string
           max_seats?: number | null
+          starting_seats?: number | null
           system?: string | null
           title?: string
           updated_at?: string
@@ -614,7 +617,7 @@ export type Database = {
         | "completed"
         | "canceled"
       gamemaster_interest_enum: "yes" | "no" | "maybe"
-      registrant_status_enum: "awaiting-approval" | "approved" | "rejected"
+      registrant_status_enum: "banned" | "approved" | "rejected" | "pending"
     }
     CompositeTypes: {
       [_ in never]: never

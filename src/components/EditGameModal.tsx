@@ -20,11 +20,11 @@ interface EditGameModalProps {
     isOpen: boolean,
     game: GMGameData,
     onConfirm: () => void,
-    onCancel: () => void,
+    onClose: () => void,
     gamemaster_id: string
 }
 
-export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onConfirm, onCancel, gamemaster_id }) => {
+export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onConfirm, onClose, gamemaster_id }) => {
     // Game details
     const [gameTitle, setGameTitle] = useState(game.title);
     const [gameDescription, setGameDescription] = useState(game.description);
@@ -77,7 +77,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
     }
 
     return (
-        <Dialog open={isOpen} onOpenChange={onCancel}>
+        <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Edit Game</DialogTitle>
@@ -165,7 +165,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
                     <Button onClick={handleEditSubmit} disabled={isPending}>
                         {isPending ? <span className="mr-2">Saving...</span> : <span className="mr-2">Save</span>}
                     </Button>
-                    <Button variant="outline" onClick={onCancel} disabled={isPending}>Cancel</Button>
+                    <Button variant="outline" onClick={onClose} disabled={isPending}>Cancel</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

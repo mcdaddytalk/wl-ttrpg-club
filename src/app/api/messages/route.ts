@@ -13,7 +13,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')
     const method = searchParams.get('method')
-    console.log('GET /api/messages', { userId, method })
+    console.debug('GET /api/messages', { userId, method })
 
     if (!userId) {
         return NextResponse.json({ message: `User ID is required` }, { status: 403 })
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json();
-    console.log(body)
+  // console.log(body)
     
     const { sender, recipient, subject, content } = body;
 

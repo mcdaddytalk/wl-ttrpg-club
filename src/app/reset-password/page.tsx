@@ -13,7 +13,7 @@ const ResetPassword = (): React.ReactNode => {
     const [statusMessage, setStatusMessage] = useState<null | string>(null);
     const session = useSession();
     
-    console.log(session); // Log the session?.access_token
+  // console.log(session); // Log the session?.access_token
     const accessToken = session?.access_token;
 
     const handleResetPassword = async () => {

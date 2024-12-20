@@ -9,6 +9,7 @@ export const mockScheduledGames: GMGameData[] = [
         "interval": "biweekly",
         "dow": "sunday",
         "scheduled_next": new Date("2024-11-30T20:20:42.481248"),
+        "pending": 2,
         "maxSeats": 8,
         "registered": 6,
         "status": "scheduled",
@@ -22,6 +23,7 @@ export const mockScheduledGames: GMGameData[] = [
         "interval": "weekly",
         "dow": "thursday",
         "scheduled_next": new Date("2024-11-24T20:20:42.481265"),
+        "pending": 0,
         "maxSeats": 6,
         "registered": 0,
         "status": "awaiting-players",
@@ -35,6 +37,7 @@ export const mockScheduledGames: GMGameData[] = [
         "interval": "biweekly",
         "dow": "wednesday",
         "scheduled_next": new Date("2024-11-26T20:20:42.481270"),
+        "pending": 3,
         "maxSeats": 6,
         "registered": 4,
         "status": "awaiting-players",
@@ -48,6 +51,7 @@ export const mockScheduledGames: GMGameData[] = [
         "interval": "biweekly",
         "dow": "wednesday",
         "scheduled_next": new Date("2024-11-28T20:20:42.481274"),
+        "pending": 0,
         "maxSeats": 6,
         "registered": 6,
         "status": "scheduled",
@@ -61,6 +65,7 @@ export const mockScheduledGames: GMGameData[] = [
         "interval": "biweekly",
         "dow": "wednesday",
         "scheduled_next": new Date("2024-12-01T20:20:42.481277"),
+        "pending": 0,
         "maxSeats": 6,
         "registered": 6,
         "status": "scheduled",
@@ -73,61 +78,73 @@ export const mockPlayers: Player[] = [
         "id": "f3582828-2ac2-40c1-b4de-1ed8ef1d4cc1",
         "email": "john.doe@example.com",
         "phoneNumber": "123-456-7890",
-        "givenName": "John",
+        "given_name": "John",
         "surname": "Doe",
         "avatar": "https://example.com/john_avatar.jpg",
         "isMinor": true,
-        "experienceLevel": "new"
+        "experienceLevel": "new",
+        "status": "pending",
+        "statusNote": "Pending approval"
     },
     {
         "id": "1e6a3116-470f-4c2e-a24a-cade0af39a0c",
         "email": "bob.douglas@example.com",
         "phoneNumber": "555-555-5555",
-        "givenName": "Bob",
+        "given_name": "Bob",
         "surname": "Douglas",
         "avatar": "https://example.com/bob_avatar.jpg",
         "isMinor": false,
-        "experienceLevel": "new"
+        "experienceLevel": "new",
+        "status": "pending",
+        "statusNote": "Pending approval"
     },
     {
         "id": "de1d6100-e5db-47da-99dc-388d8f6ea082",
         "email": "susan.anthony@example.com",
         "phoneNumber": "444-444-4444",
-        "givenName": "Susan",
+        "given_name": "Susan",
         "surname": "Anthony",
         "avatar": "https://example.com/susan_avatar.jpg",
         "isMinor": false,
-        "experienceLevel": "seasoned"
+        "experienceLevel": "seasoned",
+        "status": "pending",
+        "statusNote": "Pending approval"
     },
     {
         "id": "a2a0c3dc-24ab-4886-95d3-0ff6d6ee02cf",
         "email": "jane.doe@example.com",
         "phoneNumber": "987-654-3210",
-        "givenName": "Jane",
+        "given_name": "Jane",
         "surname": "Doe",
         "avatar": "https://example.com/jane_avatar.jpg",
         "isMinor": false,
-        "experienceLevel": "seasoned"
+        "experienceLevel": "seasoned",
+        "status": "pending",
+        "statusNote": "Pending approval"
     },
     {
         "id": "d06606a6-1e34-4d2b-bd14-20cf7fa680ce",
         "email": "felix.waldorf@example.com",
         "phoneNumber": "321-654-9870",
-        "givenName": "Felix",
+        "given_name": "Felix",
         "surname": "Waldorf",
         "avatar": "https://example.com/felix_avatar.jpg",
         "isMinor": false,
-        "experienceLevel": "novice"
+        "experienceLevel": "novice",
+        "status": "pending",
+        "statusNote": "Pending approval"
     },
     {
         "id": "fce373fd-9ec2-4c21-9d7a-6bf524d61653",
         "email": "elyssa.jackson@example.com",
         "phoneNumber": "333-333-3333",
-        "givenName": "Elyssa",
+        "given_name": "Elyssa",
         "surname": "Jackson",
         "avatar": "https://example.com/elyssa_avatar.jpg",
         "isMinor": true,
-        "experienceLevel": "novice"
+        "experienceLevel": "novice",
+        "status": "pending",
+        "statusNote": "Pending approval"
     }
 ];
 

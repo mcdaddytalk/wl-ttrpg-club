@@ -1,4 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "./useQueryClient";
 
 export const useAddMember = () => {
     const queryClient = useQueryClient();

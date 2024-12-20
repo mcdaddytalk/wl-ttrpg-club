@@ -1,13 +1,12 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import GameCarousel from "@/components/GameCarousel";
-import GameDetails from "@/components/GameDetails";
 import { GameData, GameFavorite } from "@/lib/types/custom";
 import useSession from "@/utils/supabase/use-session";
 import { Session, User } from "@supabase/supabase-js";
-import { useQueryClient } from "@/hooks/useQueryClient";
+import { useToggleFavorite } from "@/hooks/useToggleFavorite";
 
 async function fetchFavorites(userId: string): Promise<GameFavorite[]> {
   const response = await fetch(`/api/members/${userId}/favorites`, {
@@ -59,53 +58,11 @@ async function fetchGames(userId: string): Promise<GameData[]> {
   }
 }
 
-interface ToggleFavoriteVariables {
-  userId: string;
-  gameId: string;
-  currentFavorite: boolean;
-}
-
-async function toggleFavorite({userId, gameId, currentFavorite}: ToggleFavoriteVariables): Promise<void> {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  if (currentFavorite) {
-    console.log("Removing favorite for game ID:", gameId);
-    const response = await fetch(`/api/members/${userId}/favorites`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ game_id: gameId })
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Error toggling favorite");
-    }
-  } else {
-    console.log("Adding favorite for game ID:", gameId);
-    const response = await fetch(`/api/members/${userId}/favorites`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ game_id: gameId })
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Error toggling favorite");
-    }
-  }
-}
-
 export default function GamesDashboard(): React.ReactElement {
-  const queryClient = useQueryClient();
+  const { mutate: toggleFavorite } = useToggleFavorite();
   const session: Session | null = useSession();
   const user: User = (session?.user as User) ?? null;
   
-  const [selectedGame, setSelectedGame] = useState<GameData | null>(null);
   const [enhancedGames, setEnhancedGames] = useState<GameData[] | null>(null);
 
   const { data: games, isLoading: gamesLoading } = useQuery<GameData[], Error>({
@@ -122,30 +79,19 @@ export default function GamesDashboard(): React.ReactElement {
     
   useEffect(() => {
     if (!!games && !!favorites) {
-      console.log('Enhancing games...');
+    // console.log('Enhancing games...');
       setEnhancedGames(games.map((game) => ({
         ...game,
         favorite: favorites.some((favorite) => favorite.game_id === game.game_id) || false,
-        registered: game.registrations.some((registration) => registration.member_id === user?.id) || false
+        pending: game.registrations.some((registration) => registration.member_id === user?.id && registration.status === 'pending') || false,
+        registered: game.registrations.some((registration) => registration.member_id === user?.id && registration.status === 'approved') || false
       })))
     }
   }, [games, favorites, user]);
 
-  
-  const toggleFavoriteMutation = useMutation<void, Error, ToggleFavoriteVariables>({
-    mutationFn:       toggleFavorite,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['games', user?.id, 'full'] });
-        queryClient.invalidateQueries({ queryKey: ['games', 'favorites', user?.id] });
-      },
-      onError: (error) => {
-        console.error('Error toggling favorite:', error);
-      }
-    }
-  );
 
   const handleToggleFavorite = (gameId: string, currentFavorite: boolean) => {
-    toggleFavoriteMutation.mutate({userId: user?.id, gameId, currentFavorite});
+    toggleFavorite({userId: user?.id, gameId, favorite: currentFavorite});
   }
 
   if (!user) return <div>Please log in to access the dashboard.</div>;
@@ -157,10 +103,8 @@ export default function GamesDashboard(): React.ReactElement {
       <div className="space-y-8">
         <GameCarousel 
           games={enhancedGames} 
-          onSelectGame={setSelectedGame} 
           onToggleFavorite={handleToggleFavorite}
         />
-        <GameDetails game={selectedGame} />
       </div>
     </section>
   )

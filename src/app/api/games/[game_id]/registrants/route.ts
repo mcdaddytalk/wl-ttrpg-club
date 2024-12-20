@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Re
   }
 
   const { game_id } = await params;
-  console.log('Game ID:', game_id);
+// console.log('Game ID:', game_id);
   if (!game_id) {
     return NextResponse.json({ message: `Game ID is required` }, { status: 403 })
   }
@@ -24,7 +24,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Re
     .select(`
       game_id,
       member_id,
-      members(
+      status,
+      status_note,
+      members!fk_game_registrations_members(
         id,
         email,
         is_minor,
@@ -47,18 +49,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Re
 
   if (!playerData) return NextResponse.json({ message: `No players found` }, { status: 404 });
   
-  console.log('Successfully fetched players:',  playerData);
+// console.log('Successfully fetched players:',  playerData);
 
   const players: Player[] = (playerData as unknown as GameRegistration[])?.map((player) => {
     return {
       id: player.member_id,
+      status: player.status,
+      statusNote: player.status_note,
       email: player.members?.email,
       isMinor: player.members?.is_minor,
-      givenName: player.members?.profiles?.given_name ?? '',
+      given_name: player.members?.profiles?.given_name ?? '',
       surname: player.members?.profiles?.surname ?? '',
-      phoneNumber: player.members?.profiles?.phone,
+      phoneNumber: player.members?.profiles?.phone ?? '',
       experienceLevel: player.members?.profiles?.experience_level,
-      avatar: player.members?.profiles?.avatar,
+      avatar: player.members?.profiles?.avatar ?? '',
     }
   })
 
@@ -74,8 +78,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<R
 
   const { game_id } = await params;
   const body = await request.json();
-  console.log(body)
-  console.log('Game ID:', game_id);
+// console.log(body)
+// console.log('Game ID:', game_id);
   if (!game_id) {
     return NextResponse.json({ message: `Game ID is required` }, { status: 403 })
   }
@@ -86,14 +90,29 @@ export async function POST(request: NextRequest, { params }: { params: Promise<R
     .from('game_registrations')
     .insert({
       game_id,
-      member_id: body.member_id,
-      status: body.status || 'awaiting-approval',
-      status_note: body.status_note      
+      member_id: body.userId,
+      status: 'pending',
+      status_note: body.status_note || ""      
     })
   
   if (playerError) {
     console.error('Error registering player:', playerError);
     return NextResponse.json({ message: playerError.message }, { status: 500 });
+  }
+
+  const { error: messageError } = await supabase
+    .from('messages')
+    .insert({
+      sender_id: body.userId,
+      recipient_id: body.gamemasterId,
+      subject: 'A new player has registered for a game',
+      content: `A new player has registered for a game.\nGame ID: ${game_id}\nPlayer ID: ${body.userId}\nStatus: "pending"`
+    })
+
+
+  if (messageError) {
+    console.error(messageError)
+    return NextResponse.json({ message: messageError.message }, { status: 500 });
   }
 
   return NextResponse.json({ message: `Player registered` }, { status: 200 })
@@ -106,8 +125,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   const { game_id } = await params;
   const body = await request.json();
-  console.log(body)
-  console.log('Game ID:', game_id);
+// console.log(body)
+// console.log('Game ID:', game_id);
   if (!game_id) {
     return NextResponse.json({ message: `Game ID is required` }, { status: 403 })
   }
@@ -118,12 +137,28 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     .from('game_registrations')
     .delete()
     .eq('game_id', game_id)
-    .eq('member_id', body.member_id)
+    .eq('member_id', body.userId)
 
   if (playerError) {
     console.error('Error kicking player:', playerError);
     return NextResponse.json({ message: playerError.message }, { status: 500 });  
   }
+
+  const { error: messageError } = await supabase
+    .from('messages')
+    .insert({
+      sender_id: body.userId,
+      recipient_id: body.gamemasterId,
+      subject: 'A player has resigned from a game',
+      content: `A player has resigned from a game.\nGame ID: ${game_id}\nPlayer ID: ${body.userId}`
+    })
+
+  if (messageError) {
+    console.error(messageError)
+    return NextResponse.json({ message: messageError.message }, { status: 500 });
+  }
+
+  
 
   return NextResponse.json({ message: `Player unregistered` }, { status: 200 })
 }
@@ -135,8 +170,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Re
 
   const { game_id } = await params;
   const body = await request.json();
-  console.log(body)
-  console.log('Game ID:', game_id);
+// console.log(body)
+// console.log('Game ID:', game_id);
   if (!game_id) {
     return NextResponse.json({ message: `Game ID is required` }, { status: 403 })
   }
@@ -147,7 +182,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Re
     .from('game_registrations')
     .update({
       status: body.status,
-      status_note: body.status_note
+      status_note: body.status_note ?? "",
+      updated_by: body.updated_by ?? null
     })
     .eq('game_id', game_id)
     .eq('member_id', body.member_id)

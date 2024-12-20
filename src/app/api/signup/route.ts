@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Email is already in use' }, { status: 409 });
   }
 
-  console.log(`No existing user, creating user for ${email}...`)
+  console.debug(`No existing user, creating user for ${email}...`)
 
   const isMinor = calculateIsMinor(birthday);
   // Create user in Supabase auth

@@ -7,13 +7,12 @@ import GameCarouselCard from "./GameCarouselCard";
 
 interface GameCarouselProps {
     games: GameData[];
-    onSelectGame: (game: GameData) => void;
     onToggleFavorite: (gameId: string, currentFavorite: boolean) => void;
 }
 
 
 
-export default function GameCarousel({ games, onSelectGame, onToggleFavorite }: GameCarouselProps) {
+export default function GameCarousel({ games, onToggleFavorite }: GameCarouselProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     
     const handleNext = () => {
@@ -44,7 +43,7 @@ export default function GameCarousel({ games, onSelectGame, onToggleFavorite }: 
               }}
             >
             {games.map((game) => (
-              <GameCarouselCard key={game.id} game={game} onSelectGame={onSelectGame} onToggleFavorite={onToggleFavorite} className="w-[calc(100% / 3)] pl-2 pr-2"/> 
+              <GameCarouselCard key={game.id} game={game} onToggleFavorite={onToggleFavorite} className="w-[calc(100% / 3)] pl-2 pr-2"/> 
             ))}
             </div>
           </div>
