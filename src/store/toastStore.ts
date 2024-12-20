@@ -62,7 +62,6 @@ const useToastStore = create<ToastStore>()(
                 message: null,
                 setToast: (type: string, message: string, id?: string) => {
                     const toastId = id || uuidv4();
-                  // console.log(`TOAST MESSAGE:  ${type} - ${message}`)
                     set({ showToast: true, toastId, type, message })
                 },
                 resetToast: () => set({ showToast: false, toastId: null, type: null, message: null }),

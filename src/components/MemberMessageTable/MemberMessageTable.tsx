@@ -13,6 +13,7 @@ import { DataTable } from "./DataTable";
 import { Button } from "@/components/ui/button";
 import { ArchiveRestore, MailCheck, SendHorizonal } from "lucide-react";
 import MessageModal from "../MessageModal";
+import logger from "@/utils/logger";
 
 const fetchContactList = async (): Promise<ContactListDO[]> => {
     const response = await fetch('/api/members/contacts',
@@ -190,7 +191,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
         };
     });
 
-    console.log({
+    logger.debug({
         isMessageModalOpen,
         messageMode,
         selectedMessage,

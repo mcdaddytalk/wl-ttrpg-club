@@ -18,7 +18,6 @@ export default function useSession() {
         data: { session },
       } = await supabase.auth.getSession();
 
-      // console.log(`SUPABASE SESSION`, session)
       if (!session) {
         router.push("/login");
         setSession(null);
@@ -32,9 +31,7 @@ export default function useSession() {
 
     type JwtPayloadWithRoles = JwtPayload & { roles: string[] };
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // console.log('EVENT DETECTED:  ', event)
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
-        // console.log(`SUPABASE SESSION`, session)
         if (session) {
           const jwt: JwtPayloadWithRoles = jwtDecode(session?.access_token);
           const roles = jwt?.roles;

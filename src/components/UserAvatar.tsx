@@ -18,8 +18,6 @@ const UserAvatar: React.FC<AvatarProps> = ({ avatarUrl, fullName, size=8 }) => {
     return initials.toUpperCase();
   };
 
-  console.log(`AvatarUrl:  ${avatarUrl}`)
-
   const supabase = useSupabaseBrowserClient();
   let avatar = avatarUrl;
   if (avatar && !avatar.startsWith('https://')) {

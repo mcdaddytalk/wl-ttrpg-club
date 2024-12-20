@@ -19,8 +19,7 @@ export const useToggleFavorite = () => {
             favorite
         }: ToggleFavoriteVariables) => {
             if (favorite) {
-                // console.log("Removing favorite for game ID:", gameId);
-                  const response = await fetch(`/api/members/${userId}/favorites`,
+                const response = await fetch(`/api/members/${userId}/favorites`,
                     {
                       method: 'DELETE',
                       headers: {
@@ -34,7 +33,6 @@ export const useToggleFavorite = () => {
                     throw new Error("Error toggling favorite");
                   }
                 } else {
-                // console.log("Adding favorite for game ID:", gameId);
                   const response = await fetch(`/api/members/${userId}/favorites`,
                     {
                       method: 'POST',

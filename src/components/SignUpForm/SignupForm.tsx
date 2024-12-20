@@ -90,10 +90,6 @@ export const SignupForm = () => {
     });
 
     const processForm: SubmitHandler<FormValues> = async (data) => {
-      // console.log('Data received')
-      // console.log(data)
-      // console.log('Sending to server...')
-
         const signUpResponse = await fetch('/api/signup', {
             method: 'POST',
             headers: {

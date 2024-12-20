@@ -26,8 +26,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         return NextResponse.json({ message: 'No games found' }, { status: 404 });
     }
 
-    console.log('Registered Games Data:  ', gameData)
-
     return NextResponse.json(gameData, { status: 200 })
 
 }

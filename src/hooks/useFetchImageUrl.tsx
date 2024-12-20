@@ -2,7 +2,6 @@ import { useMutation } from "@tanstack/react-query"
 
 async function fetchImageUrl(imageStr: string, system?: string): Promise<string> {
     if (!imageStr || imageStr === "default") {
-      //console.log('System:  ', system);
       switch (system) {
         case "DND5e":
           return "https://kthrpfzafznkkvalszoi.supabase.co/storage/v1/object/public/images/defaults/dnd5e_game.webp?t=2024-12-06T15%3A20%3A26.768Z"; // "/images/defaults/dnd5e_game.webp";

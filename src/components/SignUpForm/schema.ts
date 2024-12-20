@@ -19,7 +19,6 @@ const calculateAge = (birthday: Date) => {
   
 // Phone validator to ensure valid phone number or 000-000-0000 (not used for parent validateion)
 const isPhoneOrNoContact = (phone: string): boolean => {
-    // console.log('TELEPHONE:  ', phone)
     const noContactNumbers = ['+1 000-000-0000', '000000000', '000-000-0000']
     if (noContactNumbers.includes(phone)) return true
     return isMobilePhone(phone)

@@ -34,28 +34,23 @@ const GameRegistrantsCard= ({ user, contactList, gameId, registrants, className 
       setSelectedPlayer(player);
       switch (modal) {
         case 'sendMessage':
-          console.log('Sending message');
           setRecipient(player);
           setMessageModalOpen(true);
           break;
         case 'approvePlayer':
-          console.log('Approving player');
           setApprovalMode(player.status === 'pending' ? 'approved' : 'pending');
           setApprovalModalOpen(true);
           break;
         case 'kickPlayer':
-          console.log('Kicking player');
           setApprovalMode('rejected');
           setApprovalModalOpen(true);
           break;
         case 'viewPlayer':
-          console.log('Viewing player');
           setPlayerViewModalOpen(true);
           break;
         default:
           break;
       }
-      console.log('Setting Modal', modal);
       setActiveModal(modal);
     }
 
@@ -85,7 +80,6 @@ const GameRegistrantsCard= ({ user, contactList, gameId, registrants, className 
     };
 
     const handleApprovalSubmit = () => {
-      console.log('approval submitted');
       setApprovalModalOpen(false);
       closeModal();
     }
