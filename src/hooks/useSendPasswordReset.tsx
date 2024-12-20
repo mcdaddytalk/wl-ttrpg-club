@@ -1,3 +1,4 @@
+import logger from "@/utils/logger";
 import { useMutation } from "@tanstack/react-query";
 // import { useQueryClient } from "./useQueryClient";
 
@@ -26,10 +27,10 @@ export const useSendPasswordReset = () => {
             return response.json();   
         },
         onError: (error) => {
-            console.error("Error resetting password:", error);
+            logger.error("Error resetting password:", error);
         },
         onSuccess: (_, { email }) => {
-            console.log("Password email sent to user: ", email);
+            logger.debug("Password email sent to user: ", email);
         },
     })
 }

@@ -1,5 +1,6 @@
 import { GetMembersSchema } from "@/app/admin/_lib/validations";
 import { MemberData, MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -69,7 +70,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json() as GetMembersSchema;
-    // console.log('BODY', body);
     const { page, perPage, sort, email, experienceLevel, isAdmin, isMinor }  = body;
 
     const supabase = await createSupabaseServerClient();
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     if (!membersData) {
-        console.log('No members found');
+        logger.debug('No members found');
         return NextResponse.json({ members: [], count: 0 }, { status: 200 });
     }
         

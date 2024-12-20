@@ -17,6 +17,7 @@ import { useQueryClient } from "@/hooks/useQueryClient";
 import { useQuery } from "@tanstack/react-query";
 import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
+import logger from "@/utils/logger";
 
 type AdventureDetailsPageProps = {
     game_id: string
@@ -43,12 +44,9 @@ export const AdventurePageDetails = ({ game_id }: AdventureDetailsPageProps): Re
                 }
                 return res.json() as Promise<GameData>;
             });
-            console.log('Game data:', response);
-            console.log('User id:', user?.id);
             response.favorite = response.favoritedBy.some((favorite: GameFavorite) => favorite.member_id === user?.id);
             response.registered = response.registrations.some((registrant: GameRegistration) => registrant.member_id === user?.id && registrant.status === 'approved');
             response.pending = response.registrations.some((registrant: GameRegistration) => registrant.member_id === user?.id && registrant.status === 'pending');
-            console.log('Game data altered:', response);
             queryClient.setQueryData(
                 ['games', game_id, user?.id],
                 response
@@ -63,7 +61,7 @@ export const AdventurePageDetails = ({ game_id }: AdventureDetailsPageProps): Re
     }
 
     if (isError) {
-        console.error(error);
+        logger.error(error);
         redirect('/error')
     }
 

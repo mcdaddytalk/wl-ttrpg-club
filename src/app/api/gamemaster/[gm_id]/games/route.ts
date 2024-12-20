@@ -12,7 +12,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
   }
 
   const { gm_id } = await params;    
-  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }
@@ -122,8 +121,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<G
 
   const { gm_id } = await params;
   const body = await request.json();
-  // console.log(body)
-  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }
@@ -176,8 +173,6 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   const { gm_id } = await params;
   const body = await request.json();
-  // console.log(body)
-  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }  
@@ -224,8 +219,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
 
   const { gm_id } = await params;
   const body = await request.json();
-  // console.log(body)
-  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }  
@@ -295,8 +288,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const { gm_id } = await params;
   const body = await request.json();
-  // console.log(body)
-  // console.log('GM ID:', gm_id);
   if (!gm_id) {
     return NextResponse.json({ message: `GM ID is required` }, { status: 403 })
   }  

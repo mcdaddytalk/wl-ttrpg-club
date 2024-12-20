@@ -13,7 +13,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Re
   }
 
   const { game_id } = await params;
-// console.log('Game ID:', game_id);
   if (!game_id) {
     return NextResponse.json({ message: `Game ID is required` }, { status: 403 })
   }
@@ -49,8 +48,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Re
 
   if (!playerData) return NextResponse.json({ message: `No players found` }, { status: 404 });
   
-// console.log('Successfully fetched players:',  playerData);
-
   const players: Player[] = (playerData as unknown as GameRegistration[])?.map((player) => {
     return {
       id: player.member_id,
@@ -78,8 +75,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<R
 
   const { game_id } = await params;
   const body = await request.json();
-// console.log(body)
-// console.log('Game ID:', game_id);
+
   if (!game_id) {
     return NextResponse.json({ message: `Game ID is required` }, { status: 403 })
   }
@@ -125,8 +121,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   const { game_id } = await params;
   const body = await request.json();
-// console.log(body)
-// console.log('Game ID:', game_id);
+
   if (!game_id) {
     return NextResponse.json({ message: `Game ID is required` }, { status: 403 })
   }
@@ -170,8 +165,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Re
 
   const { game_id } = await params;
   const body = await request.json();
-// console.log(body)
-// console.log('Game ID:', game_id);
+
   if (!game_id) {
     return NextResponse.json({ message: `Game ID is required` }, { status: 403 })
   }

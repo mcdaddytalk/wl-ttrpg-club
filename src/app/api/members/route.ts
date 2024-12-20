@@ -27,8 +27,6 @@ export async function POST(request: NextRequest) {
     body: JSON.stringify(body)
   })
   
-  // console.log(response)
-
   if (response.status === 200) {
     return NextResponse.json({ message: `Form is submit`, response }, { status: 200 })
   }

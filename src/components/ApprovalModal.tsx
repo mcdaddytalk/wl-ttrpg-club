@@ -38,14 +38,12 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onCancel, 
             { userId: player.id, gmId, gameId, status: approvalMode, status_note: statusNote },
             {
                 onSuccess: () => {
-                    console.log('SUCCESS')
                     toast.success(`Player ${approvalMode === 'pending' ? 'unapproved' : approvalMode === 'approved' ? 'approved' : 'kicked'} successfully.`);
                 },
                 onError: () => {
                     toast.error("Failed to update player.");
                 },
                 onSettled: () => {
-                    console.log('FINAL')
                     onConfirm(); // Close modal after adding member
                 }
             }
