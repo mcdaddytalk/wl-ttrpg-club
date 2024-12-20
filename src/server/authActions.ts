@@ -102,9 +102,7 @@ export async function signOut(): Promise<{ error: AuthError | null }> {
 
 export async function signInWithProvider(provider: Provider): Promise<void> {
     const supabase = await createSupabaseServerClient();
-    // const origin = (await headers()).get("origin") ?? 'http://localhost:3000';
     const origin = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
-  // console.log('origin', origin)
     const credentials: SignInWithOAuthCredentials = {
         provider,
         options: {

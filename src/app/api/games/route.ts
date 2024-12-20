@@ -67,7 +67,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
 
     const { data: registrationData, error: registrationsError } = await fetchRegistrants(supabase);
     const registrations = registrationData ? registrationData as GameRegistration[] : [];
-    // console.log(registrations);
+    
     if (registrationsError) throw registrationsError
     if (!registrations) throw new Error("Registrations not found")
 
@@ -80,22 +80,6 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         }
         return acc;
       }, {} as Record<string, number>);
-
-    // console.log(seatCounts);
-
-    // const { data: favorites, error: favoritesError } = await supabase
-    //   .from('game_favorites')
-    //   .select(`
-    //     game_id,
-    //     member_id
-    //   `)
-    //   .eq('member_id', userId);
-    
-    // if (favoritesError) {
-    //   console.error(favoritesError);
-    // }
-
-    // console.log(favorites);
 
     const scheduledGames: GameData[] = (gamesData as unknown as SupaGameScheduleData[]).map((gameSchedule) => {
       return {

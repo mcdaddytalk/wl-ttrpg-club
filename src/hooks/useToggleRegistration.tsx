@@ -20,7 +20,6 @@ export const useToggleRegistration= () => {
             registered
         }: ToggleRegistrationVariables) => {
             if (registered) {
-                // console.log(variables);      
                 return fetch(`/api/games/${gameId}/registrants`, {
                     method: "DELETE",
                     headers: {

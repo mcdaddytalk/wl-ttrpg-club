@@ -1,5 +1,6 @@
 import { SupabaseGameDataListResponse, SupabaseGameRegistrationListResponse, SupaGameScheduleData, UpcomingGame } from "@/lib/types/custom";
 import { fetchRegistrants } from "@/queries/fetchRegistrants";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -54,9 +55,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
             )
         `)
         .gt('next_game_date', new Date().toISOString()) as unknown as SupabaseGameDataListResponse;
-    
-    console.log('UpcomingGame data:', gameData);
-
+        
     if (gameError) {
         console.error(gameError)
         return NextResponse.json({ message: gameError.message }, { status: 500 });
@@ -65,18 +64,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
     const { data: gameRegistrants, error: gameRegistrantsError } = await fetchRegistrants(supabase) as unknown as SupabaseGameRegistrationListResponse;
 
     if (gameRegistrantsError) {
-        console.error(gameRegistrantsError)
+        logger.error(gameRegistrantsError)
         return NextResponse.json({ message: gameRegistrantsError.message }, { status: 500 });
     }
 
-    console.log('Game Registrants:  ', gameRegistrants);
-
+    
     const gameIds = gameRegistrants?.map((gameRegistrant) => {
         if (gameRegistrant.member_id == id) return gameRegistrant.game_id;
         return null;
     }).filter((gameId) => gameId !== null);
-
-    console.log('Game Ids:  ', gameIds);
 
     const upcomingGames: UpcomingGame[] = gameData?.filter(
             (gameSchedule: SupaGameScheduleData) => gameIds.includes(gameSchedule.game_id)

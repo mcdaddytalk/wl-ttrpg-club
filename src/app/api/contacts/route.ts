@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { Database } from '@/lib/types/supabase';
+import logger from '@/utils/logger';
 
 export async function POST(request: NextRequest) {
   const { email, ...contactData } = await request.json();
@@ -15,16 +16,15 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
 
   if (contactError) {
-    // console.error(contactError);
+    logger.error(contactError);
     return NextResponse.json({ error: 'Error checking email' }, { status: 500 });
   }
 
   if (existingContact) {
-    // console.error('Email is already in use', existingContact.email);
+    logger.error('Email is already in use', existingContact.email);
     return NextResponse.json({ error: 'Email is already in use' }, { status: 409 });
   }
 
-  // console.log(contactData);
   const convertedContactData: Database["public"]["Tables"]["contacts"]["Insert"] = {
     first_name: contactData.firstName,
     surname: contactData.surname,
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   const { error: insertError } = await supabase.from('contacts').insert(convertedContactData);
 
   if (insertError) {
-    // console.error(insertError);
+    logger.error(insertError);
     return NextResponse.json({ error: 'Error adding contact' }, { status: 500 });
   }
 

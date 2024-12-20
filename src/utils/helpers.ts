@@ -43,15 +43,9 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
     today.setHours(0, 0, 0, 0);
 
     if (date) {
-      //const nextDate = new Date(date);
-      //nextDate.setDate(nextDate.getDate() + 7);
-      //return nextDate.toISOString();
       const incomingDate = new Date(date);
       incomingDate.setHours(0, 0, 0, 0);
-    // console.log('today', today)
-    // console.log('incomingDate', incomingDate)
       if (incomingDate > today) {
-      // console.log('nextDate[incoming]', incomingDate);
         return incomingDate.toISOString();
       }
     }
@@ -64,22 +58,18 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
     nextDate.setDate(today.getDate() + daysUntilNext);
     
     if (interval === 'weekly') {
-    // console.log('nextDate[weekly]', nextDate);
       return nextDate.toISOString();
     }
     
     if (interval === 'biweekly') {
       nextDate.setDate(nextDate.getDate() + 7);
-    // console.log('nextDate[biweekly]', nextDate);
       return nextDate.toISOString();
     }
     if (interval === 'monthly') {
       nextDate.setMonth(nextDate.getMonth() + 1);
-    // console.log('nextDate[monthly]', nextDate);
       return nextDate.toISOString();
     }
     if (interval === 'custom') {
-    // console.log('nextDate[custom]', nextDate);
       return nextDate.toISOString();
     }
 

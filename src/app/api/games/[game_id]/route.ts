@@ -15,8 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
     }
 
     const { game_id } = await params;
-    // console.log('Game ID:', game_id);
-
+    
     const supabase = await createSupabaseServerClient();
     const { data: gameData, error: gameError } = await supabase
       .from("game_schedule")
@@ -57,9 +56,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         return NextResponse.json({ message: gameError.message }, { status: 500 });
     }
 
-  // console.log(gameData);
-    // const gameIds = gamesData?.map((game) => game.id) ?? [];
-
     const { data: favoritesData, error: favoritesError } = await fetchFavorites(supabase);
     const favorites: GameFavorite[] = (favoritesData)?.map((favorite) => {
         return {
@@ -73,7 +69,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
 
     const { data: registrationData, error: registrationsError } = await fetchRegistrants(supabase);
     const registrations = registrationData ? registrationData as GameRegistration[] : [];
-    // console.log(`Registrations:  `, registrations);
     
     if (registrationsError) throw registrationsError
     if (!registrations) throw new Error("Registrations not found")
@@ -81,8 +76,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
     const seatCounts = registrations.filter((reg) => {
       return reg.game_id !== null && reg.member_id !== null && reg.status === "approved"
     }).filter((reg) => reg.game_id === gameData.game_id).length
-    // console.log(`Seat Count for [${gameData.game_id}]:  `, seatCounts);
-
+    
     const game: GameData = {
         id: gameData.id,
         game_id: gameData.game_id,
