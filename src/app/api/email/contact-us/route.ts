@@ -4,8 +4,14 @@ import { ContactUsEmail } from "@/components/EmailTemplate";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+interface ContactData {
+    name: string;
+    email: string;
+    message: string;
+}
+
 export async function POST(request: Request): Promise<NextResponse> {
-    const contactUsData = await request.json();
+    const contactUsData: ContactData = await request.json();
     try {
         const { error } = await resend.emails.send({
             from: 'WL-TTRPG <onboarding@kaje.org>',

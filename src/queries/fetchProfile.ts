@@ -15,7 +15,7 @@ export const fetchUserProfile = (userId: string) => {
                 throw new Error('Failed to fetch profile');
             }
             const { data: profileData } = await response.json();
-            console.log('Profile Response: ', profileData);
+          // console.log('Profile Response: ', profileData);
             return profileData;
         },
         // enabled: !!userId,

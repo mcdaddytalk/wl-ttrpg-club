@@ -11,8 +11,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { columns } from "./columns";
 import { DataTable } from "./DataTable";
 import { Button } from "@/components/ui/button";
-import NewMessageModal from "../NewMessageModal";
 import { ArchiveRestore, MailCheck, SendHorizonal } from "lucide-react";
+import MessageModal from "../MessageModal";
 
 const fetchContactList = async (): Promise<ContactListDO[]> => {
     const response = await fetch('/api/members/contacts',
@@ -37,15 +37,17 @@ type MemberMessageTableProps = {
 const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactElement => {
     const queryClient = useQueryClient();
 
-    const [selectedMessage, setSelectedMessage] = useState<MessageDO | null>(null);
+    const [selectedMessage, setSelectedMessage] = useState<MessageDO | undefined>(undefined);
     const [selectedMessages] = useState<MessageDO[]>([]);
 
-    const [isNewMessageModalOpen, setNewMessageModalOpen] = useState<boolean>(false); 
+    const [isMessageModalOpen, setMessageModalOpen] = useState<boolean>(false); 
+    const [messageMode, setMessageMode] = useState<'new' | 'reply' | 'forward'>("new");
+    const [fixedRecipient, setRecipient] = useState<string>("");
     
     const { mutate: markMessageAsRead } = useMutation({
         mutationFn: async (messageId: string) => {
-            console.log('Marking message as read:', messageId);
-            console.log('SelectedMessage:  ', selectedMessage);
+          // console.log('Marking message as read:', messageId);
+          // console.log('SelectedMessage:  ', selectedMessage);
             const response = await fetch(`/api/messages/${messageId}`, {
                 method: 'PATCH',
                 headers: {
@@ -61,7 +63,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
             return response.json();
         },
         onSuccess: (data) => {
-            console.log('Message marked as read:', data);
+            console.debug('Message marked as read:', data);
             queryClient.invalidateQueries({ queryKey: ['messages', 'unread', user?.id] });
             queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
         },
@@ -77,7 +79,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ is_archived: !selectedMessage?.is_archived }),
+                body: JSON.stringify({ is_archived: !selectedMessage?.is_archived, is_read: !selectedMessage?.is_read }),
             });            
         },
         onSuccess: () => {
@@ -129,8 +131,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
     const { data: membersData, isLoading: membersLoading, isError: membersError} = useQuery<ContactListDO[]>({
         queryKey: ['members', 'contact_list', user?.id],
         queryFn: () => fetchContactList(),
-        initialData: [],
-        // enabled: !!user?.id,
+        enabled: !!user?.id,
     })
 
     const { data: receivedMessages, isLoading: messagesLoading, isError: messagesError} = useQuery<MessageDO[]>({
@@ -139,19 +140,19 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
         enabled: !!user?.id,
     });
 
-    const handleNewMessageSubmit = () => {
-        setNewMessageModalOpen(false);
+    const handleMessageSubmit = () => {
+        setMessageModalOpen(false);
     };
 
-    const handleReplyMessage = (message: MessageDO) => {
-        setSelectedMessage(message);
-        setNewMessageModalOpen(true);
-    };
+    // const handleReplyMessage = (message: MessageDO) => {
+    //     setSelectedMessage(message);
+    //     setMessageModalOpen(true);
+    // };
 
-    const handleForwardMessage = (message: MessageDO) => {
-        setSelectedMessage(message);
-        setNewMessageModalOpen(true);
-    };
+    // const handleForwardMessage = (message: MessageDO) => {
+    //     setSelectedMessage(message);
+    //     setMessageModalOpen(true);
+    // };
     
     if (messagesError || membersError) {
         console.error(messagesError);
@@ -176,14 +177,27 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
             },
             onReply: () => {
                 setSelectedMessage(message);
-                handleReplyMessage(message)
+                setRecipient(message.sender_id);
+                setMessageMode('reply');
+                setMessageModalOpen(true);
             },
             onForward: () => {
                 setSelectedMessage(message);
-                handleForwardMessage(message);
+                setRecipient('');
+                setMessageMode('forward');
+                setMessageModalOpen(true);
             },
         };
     });
+
+    console.log({
+        isMessageModalOpen,
+        messageMode,
+        selectedMessage,
+        fixedRecipient,
+        useFixedRecipient: fixedRecipient !== "",
+    });
+    
     
     return (
         <section>
@@ -199,7 +213,12 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
                         <Button onClick={() => markAllMessagesAsRead()}>
                             <MailCheck className="mr-2 h-4 w-4" /><span>Mark Read Selected</span>
                         </Button>
-                        <Button onClick={() => setNewMessageModalOpen(true)}>
+                        <Button 
+                            onClick={() => {
+                                setMessageMode('new');
+                                setMessageModalOpen(true)
+                            }
+                        }>
                             <SendHorizonal className="mr-2 h-4 w-4" /><span>New Message</span>
                         </Button>
                     </div>
@@ -207,12 +226,16 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
                 </CardContent>
             </Card>
             {/* MODALS GO HERE */}
-            <NewMessageModal 
-                isOpen={isNewMessageModalOpen} 
-                onConfirm={() => handleNewMessageSubmit()}
-                onCancel={() => setNewMessageModalOpen(false)}
-                members={membersData}
+            <MessageModal 
+                isOpen={isMessageModalOpen} 
+                onConfirm={() => handleMessageSubmit()}
+                onCancel={() => setMessageModalOpen(false)}
+                members={membersData || []}
                 user={user}
+                mode={messageMode}
+                message={selectedMessage}
+                fixedRecipient={fixedRecipient}
+                useFixedRecipient={fixedRecipient !== ""}
             />
         </section>
     )

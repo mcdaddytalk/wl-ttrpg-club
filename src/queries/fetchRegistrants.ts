@@ -4,6 +4,8 @@ export function fetchRegistrants(supabase: TypedSupabaseClient) {
     return supabase.from("game_registrations")
         .select(`
             game_id,
-            member_id    
+            member_id,
+            status,
+            status_note
         `);
 }

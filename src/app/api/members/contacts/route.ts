@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     }));
 
     contactList.sort((a, b) => a.surname.localeCompare(b.surname));
-    console.log('Contact list:', contactList);
+  // console.log('Contact list:', contactList);
 
     return NextResponse.json(contactList, { status: 200 });
   }

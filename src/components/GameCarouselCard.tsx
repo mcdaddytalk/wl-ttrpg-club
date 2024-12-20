@@ -6,18 +6,18 @@ import { LuCalendar, LuUsers2 } from "react-icons/lu";
 // import { TiStopwatch } from "react-icons/ti";
 import { MdOutlineEventRepeat } from "react-icons/md";
 import GameImage from "./GameImage";
+import { redirect } from "next/navigation";
 
 
 
 type GameCarouselCardProps = {
     game: GameData;
-    onSelectGame: (game: GameData) => void;
     onToggleFavorite: (gameId: string, currentFavorite: boolean) => void;
     className: string;
 }
 
 
-const GameCarouselCard = ({ game, onSelectGame, onToggleFavorite, className }: GameCarouselCardProps): React.ReactElement => {
+const GameCarouselCard = ({ game, onToggleFavorite, className }: GameCarouselCardProps): React.ReactElement => {
 
     const seatsAvailable = (game: GameData) => {
         if (game.currentSeats === null) return "N/A";
@@ -30,11 +30,13 @@ const GameCarouselCard = ({ game, onSelectGame, onToggleFavorite, className }: G
         <div className={`flex flex-col items-center ${className}`}>
             <Card
                 key={game.id}
-                onClick={() => onSelectGame(game)}
+                onClick={() => {
+                    redirect(`/games/adventure/${game.game_id}`)
+                }}
                 className={`cursor-pointer border hover:shadow-lg transition p-2`}
                 >
                 <CardHeader className="p-0">
-                    <GameImage game={game} />
+                    <GameImage game={game} className="w-full h-auto" />
                     <div className="flex flex-row gap-2">
                             {/* Clickable Favorite Badge */}
                             <Badge
@@ -48,6 +50,16 @@ const GameCarouselCard = ({ game, onSelectGame, onToggleFavorite, className }: G
                                 {game.favorite ? "⭐ Favorite" : "☆ Add Favorite"}
                             </Badge>
 
+                            {/* Pending Approval Badge */}
+                            {game.pending &&(
+                                <Badge 
+                                    key={`pending-${game.id}`} 
+                                    className="top-2 right-10"
+                                >
+                                    Pending Approval
+                                </Badge>
+                            )}
+                            {/* Registered Badge */}
                             {game.registered &&(
                                 <Badge 
                                     key={`registered-${game.id}`} 

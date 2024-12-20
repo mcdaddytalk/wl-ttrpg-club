@@ -1,4 +1,4 @@
-import { MemberData } from "@/lib/types/custom";
+import { MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const supabase = await createSupabaseServerClient();
-    const { data: memberData, error: memberError } = await supabase
+    const { data: membersData, error: membersError } = await supabase
         .from("members")
         .select(`
             *,
@@ -30,14 +30,34 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                 )
             )
         `)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false }) as unknown as SupabaseMemberListResponse;
 
-    if (memberError) {
-        console.error('Error fetching members:', memberError)
-        return NextResponse.json({ error: memberError.message }, { status: 500 });
+    if (membersError) {
+        console.error('Error fetching members:', membersError)
+        return NextResponse.json({ error: membersError.message }, { status: 500 });
     }
 
-    const members = memberData as unknown as MemberData[] || [];
+    const members: MemberDO[] = membersData.map((memberData) => {
+        const { id, email, phone, provider } = memberData;
+        return {
+            id,
+            email,
+            provider: provider ?? '',
+            phone: phone ? phone : memberData.profiles.phone ?? '',
+            given_name: memberData.profiles.given_name ?? '',
+            surname: memberData.profiles.surname ?? '',
+            displayName: `${memberData.profiles.given_name} ${memberData.profiles.surname}`,
+            birthday: memberData.profiles.birthday ? new Date(memberData.profiles.birthday) : null,
+            experienceLevel: memberData.profiles.experience_level,
+            isAdmin: memberData.is_admin,
+            isMinor: memberData.is_minor,
+            created_at: memberData.created_at,
+            updated_at: memberData.updated_at,
+            bio: memberData.profiles.bio ?? '',
+            avatar: memberData.profiles.avatar ?? '',        
+            roles: memberData.member_roles.map(role => role.roles)
+        }
+    }) || [];
 
     return NextResponse.json( members, { status: 200 });
 }

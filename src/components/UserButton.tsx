@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { MessageData, MessageDO } from '@/lib/types/custom';
 import { fetchMessages } from '@/queries/fetchMessages';
 import useSupabaseBrowserClient from '@/utils/supabase/client';
+import { Badge } from './ui/badge';
 
 interface UserButtonProps {
   user: User;
@@ -22,12 +23,10 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
   const supabase = useSupabaseBrowserClient();
   
   const menuLinks = [
-    { href: '/member/change-password', label: 'Change Password', roles: ['member'] },
-    { href: '/member/profile', label: 'Profile', roles: ['member'] },
-    { href: '/member/dashboard', label: 'Dashboard', roles: ['member'] },
-    { href: '/games', label: 'Games Dashboard', roles: ['member'] },
-    { href: '/gamemaster', label: 'Gamemaster Dashboard', roles: ['gamemaster'] },
-    { href: '/admin', label: 'Admin Dashboard', roles: ['admin'] },
+    { href: '/games', label: 'Games', roles: ['member'] },
+    { href: '/gamemaster', label: 'Gamemaster Panel', roles: ['gamemaster'] },
+    { href: '/admin', label: 'Admin Panel', roles: ['admin'] },
+    { href: '/member', label: 'Account', roles: ['member'] },    
   ];
 
   
@@ -49,7 +48,6 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
     }).catch((error) => {
       toast.error(`Logout failed - ${error.message}`);
     }).finally(() => {
-      window.location.reload();
       setDropdownOpen(false);
     })
   };
@@ -94,11 +92,22 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
       .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' }, 
         (payload: { new: MessageData; }) => {
-          const message = payload.new as MessageData;
-          if (message.recipient_id === user?.id && message.is_read === false) {
-            setUnreadCount(prev => prev + 1);
-          }
-        })
+            const message = payload.new as MessageData;
+            if (message.recipient_id === user?.id && message.is_read === false) {
+              setUnreadCount(prev => prev + 1);
+            }
+      })
+      .on('postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'messages' }, 
+            (payload: { new: MessageData; }) => {
+            const message = payload.new as MessageData;
+            if (message.recipient_id === user?.id && message.is_read === true) {
+              setUnreadCount(prev => prev - 1);
+            }
+            if (message.recipient_id === user?.id && message.is_read === false) {
+              setUnreadCount(prev => prev + 1);
+            }
+      })
       .subscribe();
 
     return () => {
@@ -131,16 +140,16 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
         { user ? ( 
           <>
             { unreadCount > 0 && (
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-2">
-                {unreadCount}
-              </span>
+              <Badge className="absolute -top-1 left-full min-w-5 -translate-x-4 border-background px-1 bg-red-500 text-white rounded-lg">
+                <span>{unreadCount}</span>
+              </Badge>
             )}
             <UserAvatar avatarUrl={userAvatar} fullName={userName} /> 
-            <span className="ml-2">{userName}</span>  
+            <span className="text-slate-300 dark:text-slate-700">{userName}</span>  
           </>
         ) : (
           <>
-            <span className="ml-2">Logging in...</span>
+            <span className="text-slate-300 dark:text-slate-700">Logging in...</span>
           </>
         )}        
       </Button>      
@@ -168,7 +177,7 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
               )}
             </Link>
           </Button>
-          <Button onClick={handleLogout} className="block w-full text-left px-4 py-2  bg-slate-800 hover:bg-slate-500 dark:bg-slate-400 hover:dark:bg-slate-200">Logout</Button>
+          <Button onClick={handleLogout} className="block w-full text-left px-4 py-2  text-slate-300 dark:text-slate-700 bg-slate-800 hover:bg-slate-500 dark:bg-slate-400 hover:dark:bg-slate-200">Logout</Button>
         </div>
       )}
     </div>

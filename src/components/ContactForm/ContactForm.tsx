@@ -82,9 +82,9 @@ export const ContactForm = () => {
     })
     
     const processForm: SubmitHandler<FormValues> = async (data) => {
-        console.log('Data received')
+      // console.log('Data received')
         //console.log(data)
-        console.log('Sending to server...')
+      // console.log('Sending to server...')
 
         const contactResponse = await fetch('/api/contacts', {
             method: 'POST',
