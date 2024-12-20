@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 // import localFont from "next/font/local";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+import { fontSans, fontMono } from "@/lib/fonts";
 import "./globals.css";
+import { siteConfig } from "@/config/site";
 
 // import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import Header from "@/components/Header";
@@ -13,6 +13,7 @@ import ToastHandler from "@/components/ToastHandler";
 import { Suspense } from "react";
 // import { Analytics } from "@vercel/analytics/react";
 import QueryProviderWrapper from "@/providers/QueryProvider";
+import { cn } from "@/lib/utils";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -25,17 +26,58 @@ import QueryProviderWrapper from "@/providers/QueryProvider";
 //   weight: "100 900",
 // });
 
-const defaultUrl = process?.env?.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const defaultUrl = siteConfig.url;
+const { title, description, icons, keywords, manifest } = siteConfig;
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Western Loudoun Table Top Roleplaying Game Group (WLTTRPGG)",
-  description: "Club for table top roleplaying gamers in the Western Loudoun area.",
-  icons: {
-    icon: "/favicon.ico"
+  title: {
+    default: title,
+    template: `%s | ${title}`,
   },
-  manifest: "/manifest.json",
+  description,
+  icons,
+  keywords,
+  manifest,
+  authors: [
+    {
+      name: "Karlan Talkington",
+      url: "https://www.kaje.org",
+    },
+  ],
+  creator: "Karlan Talkington",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: defaultUrl,
+    title,
+    description,
+    siteName: title,
+    images: [
+      {
+        url: `${defaultUrl}/og.png`,
+        width: 1200,
+        height: 630,
+        alt: "OG Image",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [`${defaultUrl}/og.png`],
+    creator: "@karlan_talkington",
+  },
 };
+
+export const viewport: Viewport = {
+  colorScheme: "dark light",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ]
+}
 
 export default async function RootLayout({
   children,
@@ -43,9 +85,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" suppressHydrationWarning>
       <body
-        className="bg-background text-foreground bg-banner bg-no-repeat bg-cover"
+        className={cn(
+          "bg-background text-foreground bg-banner bg-no-repeat bg-cover",
+          fontSans.variable,
+          fontMono.variable
+        )}
       >
           <ThemeProvider 
             attribute="class"
@@ -61,7 +107,7 @@ export default async function RootLayout({
                   <ToastHandler />
                 </Suspense>
                   <div className="flex-grow dark:bg-black-overlay bg-white-overlay">
-                    <main className="container w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 overflow-auto">
+                    <main className="container w-full max-w-screen-2xl mx-auto overflow-auto">
                       {children}
                     </main>
                   </div>

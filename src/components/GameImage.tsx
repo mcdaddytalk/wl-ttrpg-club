@@ -7,9 +7,11 @@ import React, { useEffect } from "react";
 
 type GameImageProps = {
     game: GameData;
+    size?: number;
+    className?: string;
 }
 
-const GameImage = ({ game }: GameImageProps): React.ReactElement => {
+const GameImage = ({ game, size, className }: GameImageProps): React.ReactElement => {
     const fetchImageUrlMutation = useFetchImageUrl();
     const { mutate: fetchImageUrl } = fetchImageUrlMutation;
   
@@ -29,11 +31,11 @@ const GameImage = ({ game }: GameImageProps): React.ReactElement => {
       <Image
         src={imageUrl}
         alt={game.title}
-        width={0}
-        height={0}
+        width={size ?? 0}
+        height={size ?? 0}
         priority
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className="object-cover w-full h-auto rounded-md"
+        className={`object-cover ${className}`}
       />
     );
   };

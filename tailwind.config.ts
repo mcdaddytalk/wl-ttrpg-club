@@ -9,6 +9,10 @@ const config: Config = {
   ],
   theme: {
 	extend: {
+		width: {
+			'w-16': '4rem',
+			'w-64': '16rem',
+		},
 		screens: {
 			"md-lg": "1024px",
 			"lg-sm": "1152px",
@@ -50,6 +54,18 @@ const config: Config = {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
+			success: {
+				DEFAULT: "hsl(var(--success))",
+				foreground: "hsl(var(--success-foreground))",
+			},
+			warning: {
+				DEFAULT: "hsl(var(--warning))",
+				foreground: "hsl(var(--warning-foreground))",
+			},
+			info: {
+				DEFAULT: "hsl(var(--info))",
+				foreground: "hsl(var(--info-foreground))",
+			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',

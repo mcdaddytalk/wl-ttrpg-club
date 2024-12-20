@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import useSession from "@/utils/supabase/use-session";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState("");
@@ -17,10 +17,9 @@ const ChangePassword = () => {
   //const supabase = useSupabaseBrowserClient();
   //const queryClient = useQueryClient();
   const session = useSession();
-  if (!session) {
-    redirect('/unauthorized');
-  }
 
+  console.debug('Session:  ', session);
+  
   const handleChangePassword = async () => {
     setLoading(true);
     setStatusMessage(null);

@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { MessageDO } from "@/lib/types/custom";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Archive, MailOpen, Mail, Reply, Forward  } from "lucide-react";
 
 export const columns: ColumnDef<MessageDO>[] = [
@@ -56,8 +56,7 @@ export const columns: ColumnDef<MessageDO>[] = [
         cell: ({ row }) => {
             const message = row.original;
             return (
-                <TooltipProvider>
-                    <div className="flex items-center gap-x-2">
+                <div className="flex items-center gap-x-2">
                         <Tooltip>
                             <TooltipTrigger>
                                 <Button variant="secondary" size="sm" onClick={() => message.onMarkRead?.(message.id)}>
@@ -99,7 +98,6 @@ export const columns: ColumnDef<MessageDO>[] = [
                             </TooltipContent>
                         </Tooltip>
                     </div>
-                </TooltipProvider>
             );
         },
     },

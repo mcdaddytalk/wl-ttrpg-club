@@ -11,7 +11,28 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+
   const supabase = await createSupabaseReqResClient(request, response)
+
+  const protectedApiRoutes = [
+    '/api/members',
+    '/api/admin',
+    '/api/gamemaster',
+    '/api/messages',
+    '/api/roles',
+    '/api/games',
+  ]
+
+  if (protectedApiRoutes.some((path) => request.nextUrl.pathname.startsWith(path))) {
+    const token = (await (supabase.auth.getSession())).data.session?.access_token
+    if (token) {
+       response.headers.set('Authorization', `Bearer ${token}`)
+       return NextResponse.next()
+    } else {
+       response.headers.set('Authorization', '')
+       return new NextResponse('unauthorized', { status: 401 })
+    }
+  }
 
   const { data: { user }, error } = await supabase.auth.getUser()
   const { data: { session } } = await supabase.auth.getSession()

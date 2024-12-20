@@ -11,20 +11,20 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Checkbox } from "@/components/ui/checkbox";
-import { MemberData, RoleData, RoleDO } from "@/lib/types/custom";
+import { MemberDO, RoleDO } from "@/lib/types/custom";
 import { Label } from "./ui/label";
 import { useUpdateRoles } from "@/hooks/useUpdateRoles";
 import { toast } from "sonner";
 
 interface RoleManagementModalProps {
-  member: MemberData;
+  member: MemberDO;
   allRoles: RoleDO[];
   isOpen: boolean;
-  onClose: () => void;
+  onCancel: () => void;
 }
 
-export const ManageRolesModal = ({ member, allRoles, isOpen, onClose }: RoleManagementModalProps): React.ReactElement => {
-    const currentRoles = member.member_roles.map((role: RoleData) => role.roles.id)
+export const ManageRolesModal = ({ member, allRoles, isOpen, onCancel }: RoleManagementModalProps): React.ReactElement => {
+    const currentRoles = member.roles.map((role: RoleDO) => role.id)
     const [selectedRoles, setSelectedRoles] = useState<string[]>( [...currentRoles]);
     const { mutate: updateRoles, isPending } = useUpdateRoles();
         
@@ -45,14 +45,14 @@ export const ManageRolesModal = ({ member, allRoles, isOpen, onClose }: RoleMana
                     toast.error("Failed to update roles.");
                 },
                 onSettled: () => {
-                    onClose(); // Close modal after updating roles
+                    onCancel(); // Close modal after updating roles
                 }
             }
         );
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
+        <Dialog open={isOpen} onOpenChange={onCancel}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -85,7 +85,7 @@ export const ManageRolesModal = ({ member, allRoles, isOpen, onClose }: RoleMana
             <Button onClick={handleSubmit} disabled={isPending}>
                 {isPending ? <span className="mr-2">Saving...</span> : <span className="mr-2">Save</span>}
             </Button>
-            <Button variant="outline" onClick={onClose} disabled={isPending}>
+            <Button variant="outline" onClick={onCancel} disabled={isPending}>
               Cancel
             </Button>
           </DialogFooter>

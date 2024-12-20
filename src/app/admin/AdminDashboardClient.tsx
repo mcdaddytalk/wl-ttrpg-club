@@ -1,11 +1,16 @@
 "use client"
 
 // import { AdminDrawer } from "@/components/AdminDrawer";
-import AdminMembersTable from "@/components/AdminMembersTable/AdminMembersTable";
+import AdminMembersTable from "@/app/admin/_components/AdminMembersTable/AdminMembersTable";
+// import { DataTable } from "@/components/DataTable/data-table";
+import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
+import { Shell } from "@/components/Shell";
+import { Suspense } from "react";
 
 export default function AdminDashboardClient(): React.ReactElement {
+  
   return (
-      <div className="flex flex-col">
+      <Shell className="gap-2">
         {/* Navbar */}
         {/*
         <header className="flex justify-between items-center p-4 shadow">
@@ -14,11 +19,18 @@ export default function AdminDashboardClient(): React.ReactElement {
         </header>
         */}
         {/* Main Content */}
-        <main className="p-4 overflow-y-auto">
-          <h2 className="text-2xl font-semibold mb-4">Manage Members</h2>
+        <Suspense fallback={
+          <DataTableSkeleton 
+            columnCount={7}
+            searchableColumnCount={3}
+            filterableColumnCount={5}
+            cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
+            shrinkZero
+          />
+        }>
           {/* Members Table */}
           <AdminMembersTable />
-        </main>
-      </div>
+        </Suspense>
+      </Shell>
     );
 }
