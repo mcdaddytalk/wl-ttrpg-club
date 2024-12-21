@@ -1,6 +1,7 @@
 // utils/logger.ts
 import { createLogger, format, transports } from 'winston';
 import * as Sentry from '@sentry/node';
+import path from 'path';
 import 'winston-transport';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -27,16 +28,25 @@ const logger = createLogger({
     new transports.Console({
       silent: !isDev && process.env.LOG_LEVEL === 'silent',
     }),
-    // Optional: File transport for error logs
-    new transports.File({
-      filename: 'logs/error.log',
-      level: 'error',
-      silent: !isDev && process.env.LOG_LEVEL === 'silent',
-    }),
     new SentryTransport({
       level: 'error',
       silent: !isDev && process.env.LOG_LEVEL === 'silent',
     }),
+    // Optional: File transport for error logs
+    // Log to file only in development
+    ...(isDev
+      ? [
+          new transports.File({
+            filename: path.join(__dirname, '../logs/app.log'),
+            level: 'debug',
+          }),
+          new transports.File({
+            filename: path.join(__dirname, '../logs/error.log'),
+            level: 'error',
+          }),
+        ]
+      : []),
+    
   ],
 });
 
