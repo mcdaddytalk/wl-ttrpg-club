@@ -23,8 +23,8 @@ function makeQueryClient() {
                     logger.error(`Mutation error: ${error}`)
                 },
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                onSuccess: (data, _variables, _context) => {
-                    logger.info(`Mutation success: ${JSON.stringify(data)}`)
+                onSuccess: (_data, _variables, _context) => {
+                    //logger.info(`Mutation success: ${JSON.stringify(data)}`)
                 }
             }            
         },
