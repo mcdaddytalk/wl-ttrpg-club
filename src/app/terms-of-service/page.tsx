@@ -32,7 +32,11 @@ export default function TermsPage() {
             <p>This Terms of Service is governed by the laws of the jurisdiction in which you are located. Any disputes will be resolved in that jurisdiction.</p>
             <h2 className="text-xl font-semibold mb-2">7. Modifications</h2>
             <p>We reserve the right to modify these Terms of Service at any time. By continuing to use our website after any modifications, you agree to be bound by the modified Terms of Service.</p>
-            <h2 className="text-xl font-semibold mb-2">8. Contact Us</h2>
+            <h2 className="text-xl font-semibold mb-2">8. Privacy Policy</h2>
+            <p>Please refer to our <Link className="underline" href="/privacy">Privacy Policy</Link> for information on how we collect, use, and protect your personal information.</p>
+            <h2 className="text-xl font-semibold mb-2">9. Communication</h2>
+            <p>By signing up for an account on our website, you agree to receive emails and/or SMS notifications from us about updates, schedules, and other relevant information and may opt out at any time.</p>
+            <h2 className="text-xl font-semibold mb-2">10. Contact Us</h2>
             <p>If you have any questions or concerns about these Terms of Service, please contact us <Link className="underline" href="/contact-us">here</Link>.</p>
           </div>
         </section>

@@ -12,7 +12,7 @@ const calculateIsMinor = (birthday: string): boolean => {
 };
 
 export async function POST(request: Request) {
-  const { email, password, firstName, surname, birthday } = await request.json();
+  const { email, phone, preferredContact, consent, password, firstName, surname, birthday } = await request.json();
 
   const supabase = await createSupabaseServerClient()
   // Check if email is already in use in auth.
@@ -44,7 +44,10 @@ export async function POST(request: Request) {
         given_name: firstName,
         surname: surname,
         birthday: birthday,
-        is_minor: isMinor
+        is_minor: isMinor,
+        phone: phone,
+        preferred_contact: preferredContact,
+        consent: consent
       },
     },
   });
@@ -59,9 +62,11 @@ export async function POST(request: Request) {
     // Insert into members table
     const { error: memberError } = await supabase.from('members').upsert({
       id: userId,
-      email: email,
+      email,
       provider: 'email',
-      is_minor: isMinor
+      is_minor: isMinor,
+      phone,
+      consent
     });
 
     if (memberError) {
@@ -75,6 +80,7 @@ export async function POST(request: Request) {
       given_name: firstName,
       surname: surname,
       birthday: birthday,
+      phone
     });
 
     if (profileError) {
