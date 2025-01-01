@@ -20,16 +20,28 @@ import { SignupOAuthButtons } from "@/components/SignupOAuthButtons";
 import { signInWithProvider } from "@/server/authActions";
 import { toast } from "sonner";
 import { Provider } from "@/lib/types/custom";
+import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SelectItem } from "@radix-ui/react-select";
+import { Checkbox } from "@/components/ui/checkbox";
 
-// Regular expression for password validation
+// Regular expression for password and phone validation
 const passwordValidation = new RegExp(
     /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/
 );
+
+const phoneValidation = new RegExp(/^\+?[1-9]\d{1,14}$/);
+
 // Validation Schema
 const signupSchema = z.object({
     firstName: z.string().trim().min(2, "First name must be at least 2 characters"),
     surname: z.string().min(2, "Surname must be at least 2 characters"),
     email: z.string().email("Enter a valid email, or for no contact 'no-contact@email.com'"),
+    phone: z.string()
+      .regex(phoneValidation, "Enter a valid phone number")
+      .optional()
+      .or(z.literal('')),
+    preferredContact: z.enum(["email", "phone"], { message: "Select a preferred method of contact" }),
+    consent: z.boolean().refine((value) => value === true, "You must agree to be contacted."),  
     password: z.string()
         .min(8, "Password must be at least 8 characters")
         .regex(passwordValidation, "Password must contain at least one capital letter, one number, and one special character"),
@@ -70,6 +82,9 @@ export default function SignupPage() {
       surname: "",
       birthday: "",
       email: "",
+      phone: "",
+      consent: false,
+      preferredContact: "email",
       password: "",
       confirmPassword: "",
     },
@@ -78,7 +93,7 @@ export default function SignupPage() {
   const handleSignup = async (data: SignupFormData) => {
     setLoading(true);
     try {
-        const { email, password, firstName, surname, birthday } = data;
+        const { email, phone, preferredContact, consent, password, firstName, surname, birthday } = data;
         
         const signUpResponse = await fetch('/api/signup', {
             method: 'POST',
@@ -87,6 +102,9 @@ export default function SignupPage() {
             },
             body: JSON.stringify({
                 email,
+                phone,
+                preferredContact,
+                consent,
                 password,
                 firstName,
                 surname,
@@ -112,20 +130,6 @@ export default function SignupPage() {
         } else {
             router.push('/verify-email?email=' + email);
         }
-
-    //   const { error } = await supabase.auth.signUp({
-    //     email,
-    //     password,
-    //     options: {
-    //       data: {
-    //         firstName,
-    //         surname,
-    //         birthday,
-    //         isMinor, // Pass calculated field
-    //       },
-    //     },
-    //   });
-
     } catch (error) {
       console.error(error);
       alert("Something went wrong. Please try again.");
@@ -172,6 +176,75 @@ export default function SignupPage() {
                         <FormMessage />
                     </FormItem>
                     )}
+                />
+                <FormField
+                  name="phone"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number (optional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="tel" 
+                          placeholder="+1234567890" 
+                          autoComplete="tel" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="preferredContact"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Preferred Method of Contact</FormLabel>
+                      <FormControl>
+                        <Select 
+                          {...field}
+                          onValueChange={(fieldValue) => field.onChange(fieldValue)}
+                          defaultValue={field.value || ""}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select an option" />
+                          </SelectTrigger>
+                          <SelectContent
+                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"                          
+                          >                            
+                            <SelectItem value="email">Email</SelectItem>
+                            <SelectItem value="phone">Phone</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="consent"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <div
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox 
+                          checked={field.value}
+                          id="consent" 
+                          onCheckedChange={field.onChange}
+                        />
+                        <FormLabel 
+                          htmlFor="consent" 
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          I agree to receive communications via my preferred contact method.
+                        </FormLabel>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
                 <FormField
                     name="firstName"
