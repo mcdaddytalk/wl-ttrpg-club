@@ -102,7 +102,7 @@ export const ContactForm = () => {
                 throw new Error(error.message);
             }
         } else {
-            await fetch('/api/email/new-contact', {
+            await fetch('/api/messaging/new-contact', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

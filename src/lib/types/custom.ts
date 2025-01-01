@@ -47,6 +47,8 @@ export type GameInterval = 'weekly' | 'biweekly' | 'monthly' | 'yearly' | 'custo
 export type GMInterest = 'no' | 'maybe' | 'yes';
 export type GameRegStatus = 'approved' | 'rejected' | 'pending' | 'banned';
 export type LocationType = 'vtt' | 'discord' | 'physical';
+export type DeliveryStatus = 'pending' | 'sent' | 'failed';
+export type DeliveryMethod = 'email' | 'sms' | 'both';
 
 /* DO Types */
 export type ContactListDO = {
@@ -199,6 +201,32 @@ export type RoleData = {
 }
 export type SupabaseRoleListResponse = SupabaseDataResponse<RoleData>
 export type SupbaseRoleResponse = SupabaseDataResponseSingle<RoleData>
+
+export type BroadcastRecipient = {
+  id: string;
+  message_id: string;
+  recipient_id: string;
+  members: MemberData;
+  error_message: string;
+  created_at: Date;
+  updated_at: Date;
+  delivery_method: DeliveryMethod;
+  delivery_status: DeliveryStatus;
+}
+export type SupabaseBroadcastRecipientListResponse = SupabaseDataResponse<BroadcastRecipient>
+export type SupabaseBroadcastRecipientResponse = SupabaseDataResponseSingle<BroadcastRecipient>
+
+export type BroadcastMessage = {
+  id: string;
+  sender_id: string;
+  game_id: string;
+  subject: string;
+  message: string;
+  created_at: Date;
+  mode: DeliveryMethod;
+}
+export type SupabaseBroadcastMessageListResponse = SupabaseDataResponse<BroadcastMessage>;
+export type SupabaseBroadcastMessageResponse = SupabaseDataResponseSingle<BroadcastMessage>;
 
 export type RegisteredGame = {
   id: string;
