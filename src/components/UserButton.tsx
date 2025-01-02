@@ -12,6 +12,7 @@ import { MessageData, MessageDO } from '@/lib/types/custom';
 import { fetchMessages } from '@/queries/fetchMessages';
 import useSupabaseBrowserClient from '@/utils/supabase/client';
 import { Badge } from './ui/badge';
+import { useRouter } from 'next/navigation';
 
 interface UserButtonProps {
   user: User;
@@ -21,6 +22,7 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const supabase = useSupabaseBrowserClient();
+  const router = useRouter();
   
   const menuLinks = [
     { href: '/games', label: 'Games', roles: ['member'] },
@@ -48,7 +50,10 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
     }).catch((error) => {
       toast.error(`Logout failed - ${error.message}`);
     }).finally(() => {
+      // console.log('Logout successful');
       setDropdownOpen(false);
+      // console.log('Refresh page...');
+      router.refresh();
     })
   };
 
@@ -130,13 +135,6 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
   return (
     <div className="user-button relative">
       <Button onClick={toggleDropdown} className="flex items-center bg-slate-800 hover:bg-slate-500 dark:bg-slate-400 hover:dark:bg-slate-200">
-        {/* {userAvatar ? (
-          <Image src={userAvatar} alt="User Avatar" className="w-8 h-8 rounded-full" />
-        ) : (
-          <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center">
-            <span>{userName.charAt(0)}</span>
-          </div>
-        )} */}
         { user ? ( 
           <>
             { unreadCount > 0 && (

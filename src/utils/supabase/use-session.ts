@@ -19,7 +19,7 @@ export default function useSession() {
       } = await supabase.auth.getSession();
 
       if (!session) {
-        router.push("/login");
+        // router.push("/login");
         setSession(null);
         return;
       }      
@@ -30,18 +30,19 @@ export default function useSession() {
     checkSession(); // Call the function to check the session
 
     type JwtPayloadWithRoles = JwtPayload & { roles: string[] };
-    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, updatedSession) => {
+      // console.log('Event Triggered', event, updatedSession);
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
-        if (session) {
-          const jwt: JwtPayloadWithRoles = jwtDecode(session?.access_token);
+        if (updatedSession) {
+          const jwt: JwtPayloadWithRoles = jwtDecode(updatedSession?.access_token);
           const roles = jwt?.roles;
           const user = await getUser();
-          if (user) session.user = user;
-          session.user.user_metadata.roles = roles;
+          if (user) updatedSession.user = user;
+          updatedSession.user.user_metadata.roles = roles;
+          setSession(updatedSession);
         }
-        setSession(session);
-      }
-      if (event === 'SIGNED_OUT' || !session) {
+      } else if (event === 'SIGNED_OUT') {
+        // console.log('Signed out Event Triggered');
         setSession(null);
         router.push('/'); // Or '/login'
       }
