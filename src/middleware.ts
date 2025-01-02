@@ -1,7 +1,16 @@
 import { NextRequest , NextResponse} from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
 import { createSupabaseReqResClient } from "./utils/supabase/server"
-import { RoleData, SupabaseRoleListResponse } from "./lib/types/custom";
+// import { RoleData, SupabaseRoleListResponse } from "./lib/types/custom";
+
+const protectedApiRoutes = [
+  '/api/members',
+  '/api/admin',
+  '/api/gamemaster',
+  '/api/messages',
+  '/api/roles',
+  '/api/games',
+]
 
 export async function middleware(request: NextRequest) {
   await updateSession(request)
@@ -10,21 +19,14 @@ export async function middleware(request: NextRequest) {
       headers: request.headers,
     },
   });
-
-
+ 
   const supabase = await createSupabaseReqResClient(request, response)
 
-  const protectedApiRoutes = [
-    '/api/members',
-    '/api/admin',
-    '/api/gamemaster',
-    '/api/messages',
-    '/api/roles',
-    '/api/games',
-  ]
+  const { data: { user }, error } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
   if (protectedApiRoutes.some((path) => request.nextUrl.pathname.startsWith(path))) {
-    const token = (await (supabase.auth.getSession())).data.session?.access_token
+    const token = session?.access_token
     if (token) {
        response.headers.set('Authorization', `Bearer ${token}`)
        return NextResponse.next()
@@ -34,27 +36,23 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const { data: { user }, error } = await supabase.auth.getUser()
-  const { data: { session } } = await supabase.auth.getSession()
-
-  if (error || !user || !session) {
-      // if (error) console.error('AUTH ERROR ', error)
-      // if (!user) console.error('NO USER DATA ')
-      return NextResponse.next()
-  }
-  
   const url = request.nextUrl;
   
-  const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleListResponse;
-  if (roleError) {
-    console.error('ROLE ERROR ', roleError)
-  }
-  if (!roleData) {
-    console.error('NO ROLE DATA ', roleData)
-  }
+  // const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleListResponse;
+  // if (roleError) {
+  //   console.error('ROLE ERROR ', roleError)
+  // }
+  // if (!roleData) {
+  //   console.error('NO ROLE DATA ', roleData)
+  // }
   
-  const roles = roleData ? (roleData as RoleData[])?.map((role) => role.roles.name) : [];
+  // const roles = roleData ? (roleData as RoleData[])?.map((role) => role.roles.name) : [];
   
+  let roles: string[] = [];
+  if (session) {
+    roles = session.user.user_metadata.roles || [];
+  }
+
   // Role based redirect
   // Array of restricted paths and role requirements
   const restrictedPaths = [
@@ -70,7 +68,7 @@ export async function middleware(request: NextRequest) {
     if (url.pathname.startsWith(restricted.path)) {
       // Role check for the current restricted path
       const requiredRoles = Array.isArray(restricted.role) ? restricted.role : [restricted.role];
-      if (!roles.some(role => requiredRoles.includes(role))) {
+      if (!roles || !roles.some(role => requiredRoles.includes(role))) {
         return NextResponse.redirect(new URL('/unauthorized', url));
       }
     }
