@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
  
   const supabase = await createSupabaseReqResClient(request, response)
 
-  const { data: { user }, error } = await supabase.auth.getUser()
+  // const { data: { user }, error } = await supabase.auth.getUser()
   const { data: { session } } = await supabase.auth.getSession()
 
   if (protectedApiRoutes.some((path) => request.nextUrl.pathname.startsWith(path))) {
