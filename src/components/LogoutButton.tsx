@@ -2,7 +2,7 @@
 
 // import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/router";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { signOut } from "@/server/authActions";
 
 export default function LogoutButton() {

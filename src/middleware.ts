@@ -1,6 +1,7 @@
 import { NextRequest , NextResponse} from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
-import { createSupabaseReqResClient } from "./utils/supabase/server"
+// import { createSupabaseReqResClient } from "./utils/supabase/server"
+import { getInitialSession } from "./server/authActions"
 // import { RoleData, SupabaseRoleListResponse } from "./lib/types/custom";
 
 const protectedApiRoutes = [
@@ -10,6 +11,7 @@ const protectedApiRoutes = [
   '/api/messages',
   '/api/roles',
   '/api/games',
+  '/api/locations'
 ]
 
 export async function middleware(request: NextRequest) {
@@ -20,10 +22,7 @@ export async function middleware(request: NextRequest) {
     },
   });
  
-  const supabase = await createSupabaseReqResClient(request, response)
-
-  // const { data: { user }, error } = await supabase.auth.getUser()
-  const { data: { session } } = await supabase.auth.getSession()
+  const { session } = await getInitialSession();
 
   if (protectedApiRoutes.some((path) => request.nextUrl.pathname.startsWith(path))) {
     const token = session?.access_token

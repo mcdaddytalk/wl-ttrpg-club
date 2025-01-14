@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef } from "react"
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "@/components/ui/spinner";
 
 type InfiniteScrollProps = {
     isLoadingInitial: boolean;

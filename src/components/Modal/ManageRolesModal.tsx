@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Checkbox } from "@/components/ui/checkbox";
 import { MemberDO, RoleDO } from "@/lib/types/custom";
-import { Label } from "./ui/label";
+import { Label } from "@/components/ui/label";
 import { useUpdateRoles } from "@/hooks/useUpdateRoles";
 import { toast } from "sonner";
 

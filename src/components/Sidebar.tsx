@@ -1,10 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
 import { useSidebarStore } from "@/store/sidebarStore"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 const navItems = [
     { href: "/member/my-games", label: "My Games", icon: '🎲' },
@@ -22,7 +23,7 @@ export default function Sidebar(): React.ReactElement {
             id="member-sidebar"
             className={cn(
                 'flex flex-col bg-slate-800 text-white transition-width duration-300',
-                isCollapsed ? 'w-16' : 'w-64'
+                isCollapsed ? 'w-16' : 'w-32'
               )}
         >
             {/* Toggle button */}
@@ -44,9 +45,18 @@ export default function Sidebar(): React.ReactElement {
                         className={cn(
                             'group flex items-center rounded-md px-3 py-2 text-sm font-medium leading-6 text-slate-400 hover:text-white',
                             pathName === item.href ? 'bg-slate-900 text-white' : 'text-slate-400 hover:bg-slate-700 hover:text-white'
-                          )}
+                        )}
                     >
-                        {isCollapsed ? item.icon : <span className="mr-4">{item.label}</span>}
+                        {isCollapsed ? (
+                            <Tooltip delayDuration={0}>
+                                <TooltipTrigger asChild>
+                                    <span>{item.icon}</span>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">{item.label}</TooltipContent>
+                            </Tooltip>
+                            ) : ( 
+                                <span className="mr-4">{item.label}</span>
+                            )}
                     </Link>
                 ))}
             </nav>

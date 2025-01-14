@@ -12,7 +12,7 @@ import { columns } from "./columns";
 import { DataTable } from "./DataTable";
 import { Button } from "@/components/ui/button";
 import { ArchiveRestore, MailCheck, SendHorizonal } from "lucide-react";
-import MessageModal from "../MessageModal";
+import MessageModal from "@/components/Modal/MessageModal";
 import logger from "@/utils/logger";
 
 const fetchContactList = async (): Promise<ContactListDO[]> => {

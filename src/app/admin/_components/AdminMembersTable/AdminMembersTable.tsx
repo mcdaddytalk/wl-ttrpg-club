@@ -6,21 +6,21 @@ import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
 import { useState } from "react";
 import { DataTableFilterField, MemberDO } from "@/lib/types/custom";
-import { ManageRolesModal } from "../../../../components/ManageRolesModal";
+import { ManageRolesModal } from "@/components/Modal/ManageRolesModal";
 import { getColumns } from "./columns";
 import { 
     useQuery,
     // useSuspenseQuery,
 } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
-import { ConfirmationModal } from "../../../../components/ConfirmationModal";
-import { AddMemberModal } from "../../../../components/AddMemberModal";
+import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
+import { AddMemberModal } from "@/components/Modal/AddMemberModal";
 import { 
 //    fetchMembersFull, 
     fetchRoles 
 } from "@/queries/fetchMembers";
 import { useDataTable } from "@/hooks/use-data-table";
-import { DataTableToolbar } from "../../../../components/DataTable/data-table-toolbar";
+import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { usePaginatedMembers } from "@/hooks/usePaginatedMembers";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { useSendPasswordReset } from "@/hooks/useSendPasswordReset";
@@ -129,7 +129,7 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
             ]            
         }
     ]
-
+    
     const { table } = useDataTable({
         data: enhancedMembers,
         columns: getColumns({ onOpenModal: openModal }),
@@ -200,10 +200,7 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
                 <AddMemberModal 
                     isOpen={isAddMemberModalOpen}
                     onConfirm={handleAddMemberConfirm}
-                    onCancel={() => {
-                        setAddMemberModalOpen(false);
-                        closeModal();
-                    }}
+                    onCancel={closeModal}
                 />
             )}
             

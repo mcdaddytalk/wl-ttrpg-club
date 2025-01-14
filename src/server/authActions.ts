@@ -20,10 +20,19 @@ import {
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import useToastStore from "@/store/toastStore";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 
+type JwtPayloadWithRoles = JwtPayload & { roles: string[] };
 export const getInitialSession = async (): Promise<{ session: Session | null; user: User | null; error: AuthError | null }> => {
     const supabase = await createSupabaseServerClient();
     const { data: { session }, error } = await supabase.auth.getSession();
+    if (session) {
+        const jwt: JwtPayloadWithRoles = jwtDecode(session.access_token);
+        const roles = jwt?.roles;
+        const user = await getUser();
+        if (user) session.user = user;
+        session.user.user_metadata.roles = roles;
+    }
     return { session, user: session?.user ?? null, error };
 };
 
@@ -126,6 +135,25 @@ export async function signInWithPassword(email: string, password: string): Promi
     if (error) throw new Error(error.message)
     revalidatePath('/', 'layout')
     redirect('/member/dashboard')
+}
+
+export async function signInWithPhone(phone: string): Promise<AuthOtpResponse> {
+    const supabase = await createSupabaseServerClient();
+    const credentials: SignInWithPasswordlessCredentials = {
+        phone,
+        options: {
+            shouldCreateUser: false
+        }
+    }
+    const { error } = await supabase.auth.signInWithOtp(credentials);
+    if (error) {
+        if (error instanceof AuthApiError && error.status === 422) {
+            console.error('Throwing new AuthApiError');
+            throw new AuthApiError(error.message,  error.status, error.code);
+        }
+        throw new Error(error.message);
+    }
+    redirect(`/?phone-otp=true`)
 }
 
 export async function signInWithOTP(email: string): Promise<AuthOtpResponse> {

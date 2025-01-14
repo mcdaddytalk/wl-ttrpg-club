@@ -26,7 +26,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         interval,
         first_game_date,
         next_game_date,
-        location,
+        location_id,
+        location:locations!game_schedule_location_id_fkey(
+                    *
+                ),
         day_of_week,
         games (
           title,
@@ -84,6 +87,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         interval: gameData.interval,
         firstGameDate: gameData.first_game_date,
         nextGameDate: gameData.next_game_date,
+        location_id: gameData.location_id,
         location: gameData.location,
         dayOfWeek: gameData.day_of_week,
         title: gameData.games.title,

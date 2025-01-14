@@ -13,7 +13,15 @@ export const mockScheduledGames: GMGameData[] = [
         "maxSeats": 8,
         "registered": 6,
         "status": "scheduled",
-        location: ""
+        "location_id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+        "location": {
+            "id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+            "name": "My Home",
+            "address": "123 Main St, Anytown, USA",
+            "type": "physical",
+            "created_at": new Date("2024-11-30T20:20:42.481248"),
+            "updated_at": new Date("2024-11-30T20:20:42.481248")
+        }
     },
     {
         "id": "fa87bec6-bb03-46f4-899d-b5674634395f",
@@ -27,7 +35,15 @@ export const mockScheduledGames: GMGameData[] = [
         "maxSeats": 6,
         "registered": 0,
         "status": "awaiting-players",
-        location: ""
+        "location_id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+        "location": {
+            "id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+            "name": "My Home",
+            "address": "123 Main St, Anytown, USA",
+            "type": "physical",
+            "created_at": new Date("2024-11-30T20:20:42.481248"),
+            "updated_at": new Date("2024-11-30T20:20:42.481248")
+        }
     },
     {
         "id": "3bd8219f-c1e3-4cab-ba25-fc4803a77dcc",
@@ -41,7 +57,15 @@ export const mockScheduledGames: GMGameData[] = [
         "maxSeats": 6,
         "registered": 4,
         "status": "awaiting-players",
-        location: ""
+        "location_id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+        "location": {
+            "id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+            "name": "My Home",
+            "address": "123 Main St, Anytown, USA",
+            "type": "physical",
+            "created_at": new Date("2024-11-30T20:20:42.481248"),
+            "updated_at": new Date("2024-11-30T20:20:42.481248")
+        }
     },
     {
         "id": "83e2f7f4-5b5d-4b6b-8a0e-4f1b2c3d4e5f",
@@ -55,7 +79,15 @@ export const mockScheduledGames: GMGameData[] = [
         "maxSeats": 6,
         "registered": 6,
         "status": "scheduled",
-        location: ""
+        "location_id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+        "location": {
+            "id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+            "name": "My Home",
+            "address": "123 Main St, Anytown, USA",
+            "type": "physical",
+            "created_at": new Date("2024-11-30T20:20:42.481248"),
+            "updated_at": new Date("2024-11-30T20:20:42.481248")
+        }
     },
     {
         "id": "2d6eb983-9c3a-416f-a01b-23a0a47bef04",
@@ -69,7 +101,15 @@ export const mockScheduledGames: GMGameData[] = [
         "maxSeats": 6,
         "registered": 6,
         "status": "scheduled",
-        location: ""
+        "location_id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+        "location": {
+            "id": "5d6eb983-9c3a-416f-a01b-23a0a47bef04",
+            "name": "My Home",
+            "address": "123 Main St, Anytown, USA",
+            "type": "physical",
+            "created_at": new Date("2024-11-30T20:20:42.481248"),
+            "updated_at": new Date("2024-11-30T20:20:42.481248")
+        }
     }
 ];
 

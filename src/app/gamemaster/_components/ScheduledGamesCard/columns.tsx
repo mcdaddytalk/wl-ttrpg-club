@@ -1,62 +1,57 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { GMGameData } from "@/lib/types/custom"
+import { GMGameData, Location } from "@/lib/types/custom"
 import { Button } from "@/components/ui/button"
 import { 
     DropdownMenu, 
     DropdownMenuContent,
     DropdownMenuItem, 
+    DropdownMenuLabel, 
+    DropdownMenuSeparator, 
     DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
 
-const actions = [
-    { 
-        name: "Edit", 
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">`,
-        onClick: (game: GMGameData) => game.onEditGame?.(game)
-    },
-    // { 
-    //     name: "Delete", 
-    //     icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">`,
-    //     onClick: () => game.onDeleteGame?.(game)
-    // },
-    { 
-        name: "View", 
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">`,
-        onClick: (game: GMGameData) => game.onShowDetails?.(game)
-    }
-]
+interface ColumnOptions {
+    onOpenModal: (modalName: string, data: GMGameData) => void
+}
 
-
-export const columns: ColumnDef<GMGameData>[] = [
+export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameData>[] => [
     {
         accessorKey: "title",
         header: "Title",
         cell: ({ row }) => {
             return row.getValue("title")
-        }
+        },
+        enableSorting: true,
+        enableHiding: false
     },
     {
         accessorKey: "system",
         header: "System",
         cell: ({ row }) => {
             return row.getValue("system")
-        }
+        },
+        enableSorting: true,
+        enableHiding: false
     },
     {
         accessorKey: "interval",
         header: "Interval",
         cell: ({ row }) => {
-            return row.getValue("interval")
-        }
+            return (row.getValue("interval") as string).charAt(0).toUpperCase() + (row.getValue("interval") as string).slice(1)
+        },
+        enableSorting: true,
+        enableHiding: false
     },
     {
         accessorKey: "dow",
         header: "Day of Week",
         cell: ({ row }) => {
             return (row.getValue("dow") as string).charAt(0).toUpperCase() + (row.getValue("dow") as string).slice(1)
-        }
+        },
+        enableSorting: true,
+        enableHiding: true
     },
     {
         accessorKey: "scheduled_next",
@@ -64,49 +59,66 @@ export const columns: ColumnDef<GMGameData>[] = [
         cell: ({ row }) => {
             const data = row.getValue("scheduled_next") as Date;
             return new Date(data).toLocaleDateString()
-        }
+        },
+        enableSorting: true,
+        enableHiding: false
     },
     {
         accessorKey: "location",
-        header: "Location",
+        header: "Location",    
         cell: ({ row }) => {
-            return row.getValue("location")
-        }
+            const location: Location = row.getValue("location");
+            return location?.name;
+        },
+        enableResizing: true,
+        enableSorting: true,
+        enableHiding: true,
+        size: 400      
     },
     {
         accessorKey: "pending",
         header: "Approvals Pending",
         cell: ({ row }) => {
             return row.getValue("pending")
-        }
+        },
+        enableSorting: true,
+        enableHiding: false
     },
     {
         accessorKey: "registered",
         header: "Registered Players",
         cell: ({ row }) => {
             return row.getValue("registered")
-        }
+        },
+        enableSorting: true,
+        enableHiding: false
     },
     {
         accessorKey: "startingSeats",
         header: "Min Seats",
         cell: ({ row }) => {
             return row.getValue("startingSeats")
-        }
+        },
+        enableSorting: true,
+        enableHiding: true
     },
     {
         accessorKey: "maxSeats",
         header: "Max Seats",
         cell: ({ row }) => {
             return row.getValue("maxSeats")
-        }
+        },
+        enableSorting: true,
+        enableHiding: true
     },    
     {
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => {
             return row.getValue("status")
-        }
+        },
+        enableSorting: true,
+        enableHiding: true
     },
     {
         id: 'actions', // A custom column for the button
@@ -129,17 +141,46 @@ export const columns: ColumnDef<GMGameData>[] = [
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                    {actions.map((action) => (
-                        <DropdownMenuItem key={action.name} onClick={() => action.onClick(game)}>
-                            <Button variant="secondary" size="sm" className="h-8 w-full p-0">
-                                <span className="">{action.name}</span>
-                            </Button>
-                        </DropdownMenuItem>
-                    ))}                    
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />                        
+                    <DropdownMenuItem onClick={() => onOpenModal('edit', game)}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                        >
+                            Edit
+                        </Button>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onOpenModal('time', game)}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                        >
+                            Game Date
+                        </Button>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onOpenModal('transfer', game)}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                        >
+                            Transfer
+                        </Button>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => game.onShowDetails?.(game)}>
+                        <Button
+                            variant="outline"
+                            size="sm"                                    
+                        >
+                            View
+                        </Button>
+                    </DropdownMenuItem>                    
                 </DropdownMenuContent>
             </DropdownMenu>
           );
         },
+        enableSorting: false,
+        enableHiding: false
       },
     
 ]

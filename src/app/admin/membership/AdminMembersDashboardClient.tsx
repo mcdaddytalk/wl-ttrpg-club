@@ -7,7 +7,7 @@ import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { Shell } from "@/components/Shell";
 import { Suspense } from "react";
 
-export default function AdminDashboardClient(): React.ReactElement {
+export default function AdminMembersDashboardClient(): React.ReactElement {
   
   return (
       <Shell className="gap-2">

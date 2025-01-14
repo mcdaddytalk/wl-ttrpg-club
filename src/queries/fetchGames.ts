@@ -18,7 +18,9 @@ export function fetchGamesByUser(supabase: TypedSupabaseClient, userid: string) 
                 next_game_date,
                 last_game_date,
                 status,
-                location
+                location:locations!game_schedule_location_id_fkey(
+                    *
+                )
             ),
             gamemaster_id,
             gamemaster:members!fk_games_members (
@@ -30,15 +32,11 @@ export function fetchGamesByUser(supabase: TypedSupabaseClient, userid: string) 
                 )
             ),
             game_registrations (
+                id,
                 member_id,
-                members!fk_game_registrations_members (
-                    id,
-                    profiles (
-                        given_name,
-                        surname,
-                        avatar
-                    )
-                )
+                status,
+                status_note,
+                registered_at
             )
         `)
         .eq("game_registrations.member_id", userid);

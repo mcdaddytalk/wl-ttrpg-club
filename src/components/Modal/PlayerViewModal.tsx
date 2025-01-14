@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 // import Image from "next/image";
 import { cn } from "@/lib/utils";
-import UserAvatar from "./UserAvatar";
+import UserAvatar from "@/components/UserAvatar";
 import { Player } from "@/lib/types/custom";
 interface PlayerViewModalProps {
     isOpen: boolean;

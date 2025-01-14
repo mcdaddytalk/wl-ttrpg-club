@@ -13,22 +13,22 @@ export const useUpdateGame = () => {
             system,
             maxSeats,
             status,
-            location,
+            location_id,
             nextGameDate,
             interval,
             dayOfWeek,
             gm_id
         }: {
             id: string;
-            title: string;
-            description: string;
-            system: string;
-            maxSeats: number;
-            status: GameStatus;
-            location: string;
-            nextGameDate: Date;
-            interval: GameInterval;
-            dayOfWeek: DOW;
+            title?: string;
+            description?: string;
+            system?: string;
+            maxSeats?: number;
+            status?: GameStatus;
+            location_id?: string;
+            nextGameDate?: Date;
+            interval?: GameInterval;
+            dayOfWeek?: DOW;
             gm_id: string
         }) => {
             const response = await fetch(`/api/gamemaster/${gm_id}/games`,                 
@@ -44,7 +44,7 @@ export const useUpdateGame = () => {
                     system,
                     maxSeats,
                     status,
-                    location,
+                    location_id,
                     nextGameDate,
                     interval,
                     dayOfWeek
@@ -55,8 +55,8 @@ export const useUpdateGame = () => {
             }
             return response.json();
         },
-        onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ["games", "user", "full"] });
+        onSuccess: (_data, { gm_id }) => {
+                queryClient.invalidateQueries({ queryKey: ["games", gm_id, "gm", "full"] });
         },
         onError: (error) => {
             console.error(error);

@@ -1,10 +1,10 @@
 import { Player } from "@/lib/types/custom";
 import { Dialog } from "@radix-ui/react-dialog";
 import { useState } from "react";
-import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Button } from "./ui/button";
+import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label"
-import { Input } from "./ui/input";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useTogglePlayerRegistration } from "@/hooks/useTogglePlayerRegistration";
 

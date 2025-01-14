@@ -2,7 +2,7 @@ import transformObjectToParams, { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EmailOptions } from "@/lib/types/social-share";
 import { Tooltip } from "@radix-ui/react-tooltip";
-import { TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface EmailShareButtonProps {
     url: string;

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 // import Image from 'next/image';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import UserAvatar from './UserAvatar';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -11,7 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { MessageData, MessageDO } from '@/lib/types/custom';
 import { fetchMessages } from '@/queries/fetchMessages';
 import useSupabaseBrowserClient from '@/utils/supabase/client';
-import { Badge } from './ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 
 interface UserButtonProps {

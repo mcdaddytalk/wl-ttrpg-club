@@ -28,7 +28,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
             next_game_date,
             last_game_date,
             status,
-            location,
+            location:locations!game_schedule_location_id_fkey(
+                *
+            ),
             games (
                 id,
                 title,
@@ -45,12 +47,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
                         surname,
                         avatar
                     )
-                ),
-                registrants:game_registrations!fk_game_registrations_members (
-                    member_id,
-                    registered_at,
-                    status,
-                    status_note
                 )
             )
         `)
@@ -87,11 +83,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
                     image: game.games.image,
                     scheduled_for: new Date(game.next_game_date) || null,
                     status: game.status,
-                    num_players: game.games.registrants.length,
+                    num_players: gameRegistrants.filter((gameRegistrant) => gameRegistrant.game_id === game.game_id).length,
+                    max_seats: game.games.max_seats,
                     gm_name: game.games.gamemaster.profiles.given_name + ' ' + game.games.gamemaster.profiles.surname,
                     gm_member_id: game.games.gamemaster.id,
                     registered: true,
-                    registration_date: game.games.registrants.find((registrant) => registrant.member_id === id)?.registered_at || null
+                    registration_status: gameRegistrants.find((registrant) => registrant.member_id === id && registrant.game_id === game.game_id)?.status || 'pending',
+                    registration_date: gameRegistrants.find((registrant) => registrant.member_id === id)?.registered_at || null
                 }
             }
         )

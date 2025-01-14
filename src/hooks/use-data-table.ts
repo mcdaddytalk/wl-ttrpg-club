@@ -217,14 +217,14 @@ export function useDataTable<TData>({
     const [filterValues, setFilterValues] = useQueryStates(filterParsers)
 
     const debouncedSetFilterValues = useDebouncedCallback(
-    setFilterValues,
-    debounceMs
+        setFilterValues,
+        debounceMs
     )
 
     // Paginate
     const pagination: PaginationState = {
-    pageIndex: page - 1, // zero-based index -> one-based index
-    pageSize: perPage,
+        pageIndex: page - 1, // zero-based index -> one-based index
+        pageSize: perPage,
     }
 
     function onPaginationChange(updaterOrValue: Updater<PaginationState>) {
@@ -323,35 +323,41 @@ export function useDataTable<TData>({
     )
 
     const table = useReactTable({
-    ...props,
-    initialState,
-    pageCount,
-    state: {
-        pagination,
-        sorting,
-        columnVisibility,
-        rowSelection,
-        columnFilters: enableAdvancedFilter ? [] : columnFilters,
-    },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onPaginationChange,
-    onSortingChange,
-    onColumnFiltersChange,
-    onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: enableAdvancedFilter
-        ? undefined
-        : getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: enableAdvancedFilter ? undefined : getFacetedRowModel(),
-    getFacetedUniqueValues: enableAdvancedFilter
-        ? undefined
-        : getFacetedUniqueValues(),
-    manualPagination: true,
-    manualSorting: true,
-    manualFiltering: true,
+        ...props,
+        initialState,
+        pageCount,
+        state: {
+            pagination,
+            sorting,
+            columnVisibility,
+            rowSelection,
+            columnFilters: enableAdvancedFilter ? [] : columnFilters,
+        },
+        defaultColumn: {
+            size: 200,
+            minSize: 20,
+            maxSize: 800,
+        },
+        columnResizeMode: "onChange",
+        enableRowSelection: true,
+        onRowSelectionChange: setRowSelection,
+        onPaginationChange,
+        onSortingChange,
+        onColumnFiltersChange,
+        onColumnVisibilityChange: setColumnVisibility,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: enableAdvancedFilter
+            ? undefined
+            : getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFacetedRowModel: enableAdvancedFilter ? undefined : getFacetedRowModel(),
+        getFacetedUniqueValues: enableAdvancedFilter
+            ? undefined
+            : getFacetedUniqueValues(),
+        manualPagination: true,
+        manualSorting: true,
+        manualFiltering: true,
     })
 
     return { table }

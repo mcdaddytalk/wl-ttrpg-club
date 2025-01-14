@@ -14,17 +14,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { calculateNextGameDate, daysOfWeek, intervals, gameStatuses } from '@/utils/helpers';
 import { toast } from "sonner";
 import { useUpdateGame } from "@/hooks/useUpdateGame";
-import { DOW, GameInterval, GameStatus, GMGameData } from "@/lib/types/custom";
+import { DOW, GameInterval, GameStatus, GMGameData, Location } from "@/lib/types/custom";
 
 interface EditGameModalProps {
     isOpen: boolean,
     game: GMGameData,
+    locations: Location[],
     onConfirm: () => void,
     onClose: () => void,
     gamemaster_id: string
 }
 
-export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onConfirm, onClose, gamemaster_id }) => {
+export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onConfirm, onClose, gamemaster_id, locations }) => {
     // Game details
     const [gameTitle, setGameTitle] = useState(game.title);
     const [gameDescription, setGameDescription] = useState(game.description);
@@ -36,11 +37,13 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
     const [gameInterval, setGameInterval] = useState(game.interval);
     const [gameDay, setGameDay] = useState(game.dow);
     const [gameStatus, setGameStatus] = useState(game.status);
-    const [gameLocation, setGameLocation] = useState(game.location);
+    const [gameLocationId, setGameLocationId] = useState(game.location.id);
+    const [error, setError] = useState<string | null>(null);
 
     const { mutate: editGame, isPending } = useUpdateGame();
 
     const handleEditSubmit = async () => {
+        setError(null)
         const nextGameDate = calculateNextGameDate(gameDay, gameInterval, gameDate);
         if (nextGameDate) {
             setGameDate(new Date(nextGameDate));
@@ -52,7 +55,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
                 system: gameSystem,
                 maxSeats: gameMaxSeats,
                 status: gameStatus,
-                location: gameLocation,
+                location_id: gameLocationId,
                 nextGameDate: gameDate,
                 interval: gameInterval,
                 dayOfWeek: gameDay,
@@ -72,6 +75,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
                 }
             );
         } else {
+            setError("Invalid game date");
             toast.error("Invalid game date");
         }
     }
@@ -158,9 +162,24 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="location" className="text-right">Location</Label>
-                        <Input id="location" value={gameLocation} onChange={(e) => setGameLocation(e.target.value)} className="col-span-3" />
+                        <Select 
+                            value={locations.find((location) => location.id === gameLocationId)?.id || locations[0].id} 
+                            onValueChange={(e) => setGameLocationId(e as string)}
+                        >
+                            <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select a location" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {locations.map((location) => (
+                                    <SelectItem key={location.id} value={location.id}>
+                                        {location.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
+                {error && <p className="text-red-500">{error}</p>}
                 <DialogFooter>
                     <Button onClick={handleEditSubmit} disabled={isPending}>
                         {isPending ? <span className="mr-2">Saving...</span> : <span className="mr-2">Save</span>}

@@ -5,10 +5,10 @@ import { DataTable } from "@/components/DataTable/data-table"
 import { getColumns } from './columns';
 import { ContactListDO, Player } from "@/lib/types/custom";
 import { useDataTable } from "@/hooks/use-data-table";
-import MessageModal from "@/components/MessageModal";
+import MessageModal from "@/components/Modal/MessageModal";
 import { User } from "@supabase/supabase-js";
-import { ApprovalModal } from "@/components/ApprovalModal";
-import PlayerViewModal from "@/components/PlayerViewModal";
+import { ApprovalModal } from "@/components/Modal/ApprovalModal";
+import PlayerViewModal from "@/components/Modal/PlayerViewModal";
 
 
 type GameRegistrantsCardProps = {
