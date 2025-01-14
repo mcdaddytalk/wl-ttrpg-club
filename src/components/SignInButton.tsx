@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState } from 'react';
-import Modal from './Modal'; // Import the Modal component
-import { Button } from './ui/button';
+import Modal from '@/components/Modal'; // Import the Modal component
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { 
   signInWithOTP, 
   //signInWithProvider 
 } from '@/server/authActions';
-import { OAuthButtons } from './OAuthButtons';
-import PasswordlessButton from './PasswordlessButton';
+import { OAuthButtons } from '@/components/OAuthButtons';
+import PasswordlessButton from '@/components/PasswordlessButton';
 import { useRouter } from 'next/navigation';
 
 interface SignInButtonProps {

@@ -1,4 +1,4 @@
-import { DOW, GameInterval } from '@/lib/types/custom';
+import { DOW, GameInterval, Location } from '@/lib/types/custom';
 import React, { useState } from 'react';
 import {
     Dialog,
@@ -11,21 +11,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from './ui/textarea';
+import { Textarea } from '@/components/ui/textarea';
 import { calculateNextGameDate, daysOfWeek, intervals } from '@/utils/helpers';
 
 interface NewModalProps {
     isOpen: boolean;
     onClose: () => void;
     onGameAdded: () => void;
-    gamemaster_id: string
+    gamemaster_id: string;
+    locations: Location[];
 }
 
 export default function NewGameModal({
     isOpen,
     onClose,
     onGameAdded,
-    gamemaster_id
+    gamemaster_id,
+    locations
 }:NewModalProps): React.ReactElement {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -33,13 +35,14 @@ export default function NewGameModal({
   const [interval, setInterval] = useState<GameInterval>('weekly');
   const [dayOfWeek, setDayOfWeek] = useState<DOW>('sunday');
   const [maxSeats, setMaxSeats] = useState<number | ''>('');
+  const [gameLocationId, setGameLocationId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     try {
         setError(null);
 
-        if (!title || !system || !interval || !dayOfWeek || !maxSeats) {
+        if (!title || !system || !interval || !dayOfWeek || !maxSeats || !gameLocationId) {
             setError('All fields are required.');
             return;
         }
@@ -60,7 +63,8 @@ export default function NewGameModal({
                     dayOfWeek,
                     nextGameDate,
                     maxSeats,
-                    gamemaster_id
+                    gamemaster_id,
+                    location_id: gameLocationId
                 }),
         });
 
@@ -81,28 +85,28 @@ export default function NewGameModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Game</DialogTitle>
         </DialogHeader>
         {error && <p className="text-red-500 mb-4">{error}</p>}
-        <div className="space-y-4">
-          <div>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label className="block font-medium">Title</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} className="col-span-3" />
           </div>
-          <div>
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label className="block font-medium">Description</Label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="col-span-3" />
           </div>
-          <div>
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label className="block font-medium">System</Label>
-            <Input value={system} onChange={(e) => setSystem(e.target.value)} />
+            <Input value={system} onChange={(e) => setSystem(e.target.value)} className="col-span-3" />
           </div>
-          <div>
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label className="block font-medium">Interval</Label>
             <Select value={interval} onValueChange={(value) => setInterval(value as 'weekly' | 'biweekly' | 'monthly')}>
-              <SelectTrigger>
+              <SelectTrigger  className="col-span-3">
                 <SelectValue placeholder="Select Interval" />
               </SelectTrigger>
               <SelectContent>
@@ -114,10 +118,10 @@ export default function NewGameModal({
               </SelectContent>
             </Select>
           </div>
-          <div>
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label className="block font-medium">Starting Day of the Week</Label>
             <Select value={dayOfWeek} onValueChange={(value) => setDayOfWeek(value as DOW)}>
-              <SelectTrigger>
+              <SelectTrigger  className="col-span-3">
                 <SelectValue placeholder="Select Day" />
               </SelectTrigger>
               <SelectContent>
@@ -129,9 +133,27 @@ export default function NewGameModal({
               </SelectContent>
             </Select>
           </div>
-          <div>
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label className="block font-medium">Max Seats</Label>
             <Input type="number" value={maxSeats} onChange={(e) => setMaxSeats(Number(e.target.value))} />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="location" className="text-right">Location</Label>
+              <Select 
+                  value={gameLocationId} 
+                  onValueChange={(e) => setGameLocationId(e as string)}
+              >
+                  <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Select a location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      {locations.map((location) => (
+                          <SelectItem key={location.id} value={location.id}>
+                              {location.name}
+                          </SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
           </div>
         </div>
         <DialogFooter>

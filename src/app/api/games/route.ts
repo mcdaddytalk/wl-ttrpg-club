@@ -1,6 +1,7 @@
 import { GameData, GameRegistration, SupaGameScheduleData } from "@/lib/types/custom";
 import { fetchFavorites } from "@/queries/fetchFavorites";
 import { fetchRegistrants } from "@/queries/fetchRegistrants";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,7 +22,10 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         interval,
         first_game_date,
         next_game_date,
-        location,
+        location_id,
+        location:locations!game_schedule_location_id_fkey(
+          *
+        ),
         day_of_week,
         games (
           title,
@@ -45,10 +49,11 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
       .order("next_game_date", { ascending: true });
 
       if (gamesError) {
-        console.error(gamesError)
+        logger.error(gamesError)
         return NextResponse.json({ message: gamesError.message }, { status: 500 });
     }
-    
+
+    // logger.info(`gamesData: ${JSON.stringify(gamesData)}`)
     // const gameIds = gamesData?.map((game) => game.id) ?? [];
 
     const { data: favoritesData, error: favoritesError } = await fetchFavorites(supabase);
@@ -89,6 +94,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         interval: gameSchedule.interval,
         firstGameDate: gameSchedule.first_game_date,
         nextGameDate: gameSchedule.next_game_date,
+        location_id: gameSchedule.location_id,
         location: gameSchedule.location,
         dayOfWeek: gameSchedule.day_of_week,
         title: gameSchedule.games.title,

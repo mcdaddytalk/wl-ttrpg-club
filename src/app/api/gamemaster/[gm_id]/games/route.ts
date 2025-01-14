@@ -1,4 +1,5 @@
-import { DOW, GMGameData } from "@/lib/types/custom";
+import { DOW, GMGameData, SupabaseGMGameDataListResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -29,16 +30,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         starting_seats, 
         game_schedule(
           id,
+          game_id,
           interval,
           day_of_week,
           first_game_date,
           next_game_date,
           last_game_date,
           status,
-          location        
+          location:locations!game_schedule_location_id_fkey(
+                    *
+                )        
         )    
       `)
-    .eq('gamemaster_id', gm_id);
+    .eq('gamemaster_id', gm_id) as unknown as SupabaseGMGameDataListResponse;
 
     if (gamesError) {
       console.error(gamesError);
@@ -48,6 +52,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
     if (!gamesData) {
       return NextResponse.json({ message: `No games found` }, { status: 404 })
     }
+
+    // logger.info(`GAME DATA: ${JSON.stringify(gamesData)}`)
     
     if (gamesData) {
       gamesData.sort((a, b) => {
@@ -99,12 +105,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
       title: game.title,
       description: game.description ?? '',
       system: game.system ?? '',
-      scheduled_next: new Date(game.game_schedule[0]?.next_game_date as string),
+      scheduled_next: new Date(game.game_schedule[0]?.next_game_date),
       interval: game.game_schedule[0]?.interval,
       dow: game.game_schedule[0]?.day_of_week as DOW,
       maxSeats: game.max_seats as number,
       startingSeats: game.starting_seats as number,
       status: game.game_schedule[0]?.status,
+      location_id: game.game_schedule[0]?.location_id,
       location: game.game_schedule[0]?.location ?? '',
       pending: pending![game.id] || 0,
       registered: seatCounts![game.id] || 0,
@@ -127,7 +134,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<G
 
   const supabase = await createSupabaseServerClient();
 
-  const { title, description, system, interval, dayOfWeek, nextGameDate, maxSeats, startingSeats } = body;
+  const { title, description, system, interval, dayOfWeek, nextGameDate, maxSeats, startingSeats, location_id } = body;
 
   try {
     const { data, error } = await supabase.from('games').insert({
@@ -140,7 +147,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<G
     }).select('id');
 
     if (error) {
-      console.error(error);
+      logger.error(error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
     
@@ -150,13 +157,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<G
             game_id: data[0].id,
             status: 'draft',
             interval,
+            location_id,
             first_game_date: nextGameDate,
             next_game_date: nextGameDate,
             day_of_week: dayOfWeek,
     })
 
     if (gameScheduleError) {
-        console.error(gameScheduleError);
+        logger.error(gameScheduleError);
         return NextResponse.json({ error: gameScheduleError.message }, { status: 500 });
     }
 
@@ -233,7 +241,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
     maxSeats,
     startingSeats,
     status,
-    location,
+    location_id,
     nextGameDate,
     interval,
     dayOfWeek
@@ -261,7 +269,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
         .update({
             interval,
             status,
-            location,
+            location_id,
             next_game_date: nextGameDate,
             day_of_week: dayOfWeek,
             updated_at: new Date().toISOString()
@@ -294,7 +302,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const supabase = await createSupabaseServerClient();
 
-  const { id, title, description, system, interval, dayOfWeek, nextGameDate, maxSeats } = body;
+  const { id, title, description, system, interval, dayOfWeek, nextGameDate, maxSeats, location_id } = body;
 
   try {
     const { error } = await supabase.from('games').update({
@@ -313,6 +321,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         .from('game_schedule')
         .update({
             interval,
+            location_id,
             first_game_date: nextGameDate,
             next_game_date: nextGameDate,
             day_of_week: dayOfWeek,

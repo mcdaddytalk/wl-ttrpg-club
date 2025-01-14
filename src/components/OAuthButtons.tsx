@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 import { Provider } from "@/lib/types/custom";
 import { signInWithProvider } from "@/server/authActions";
 import {

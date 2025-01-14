@@ -2,31 +2,23 @@
 import { Button } from "@/components/ui/button";
 import { GameData, MessageUserDO } from "@/lib/types/custom";
 import { toast } from "sonner";
-import GameImage from "./GameImage";
+import GameImage from "@/components/GameImage";
 import { MdOutlineEventRepeat } from "react-icons/md";
 import { LuCalendar, LuUsers2 } from "react-icons/lu";
-import Link from "next/link";
-import { Badge } from "./ui/badge";
+import { SiStatuspal } from "react-icons/si";
+import { Badge } from "@/components/ui/badge";
 import { useToggleFavorite } from "@/hooks/useToggleFavorite";
 import { User } from "@supabase/supabase-js";
 import { StarOff } from "lucide-react";
-import MessageModal from "./MessageModal";
+import MessageModal from "@/components/Modal/MessageModal";
 import { useState } from "react";
 import { useToggleRegistration } from "@/hooks/useToggleRegistration";
-import EmailShareButton from "./EmailShareButton";
+import EmailShareButton from "@/components/EmailShareButton";
 import { usePathname } from "next/navigation";
 import { EmailOptions } from "@/lib/types/social-share";
-import EmailShareIcon from "./EmailShareIcon";
-import { ConfirmationModal } from "./ConfirmationModal";
-
-const enhanceLocation = (location: string) => {
-    if (location.startsWith('http')) {
-        return (
-            <Link href={location} target="_blank" rel="noopener noreferrer" className="underline">{location}</Link>
-        )
-    }
-    return location;
-};
+import EmailShareIcon from "@/components/EmailShareIcon";
+import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
+import GameLocation from "@/components/GameLocation";
 
 const enhanceStatus = (game: GameData) => {
     const { status, currentSeats, startingSeats } = game;
@@ -155,23 +147,26 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                         <p className="mt-4"><strong>Gamemaster:</strong> {game.gm_given_name} {game.gm_surname}</p>
                         <div className="flex items-center gap-2">
                             {/* Icon and Text on the Same Line */}
-                            <MdOutlineEventRepeat />
+                            <MdOutlineEventRepeat className="text-xl" />
                             <span>{game.interval} / {game.dayOfWeek}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             {/* Icon and Text on the Same Line */}
-                            <LuCalendar />
+                            <LuCalendar className="text-xl" />
                             <span>{new Date(game.nextGameDate).toLocaleDateString()} @{' '}
                             {new Date(game.nextGameDate).toLocaleTimeString('en-US', {
                             hour: '2-digit',
                             minute: '2-digit',
                             })}</span>
                         </div>
-                        <p><strong>Location:</strong> { enhanceLocation(game.location) }</p>
-                        <p><strong>Status:</strong> { enhanceStatus(game) }</p>
+                        <GameLocation location={game.location}/>
+                        <div className="flex items-center gap-2">
+                            <SiStatuspal className="text-xl" />
+                            <span>{ enhanceStatus(game) }</span>
+                        </div>
                         <div className="flex items-center gap-2">
                             {/* Icon and Text on the Same Line */}
-                            <LuUsers2 />
+                            <LuUsers2 className="text-xl" />
                             <span>{seatsAvailable(game)} Seats Filled</span>
                         </div>
                     </div>

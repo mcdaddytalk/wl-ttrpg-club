@@ -9,6 +9,117 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      broadcast_messages: {
+        Row: {
+          created_at: string | null
+          game_id: string | null
+          id: string
+          message: string
+          mode: Database["public"]["Enums"]["delivery_mode"] | null
+          sender_id: string | null
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          game_id?: string | null
+          id?: string
+          message: string
+          mode?: Database["public"]["Enums"]["delivery_mode"] | null
+          sender_id?: string | null
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          game_id?: string | null
+          id?: string
+          message?: string
+          mode?: Database["public"]["Enums"]["delivery_mode"] | null
+          sender_id?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broadcast_messages_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broadcast_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "broadcast_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      broadcast_recipients: {
+        Row: {
+          created_at: string | null
+          delivery_method: Database["public"]["Enums"]["delivery_mode"] | null
+          delivery_status: Database["public"]["Enums"]["delivery_status"] | null
+          error_message: string | null
+          id: string
+          message_id: string | null
+          recipient_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_method?: Database["public"]["Enums"]["delivery_mode"] | null
+          delivery_status?:
+            | Database["public"]["Enums"]["delivery_status"]
+            | null
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          recipient_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          delivery_method?: Database["public"]["Enums"]["delivery_mode"] | null
+          delivery_status?:
+            | Database["public"]["Enums"]["delivery_status"]
+            | null
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          recipient_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broadcast_recipients_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "broadcast_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broadcast_recipients_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "broadcast_recipients_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contacts: {
         Row: {
           agree_to_rules: boolean
@@ -117,6 +228,7 @@ export type Database = {
           registered_at: string
           status: Database["public"]["Enums"]["registrant_status_enum"]
           status_note: string | null
+          updated_by: string | null
         }
         Insert: {
           game_id: string
@@ -125,6 +237,7 @@ export type Database = {
           registered_at?: string
           status?: Database["public"]["Enums"]["registrant_status_enum"]
           status_note?: string | null
+          updated_by?: string | null
         }
         Update: {
           game_id?: string
@@ -133,6 +246,7 @@ export type Database = {
           registered_at?: string
           status?: Database["public"]["Enums"]["registrant_status_enum"]
           status_note?: string | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -156,6 +270,20 @@ export type Database = {
             referencedRelation: "members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "game_registrations_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "game_registrations_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
         ]
       }
       game_schedule: {
@@ -168,7 +296,7 @@ export type Database = {
           id: string
           interval: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date: string | null
-          location: string | null
+          location_id: string | null
           next_game_date: string | null
           status: Database["public"]["Enums"]["game_status_enum"]
           updated_at: string | null
@@ -182,7 +310,7 @@ export type Database = {
           id?: string
           interval: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date?: string | null
-          location?: string | null
+          location_id?: string | null
           next_game_date?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           updated_at?: string | null
@@ -196,7 +324,7 @@ export type Database = {
           id?: string
           interval?: Database["public"]["Enums"]["game_interval_enum"]
           last_game_date?: string | null
-          location?: string | null
+          location_id?: string | null
           next_game_date?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           updated_at?: string | null
@@ -207,6 +335,13 @@ export type Database = {
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_schedule_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
         ]
@@ -224,6 +359,7 @@ export type Database = {
           system: string | null
           title: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
@@ -237,6 +373,7 @@ export type Database = {
           system?: string | null
           title: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
@@ -250,6 +387,7 @@ export type Database = {
           system?: string | null
           title?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -267,6 +405,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      locations: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["location_type"]
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          type?: Database["public"]["Enums"]["location_type"]
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["location_type"]
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: []
       }
       member_roles: {
         Row: {
@@ -313,6 +481,7 @@ export type Database = {
       }
       members: {
         Row: {
+          consent: boolean
           created_at: string | null
           deleted_at: string | null
           deleted_by: string | null
@@ -325,6 +494,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          consent?: boolean
           created_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
@@ -337,6 +507,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          consent?: boolean
           created_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
@@ -578,6 +749,14 @@ export type Database = {
           num_players: number
         }[]
       }
+      transfer_game_ownership: {
+        Args: {
+          game_id: string
+          new_gamemaster_id: string
+          old_gamemaster_id: string
+        }
+        Returns: undefined
+      }
       verify_user_password: {
         Args: {
           password: string
@@ -596,6 +775,8 @@ export type Database = {
         | "thursday"
         | "friday"
         | "saturday"
+      delivery_mode: "email" | "sms" | "both"
+      delivery_status: "pending" | "sent" | "failed"
       experience_level_enum:
         | "new"
         | "novice"
@@ -617,6 +798,7 @@ export type Database = {
         | "completed"
         | "canceled"
       gamemaster_interest_enum: "yes" | "no" | "maybe"
+      location_type: "vtt" | "discord" | "physical"
       registrant_status_enum: "banned" | "approved" | "rejected" | "pending"
     }
     CompositeTypes: {

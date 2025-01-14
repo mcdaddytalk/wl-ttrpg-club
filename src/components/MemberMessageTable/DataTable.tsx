@@ -19,8 +19,8 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Button } from '../ui/button';
-import { Skeleton } from '../ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

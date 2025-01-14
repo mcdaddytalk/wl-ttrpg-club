@@ -11,6 +11,7 @@ const config: Config = {
 	extend: {
 		width: {
 			'w-16': '4rem',
+			'w-32': '8rem',
 			'w-64': '16rem',
 		},
 		screens: {

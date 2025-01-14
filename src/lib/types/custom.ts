@@ -46,6 +46,7 @@ export type ExperienceLevel = typeof experienceLevels[number];
 export type GameInterval = 'weekly' | 'biweekly' | 'monthly' | 'yearly' | 'custom';
 export type GMInterest = 'no' | 'maybe' | 'yes';
 export type GameRegStatus = 'approved' | 'rejected' | 'pending' | 'banned';
+export type LocationType = 'vtt' | 'discord' | 'physical';
 
 /* DO Types */
 export type ContactListDO = {
@@ -55,21 +56,21 @@ export type ContactListDO = {
 }
 export type MemberDO = {
   id: string;
-  provider: string;
+  provider?: string;
   given_name: string;
   surname: string;
   displayName: string;
   email: string;
   phone: string;
-  birthday: Date | null;
+  birthday?: Date | null;
   isMinor: boolean;
   isAdmin: boolean;
-  experienceLevel: ExperienceLevel;
-  bio: string;
+  experienceLevel?: ExperienceLevel;
+  bio?: string;
   avatar: string;
   roles: RoleDO[];
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
   onManageRoles?: (member: MemberDO) => void; // Optional callback to manage roles
   onRemoveMember?: (id: string, displayName: string) => void; // Optional callback to remove a member
   onResetPassword?: (email: string) => void; // Optional callback to reset the member's password
@@ -233,10 +234,12 @@ export type UpcomingGame = {
   scheduled_for: Date | null;
   status: string;
   num_players: number;
-  registered: boolean;
-  registration_date: Date | null;
+  max_seats: number;
   gm_name: string;
   gm_member_id: string;
+  registered: boolean;
+  registration_status: GameRegStatus;
+  registration_date: Date | null;  
 }
 
 export type GameData = {
@@ -245,8 +248,9 @@ export type GameData = {
   status: GameStatus;
   interval: GameInterval;
   firstGameDate: Date; // or Date if you convert the date
-  nextGameDate: Date; // or Date if you convert the date
-  location: string;
+  nextGameDate: Date;
+  location_id: string;
+  location: Location;
   dayOfWeek: DOW;
   title: string;
   description: string;
@@ -272,8 +276,10 @@ export type SupaGameScheduleData = {
   day_of_week: DOW;
   first_game_date: Date; // or Date if you convert the date
   next_game_date: Date; // or Date if you convert the date
+  last_game_date: Date; // or Date if you convert the date
   status: GameStatus;
-  location: string;
+  location_id: string;
+  location: Location;
   games: SupaGameData;
 }
 
@@ -294,6 +300,19 @@ export type SupabaseGameDataResponse = SupabaseDataResponseSingle<SupaGameSchedu
 export type SupabaseGameDataListResponse = SupabaseDataResponse<SupaGameScheduleData>
 export type SupabaseUpcomingGamesListResponse = SupabaseDataResponse<GameData>
 
+export type SupaGMGameData = {
+  id: string;
+  title: string;
+  description: string;
+  system: string;
+  image: string;
+  max_seats: number;
+  starting_seats: number;
+  game_schedule: SupaGameScheduleData[];
+}
+export type SupabaseGMGameDataResponse = SupabaseDataResponseSingle<SupaGMGameData>
+export type SupabaseGMGameDataListResponse = SupabaseDataResponse<SupaGMGameData>
+
 export type GMGameData = {
   id: string;
   title: string;
@@ -304,7 +323,8 @@ export type GMGameData = {
   dow: DOW;
   maxSeats: number;
   status: GameStatus;
-  location: string;
+  location_id: string;
+  location: Location;
   pending: number;
   registered: number;
   onShowDetails?: (game: GMGameData) => void;
@@ -398,4 +418,14 @@ export type SupaGameSchedule = {
   next_game_date: Date;
   last_game_date?: Date;
   status: GameStatus;
+}
+
+export type Location = {
+  id: string;
+  name: string;
+  url?: string;
+  address?: string;
+  type: LocationType;
+  created_at: Date;
+  updated_at: Date;
 }

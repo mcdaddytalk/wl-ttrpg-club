@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "./ui/separator";
+import { Separator } from "@/components/ui/separator";
 import { GameData } from "@/lib/types/custom";
 import { LuCalendar, LuUsers2 } from "react-icons/lu";
 // import { TiStopwatch } from "react-icons/ti";

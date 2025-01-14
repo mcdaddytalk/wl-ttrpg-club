@@ -1,7 +1,7 @@
 import { Link } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import GameList from "../GameList/GameList"
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { GMGameData } from "@/lib/types/custom"
 
 
