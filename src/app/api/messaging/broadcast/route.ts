@@ -1,10 +1,12 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { 
     sendEmail, 
-    // sendSMS 
+    sendSMS 
 } from '@/utils/messaging';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { BroadcastRecipient, SupabaseBroadcastMessageResponse, SupabaseBroadcastRecipientListResponse } from '@/lib/types/custom';
+import { CreateEmailResponse } from 'resend';
+import { MessageInstance } from 'twilio/lib/rest/api/v2010/account/message';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
     if (request.method !== 'POST') {
@@ -35,7 +37,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             .select(`
                 *,
                 members!inner(
-                    email
+                    email,
+                    phone                
                 )
             `)
             .eq('message_id', messageId) as unknown as SupabaseBroadcastRecipientListResponse;
@@ -47,13 +50,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         console.log('Recipients:', recipients);
         // Send messages
         const results = await Promise.all(
-        recipients.map(async (recipient: BroadcastRecipient) => {
-            // if (recipient.delivery_method === 'email') {
-                return sendEmail(recipient.members.email, message.subject, message.message);
-            //  else if (recipient.delivery_method === 'sms') {
-            //     return sendSMS(recipient.recipient_id, message.message);
-            // }
-        })
+            recipients.map(async (recipient: BroadcastRecipient) => {
+                if (recipient.delivery_method === 'email') {
+                    return sendEmail(recipient.members.email, message.subject, message.message);
+                } else if (recipient.delivery_method === 'sms') {
+                    if (!recipient.members.phone) {
+                        console.log('No phone number found for recipient:', recipient.members);
+                        return sendEmail(recipient.members.email, message.subject, message.message);
+                    }
+                    return sendSMS(recipient.members.phone, message.message);
+                } else if (recipient.delivery_method === 'both') {
+                    const result: { email: string | CreateEmailResponse, sms: string | MessageInstance } = {
+                        email: 'not sent',
+                        sms: 'not sent'
+                    }
+                    result['email'] = await sendEmail(recipient.members.email, message.subject, message.message);
+                    if (recipient.members.phone)
+                        result['sms'] = await sendSMS(recipient.members.phone, message.message);
+                    return result;
+                }
+            })
         );
 
         // Update delivery status in the database

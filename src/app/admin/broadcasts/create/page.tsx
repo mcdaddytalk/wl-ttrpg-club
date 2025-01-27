@@ -55,7 +55,7 @@ export default function CreateBroadcastPage() {
     });
 
     if (res.ok) {
-      router.push('/broadcasts');
+      router.push('/admin/broadcasts');
     } else {
       console.error('Failed to create broadcast');
     }
@@ -82,8 +82,8 @@ export default function CreateBroadcastPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="email">Email</SelectItem>
-            { /*<SelectItem value="sms">SMS</SelectItem>
-            <SelectItem value="both">Both</SelectItem> */ }
+            <SelectItem value="sms">SMS</SelectItem>
+            <SelectItem value="both">Both</SelectItem>
           </SelectContent>
         </Select>
         <h2 className="text-lg font-semibold">Select Recipients</h2>
@@ -96,7 +96,7 @@ export default function CreateBroadcastPage() {
                 onCheckedChange={() => toggleRecipient(member.id)}
               />
               <label htmlFor={`recipient-${member.id}`} className="ml-2">
-                {member.email || member.phone || 'No contact info'}
+                {`${member.given_name} ${member.surname}`}
               </label>
             </div>
           ))}

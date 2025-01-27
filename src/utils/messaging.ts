@@ -1,8 +1,8 @@
 import { Resend } from 'resend';
-//import twilio from 'twilio';
+import twilio from 'twilio';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-//const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 /**
  * Send an email using Resend.
@@ -18,7 +18,8 @@ export const sendEmail = async (
   try {
     console.log(`Sending email to ${to} with subject ${subject} and body ${body}`)
     const response = await resend.emails.send({
-      from: 'WL-TTRPG <onboarding@kaje.org>',
+    // from: 'WL-TTRPG <onboarding@kaje.org>',
+      from: 'WL-TTRPG Announcements <wl-ttrpg-announcements@kaje.org>',
       to,
       subject,
       html: body,
@@ -39,16 +40,21 @@ export const sendEmail = async (
  * @param to Recipient phone number
  * @param body SMS content
  */
-// export const sendSMS = async (to: string, body: string) => {
-//   try {
-//     const response = await twilioClient.messages.create({
-//       body,
-//       from: process.env.TWILIO_PHONE_NUMBER,
-//       to,
-//     });
-//     return response;
-//   } catch (error) {
-//     console.error('Error sending SMS:', error);
-//     throw new Error('Failed to send SMS.');
-//   }
-// };
+export const sendSMS = async (to: string, body: string) => {
+  try {
+    const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
+    const response = await twilioClient.messages.create({
+      messagingServiceSid,
+      body,
+      to,
+    });
+    if (response.status == 'failed' || response.status == 'undelivered') {
+      throw Error(response.errorMessage);
+    }
+    console.log('SMS sent successfully:', response);
+    return response;
+  } catch (error) {
+    console.error('Error sending SMS:', error);
+    throw new Error('Failed to send SMS.');
+  }
+};
