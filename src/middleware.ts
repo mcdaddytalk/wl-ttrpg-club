@@ -5,13 +5,16 @@ import { getInitialSession } from "./server/authActions"
 // import { RoleData, SupabaseRoleListResponse } from "./lib/types/custom";
 
 const protectedApiRoutes = [
-  '/api/members',
   '/api/admin',
+  '/api/broadcasts',
+  '/api/contacts',
   '/api/gamemaster',
-  '/api/messages',
-  '/api/roles',
   '/api/games',
-  '/api/locations'
+  '/api/locations',
+  '/api/members',
+  '/api/messages',
+  '/api/messaging',
+  '/api/roles',  
 ]
 
 export async function middleware(request: NextRequest) {

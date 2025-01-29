@@ -1,0 +1,32 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord (Deployment Started)
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{"content": "🚀 **Deployment started:** Vercel is deploying `main`..."}' \
+               $DISCORD_WEBHOOK
+
+      - name: Notify Vercel Deployment
+        run: echo "Deployment to Vercel triggered by merge into main"
+
+      - name: Notify Discord (Deployment Successful)
+        if: success()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{"content": "✅ **Deployment Success:** `main` has been deployed to production! 🎉"}' \
+               $DISCORD_WEBHOOK
