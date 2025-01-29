@@ -137,6 +137,16 @@ export function isValidHour(value: string) {
   }
   
   export function getDateByType(date: Date, type: TimePickerType) {
+    if (typeof date === "string" || typeof date === "number") {
+      date = new Date(date);
+    }
+
+    if (!(date instanceof Date)) {
+        throw new Error("Provided date is not a valid Date instance.");
+    }
+  
+    if (!date) return "00";
+
     switch (type) {
       case "minutes":
         return getValidMinuteOrSecond(String(date.getMinutes()));
