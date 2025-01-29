@@ -1,0 +1,38 @@
+name: Tag Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get latest tag
+        id: get_tag
+        run: echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV || echo "TAG=v0.0.0" >> $GITHUB_ENV
+
+      - name: Bump version
+        id: bump_version
+        run: |
+          OLD_TAG=${{ env.TAG }}
+          NEW_TAG=$(echo $OLD_TAG | awk -F. -v OFS=. '{$NF++; print}')
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+      - name: Create new tag
+        run: |
+          git tag ${{ env.NEW_TAG }}
+          git push origin ${{ env.NEW_TAG }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.NEW_TAG }}
+          name: Release ${{ env.NEW_TAG }}
+          body: "Automated release of ${{ env.NEW_TAG }}"
+          draft: false
+          prerelease: false
