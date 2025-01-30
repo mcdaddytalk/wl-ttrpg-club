@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle
@@ -88,6 +89,9 @@ export default function NewGameModal({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Game</DialogTitle>
+          <DialogDescription>
+            Fill out the form below to add a new game.
+          </DialogDescription>
         </DialogHeader>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="grid gap-4 py-4">
