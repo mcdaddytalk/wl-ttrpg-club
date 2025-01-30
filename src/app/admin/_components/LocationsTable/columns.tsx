@@ -1,4 +1,4 @@
-import { Location } from "@/lib/types/custom"
+import { AdminLocationDO } from "@/lib/types/custom"
 import { ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -13,10 +13,10 @@ import {
 
 
 interface ColumnOptions {
-    onOpenModal: (modalName: string, data: Location) => void
+    onOpenModal: (modalName: string, data: AdminLocationDO) => void
 }
 
-export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<Location>[] => [
+export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<AdminLocationDO>[] => [
     {
         id: "select",
         header: ({ table }) => (
@@ -40,6 +40,7 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<Location>[
         ),
         enableSorting: false,
         enableHiding: false,
+        size: 80,
     },
     {
         accessorKey: "name",
@@ -78,6 +79,27 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<Location>[
         enableHiding: false
     },
     {
+        accessorKey: "authorized_gamemasters",
+        header: "Authorized Gamemasters",
+        cell: ({ row }) => {
+            const gmList = row.original.authorized_gamemasters;            
+            return (
+                <div className="flex flex-wrap space-x-1 gap-1">
+                    {gmList
+                        .sort((a, b) => a.surname.localeCompare(b.given_name))
+                        .map((gm) => (
+                            <span 
+                                key={gm.id} 
+                                className="px-2 py-1 text-sm font-medium text-white bg-blue-500 rounded-full"
+                            >
+                                {gm.given_name} {gm.surname}
+                            </span>
+                        ))}
+                </div>
+            )            
+        }
+    },
+    {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {
@@ -105,7 +127,15 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<Location>[
                                 variant="outline"
                                 size="sm"                                
                             >
-                                Edit
+                                Edit Location
+                            </Button>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onOpenModal('manageGMs', location)}>
+                            <Button
+                                variant="outline"
+                                size="sm"                                    
+                            >
+                                Manage Authorized GMs
                             </Button>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onOpenModal('removeLocation', location)}>
@@ -113,7 +143,7 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<Location>[
                                 variant="outline"
                                 size="sm"                                
                             >
-                                Remove
+                                Remove Location
                             </Button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
