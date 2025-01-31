@@ -43,6 +43,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       type: location.type,
       created_at: location.created_at,
       updated_at: location.updated_at,
+      created_by: location.created_by,
+      scope: location.scope,
       authorized_gamemasters: location.location_perms.map((location_perm) => {
         return {
           id: location_perm.gamemaster_id,
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const supabase = await createSupabaseServerClient();
 
   const body = await request.json();
-  const { name, address, url, type } = body;
+  const { scope, created_by, name, address, url, type, gamemasters } = body;
 
   if (!name || !type) {
     return NextResponse.json({ message: 'Name and Type are required' }, { status: 400 });
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const { data: locationData, error: locationError } = await supabase
     .from('locations')
-    .insert({ name, address, url, type })
+    .insert({ name, address, url, type, scope, created_by })
     .select('*')
     .single();
 
@@ -81,6 +83,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     logger.error(locationError);
     return NextResponse.json({ message: 'Error creating location' }, { status: 500 });
   }
+
+  const { error: locationPermsError } = await supabase
+    .from('location_perms')
+    .insert(gamemasters.map((gm: string) => ({ location_id: locationData.id, gamemaster_id: gm })));
+
+  if (locationPermsError) {
+    logger.error(locationPermsError);
+    return NextResponse.json({ message: 'Error creating location permissions' }, { status: 500 });
+  }
+
 
   return NextResponse.json(locationData);
 }

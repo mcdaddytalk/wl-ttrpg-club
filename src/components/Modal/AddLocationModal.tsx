@@ -12,29 +12,43 @@ import {
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useAddLocation } from '@/hooks/useAddLocation'
-import { LocationType } from "@/lib/types/custom";
+import { ContactListDO, LocationType } from "@/lib/types/custom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Command, CommandInput, CommandList, CommandItem, CommandGroup } from "@/components/ui/command";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 interface AddLocationModalProps {
-    isOpen: boolean
-    onCancel: () => void
-    onConfirm: () => void
+    isOpen: boolean;
+    gamemasters: ContactListDO[];
+    scope: string;
+    userId: string;
+    onCancel: () => void;
+    onConfirm: () => void;
 }
 
-export const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onCancel, onConfirm }) => {
+export const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onCancel, onConfirm, scope, userId, gamemasters }) => {
     const [locationName, setLocationName] = useState("");
     const [locationAddress, setLocationAddress] = useState("");
     const [locationUrl, setLocationUrl] = useState("");
     const [locationType, setLocationType] = useState<LocationType>("physical");
+    const [selectedGMs, setSelectedGMs] = useState<string[]>([userId]);
     // const [error, setError] = useState<string | null>(null);
     const { mutate: addLocation, isPending } = useAddLocation();
 
+    const handleSelectGM = (gmId: string) => {
+        if (selectedGMs.includes(gmId)) {
+            setSelectedGMs(selectedGMs.filter((id) => id !== gmId));
+        } else {
+            setSelectedGMs([...selectedGMs, gmId]);
+        }
+    };
+
     const handleSubmit = async () => {
         addLocation(
-            { name: locationName, address: locationAddress, url: locationUrl, type: locationType },
+            { scope, created_by: userId, name: locationName, address: locationAddress, url: locationUrl, type: locationType, gamemasters: selectedGMs },
             {
                 onSuccess: () => {
                     toast.success("Location added successfully.");
@@ -83,6 +97,37 @@ export const AddLocationModal: React.FC<AddLocationModalProps> = ({ isOpen, onCa
                                 <SelectItem value="discord">Discord</SelectItem>
                             </SelectContent>
                         </Select>                            
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label className="text-right">Authorized GMs</Label>
+                        <div className="col-span-3">
+                            <Command>
+                                <CommandInput placeholder="Search GMs..." />
+                                <CommandList>
+                                    <CommandGroup>
+                                        {gamemasters.map((gm) => (
+                                            <CommandItem
+                                                key={gm.id}
+                                                onSelect={() => handleSelectGM(gm.id)}
+                                            >
+                                                {selectedGMs.includes(gm.id) && <span>✅ </span>}
+                                                {gm.given_name} {gm.surname}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {selectedGMs.map((gmId) => {
+                                    const gm = gamemasters.find(g => g.id === gmId);
+                                    return gm ? (
+                                        <Badge key={gmId} variant="secondary">
+                                            {gm.given_name} {gm.surname}
+                                        </Badge>
+                                    ) : null;
+                                })}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <DialogFooter>

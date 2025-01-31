@@ -49,6 +49,7 @@ export type GameRegStatus = 'approved' | 'rejected' | 'pending' | 'banned';
 export type LocationType = 'vtt' | 'discord' | 'physical';
 export type DeliveryStatus = 'pending' | 'sent' | 'failed';
 export type DeliveryMethod = 'email' | 'sms' | 'both';
+export type LocationScope = 'admin' | 'gm' | 'disabled';
 
 /* DO Types */
 export type ContactListDO = {
@@ -58,6 +59,10 @@ export type ContactListDO = {
 }
 
 export type AdminLocationDO = Location & {
+  authorized_gamemasters: ContactListDO[];
+}
+
+export type GMLocationDO = Location & {
   authorized_gamemasters: ContactListDO[];
 }
 
@@ -376,6 +381,8 @@ export type Location = {
   type: LocationType;
   created_at: Date;
   updated_at: Date;
+  created_by: string;
+  scope: LocationScope;
 }
 
 export type AdminLocationData = 
