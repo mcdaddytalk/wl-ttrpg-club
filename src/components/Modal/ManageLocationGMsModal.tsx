@@ -19,14 +19,15 @@ import { useUpdateLocationGMs } from "@/hooks/useUpdateLocationGMs";
 interface ManageLocationGMsModalProps {
     location: AdminLocationDO;
     gamemasters: ContactListDO[];
+    userId: string;
     isOpen: boolean;
     onConfirm: () => void;
     onClose: () => void;
 }
 
-const ManageLocationGMsModal: React.FC<ManageLocationGMsModalProps> = ({ location, gamemasters, isOpen, onClose, onConfirm }) => {
+const ManageLocationGMsModal: React.FC<ManageLocationGMsModalProps> = ({ location, gamemasters, isOpen, onClose, onConfirm, userId }) => {
     const currentGMs = location.authorized_gamemasters.map((gm: ContactListDO) => gm.id)
-    const [selectedGMs, setSelectedGMs] = useState<string[]>([]);
+    const [selectedGMs, setSelectedGMs] = useState<string[]>([userId, ...currentGMs]);
     const { mutate: updateGMs, isPending } = useUpdateLocationGMs();
 
     const handleCheckboxChange = (gmId: string) => {

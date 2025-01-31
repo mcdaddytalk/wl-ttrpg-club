@@ -1,4 +1,4 @@
-import { Location, LocationType } from "@/lib/types/custom";
+import { Location, LocationScope, LocationType } from "@/lib/types/custom";
 import React, { useState } from "react";
 import { 
     Dialog, 
@@ -13,52 +13,46 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner"
+import { useUpdateLocation } from "@/hooks/useUpdateLocation";
 
 
 interface EditLocationProps {
     isOpen: boolean;
+    scope: LocationScope;
     onCancel: () => void;
     onConfirm: () => void;
     location: Location;
 }
 
-export const EditLocationModal: React.FC<EditLocationProps> = ({ isOpen, onCancel, onConfirm, location }) => {
+export const EditLocationModal: React.FC<EditLocationProps> = ({ isOpen, onCancel, onConfirm, location, scope }) => {
     const [locationName, setLocationName] = useState(location.name);
     const [locationAddress, setLocationAddress] = useState(location.address || '');
     const [locationUrl, setLocationUrl] = useState(location.url || '');
     const [locationType, setLocationType] = useState<LocationType>(location.type);
     const [error, setError] = useState<string | null>(null);
-    const [isPending, setPending] = useState(false);
+    const { mutate: updateLocation, isPending } = useUpdateLocation();
 
     const handleEditSubmit = async () => {
-        try {
-            setError(null);
-            setPending(true);
-
-            if (!locationName || !locationAddress || !locationType) {
-                setError('All fields are required.');
-                return;
-            }
-
-            const response = await fetch(`/api/locations/${location.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name: locationName, address: locationAddress, url: locationUrl, type: locationType }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update location');
-            }
-            toast.success('Location updated successfully');
-            onConfirm();
-        } catch (error) {
-            setError(error instanceof Error ? error.message : 'Failed to update location');
-            toast.error('Failed to update location');
-        } finally {
-            setPending(false);
+        setError(null);
+        if (!locationName || 
+            (!locationAddress && !locationType) ) {
+            setError('All fields are required.');
+            return;
         }
+        updateLocation(
+            { scope, id: location.id, name: locationName, address: locationAddress, url: locationUrl, type: locationType },
+            {
+                onSuccess: () => {
+                    toast.success('Location updated successfully');
+                },
+                onError: () => {
+                    toast.error('Failed to update location');
+                },
+                onSettled: () => {
+                    onConfirm();
+                }
+            }
+        )
     };
 
     return (

@@ -3,27 +3,33 @@ import { useQueryClient } from "./useQueryClient";
 import { useMutation } from "@tanstack/react-query";
 import { LocationScope } from "@/lib/types/custom";
 
-
-
-interface RemoveLocationVariables {
-    locationId: string;
+interface UpdateLocationVariables {
+    id: string;
+    name: string;
+    address: string;
+    url: string;
+    type: string;
     scope: LocationScope;
 }
 
-export const useRemoveLocation = () => {
+export const useUpdateLocation = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async ({
-            locationId,
+            id,
+            name,
+            address,
+            url,
+            type,
             scope
-        }: RemoveLocationVariables) => {
-            const response = await fetch(`/api/locations`, {
-                method: "DELETE",
+        }: UpdateLocationVariables) => {
+            const response = await fetch(`/api/locations/${id}`, {
+                method: 'PUT',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ locationId, scope }),
+                body: JSON.stringify({ scope, name, address, url, type }),
             });
 
             if (!response.ok) {
