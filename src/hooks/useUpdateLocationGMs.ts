@@ -1,9 +1,8 @@
-import createSupabaseBrowserClient from '@/utils/supabase/client';
+import useSupabaseBrowserClient from '@/utils/supabase/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import logger from '@/utils/logger';
 
 export const useUpdateLocationGMs = () => {
-    const supabase = createSupabaseBrowserClient();
+    const supabase = useSupabaseBrowserClient();
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -45,7 +44,7 @@ export const useUpdateLocationGMs = () => {
             queryClient.invalidateQueries({ queryKey: ['locations', 'admin', 'full'] });
           },
           onError: (error) => {
-            logger.error('Error updating gms:', error);
+            console.error('Error updating gms:', error);
           },
     });
 }
