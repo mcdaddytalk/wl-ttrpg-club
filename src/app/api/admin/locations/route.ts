@@ -1,3 +1,4 @@
+import { AdminLocationDO, SupabaseAdminLocationPermListResponse } from "@/lib/types/custom";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,14 +11,52 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const supabase = await createSupabaseServerClient();
   const { data: locationsData, error: locationsError } = await supabase
     .from('locations')
-    .select('*');
+    .select(`
+      *,
+      location_perms(
+        gamemaster_id,
+        members(
+          email,
+          profiles (
+            given_name,
+            surname
+          )
+        )
+      )  
+    `) as unknown as SupabaseAdminLocationPermListResponse;
 
   if (locationsError) {
     logger.error(locationsError);
     return NextResponse.json({ message: 'Error fetching locations' }, { status: 500 });
   }
 
-  return NextResponse.json(locationsData);
+  if (!locationsData) {
+    return NextResponse.json({ message: 'Locations not found' }, { status: 404 });
+  }
+
+  const locations: AdminLocationDO[] = locationsData.map((location) => {
+    return {
+      id: location.id,
+      name: location.name,
+      address: location.address,
+      url: location.url,
+      type: location.type,
+      created_at: location.created_at,
+      updated_at: location.updated_at,
+      created_by: location.created_by,
+      scope: location.scope,
+      authorized_gamemasters: location.location_perms.map((location_perm) => {
+        return {
+          id: location_perm.gamemaster_id,
+          given_name: location_perm.members?.profiles.given_name || '',
+          surname: location_perm.members?.profiles.surname || ''
+        }
+      }
+    )
+    }
+  })
+
+  return NextResponse.json(locations);
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -36,7 +75,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const { data: locationData, error: locationError } = await supabase
     .from('locations')
-    .insert({ name, address, url, type, created_by, scope })
+    .insert({ name, address, url, type, scope, created_by })
     .select('*')
     .single();
 
@@ -53,6 +92,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     logger.error(locationPermsError);
     return NextResponse.json({ message: 'Error creating location permissions' }, { status: 500 });
   }
+
 
   return NextResponse.json(locationData);
 }

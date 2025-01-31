@@ -406,6 +406,46 @@ export type Database = {
           },
         ]
       }
+      location_perms: {
+        Row: {
+          gamemaster_id: string
+          id: string
+          location_id: string
+        }
+        Insert: {
+          gamemaster_id?: string
+          id?: string
+          location_id?: string
+        }
+        Update: {
+          gamemaster_id?: string
+          id?: string
+          location_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_perms_gamemaster_id_fkey"
+            columns: ["gamemaster_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "location_perms_gamemaster_id_fkey"
+            columns: ["gamemaster_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "location_perms_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       locations: {
         Row: {
           address: string | null

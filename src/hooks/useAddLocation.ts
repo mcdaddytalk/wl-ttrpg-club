@@ -10,15 +10,21 @@ export const useAddLocation = () => {
 
     return useMutation({
         mutationFn: async ({
+            scope,
+            created_by,
             name,
             type,
             address,
-            url
+            url,
+            gamemasters
         }: {
+            scope: string;
+            created_by: string;
             name: string;
             type: LocationType;
             address?: string;
             url?: string;
+            gamemasters?: string[]
         }) => {
             const response = await fetch(`/api/locations`, {
                 method: "POST",
@@ -26,10 +32,13 @@ export const useAddLocation = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    scope,
+                    created_by,
                     name,
                     type,
                     address,
-                    url
+                    url,
+                    gamemasters
                 }),
             });
 
@@ -39,8 +48,9 @@ export const useAddLocation = () => {
 
             return response.json()
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['locations', 'full'] }) ;
+        onSuccess: (_data, variables) => {
+            const { scope } = variables;
+            queryClient.invalidateQueries({ queryKey: ['locations', scope, 'full'] }) ;
         },
         onError: () => {
             logger.error("Failed to add location");

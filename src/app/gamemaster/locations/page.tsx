@@ -1,14 +1,14 @@
 import { useQueryClient } from "@/hooks/useQueryClient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import LocationsDashboard from "./LocationsDashboard";
+import GMLocationsDashboard from "./GMLocationsDashboard";
 
-const AdminLocationsPage = (): React.ReactElement => {
+const GMLocationsPage = (): React.ReactElement => {
     const queryClient = useQueryClient();
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <LocationsDashboard />
+            <GMLocationsDashboard />
         </HydrationBoundary>
     )
 }
 
-export default AdminLocationsPage;
+export default GMLocationsPage;

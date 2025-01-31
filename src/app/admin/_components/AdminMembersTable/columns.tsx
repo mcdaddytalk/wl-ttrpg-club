@@ -42,6 +42,7 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<MemberDO>[
         ),
         enableSorting: false,
         enableHiding: false,
+        size: 80,
     },
     {
         accessorKey: "displayName",

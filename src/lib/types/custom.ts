@@ -49,6 +49,7 @@ export type GameRegStatus = 'approved' | 'rejected' | 'pending' | 'banned';
 export type LocationType = 'vtt' | 'discord' | 'physical';
 export type DeliveryStatus = 'pending' | 'sent' | 'failed';
 export type DeliveryMethod = 'email' | 'sms' | 'both';
+export type LocationScope = 'admin' | 'gm' | 'disabled';
 
 /* DO Types */
 export type ContactListDO = {
@@ -56,6 +57,15 @@ export type ContactListDO = {
   given_name: string;
   surname: string;
 }
+
+export type AdminLocationDO = Location & {
+  authorized_gamemasters: ContactListDO[];
+}
+
+export type GMLocationDO = Location & {
+  authorized_gamemasters: ContactListDO[];
+}
+
 export type MemberDO = {
   id: string;
   provider?: string;
@@ -125,6 +135,7 @@ type SupabaseDataResponseSingle<T> = {
 /* Supabase Query Responses */
 export type ContactListData = {
   id: string;
+  member_roles?: RoleData[];
   profiles: ProfileData;
 }
 export type SupabaseContactListResponse = SupabaseDataResponse<ContactListData>
@@ -359,6 +370,41 @@ export type GMGameData = {
   onEditGame?: (game: GMGameData) => void;
 }
 
+export type SupabaseLocationResponse = SupabaseDataResponseSingle<Location>
+export type SupabaseLocationListResponse = SupabaseDataResponse<Location>
+
+export type Location = {
+  id: string;
+  name: string;
+  url?: string;
+  address?: string;
+  type: LocationType;
+  created_at: Date;
+  updated_at: Date;
+  created_by: string;
+  scope: LocationScope;
+}
+
+export type AdminLocationData = 
+  Location & {
+    location_perms: LocationPermData[];
+  }
+
+export type LocationPerm = {
+  id: string;
+  location_id: string;
+  gamemaster_id: string;  
+}
+
+export type LocationPermData = LocationPerm & {
+  members: MemberData
+}
+
+export type SupabaseAdminLocationPermResponse = SupabaseDataResponseSingle<AdminLocationData>
+export type SupabaseAdminLocationPermListResponse = SupabaseDataResponse<AdminLocationData>
+
+export type SupabaseLocationPermResponse = SupabaseDataResponseSingle<LocationPermData>
+export type SupabaseLocationPermListResponse = SupabaseDataResponse<LocationPermData>
 
 export type NewContact = {
   firstName: string;
@@ -436,7 +482,6 @@ export type GameScheduleWithRegistrantsData = {
   game_registrations: GameRegistrationData[];
 };
 
-
 export type SupaGameSchedule = {
   gm_id: string;
   game_id: string;
@@ -446,14 +491,4 @@ export type SupaGameSchedule = {
   next_game_date: Date;
   last_game_date?: Date;
   status: GameStatus;
-}
-
-export type Location = {
-  id: string;
-  name: string;
-  url?: string;
-  address?: string;
-  type: LocationType;
-  created_at: Date;
-  updated_at: Date;
 }

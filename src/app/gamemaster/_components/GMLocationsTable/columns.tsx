@@ -1,4 +1,3 @@
-import { AdminLocationDO } from "@/lib/types/custom"
 import { ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -10,39 +9,39 @@ import {
     DropdownMenuSeparator, 
     DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
-
+import { GMLocationDO } from "@/lib/types/custom"
 
 interface ColumnOptions {
-    onOpenModal: (modalName: string, data: AdminLocationDO) => void
+    onOpenModal: (modalName: string, data: GMLocationDO) => void
 }
 
-export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<AdminLocationDO>[] => [
+export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMLocationDO>[] => [
     {
         id: "select",
         header: ({ table }) => (
-          <Checkbox
+            <Checkbox
             checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-            className="translate-y-0.5"
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-            className="translate-y-0.5"
-          />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-        size: 80,
-    },
-    {
+                table.getIsAllPageRowsSelected() ||
+                (table.getIsSomePageRowsSelected() && "indeterminate")
+              }
+              onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+              aria-label="Select all"
+              className="translate-y-0.5"
+            />
+          ),
+          cell: ({ row }) => (
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label="Select row"
+              className="translate-y-0.5"
+            />
+          ),
+          enableSorting: false,
+          enableHiding: false,
+          size: 80,
+      },
+      {
         accessorKey: "name",
         header: "Name",
         cell: ({ row }) => {
@@ -79,35 +78,15 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<AdminLocat
         enableHiding: false
     },
     {
-        accessorKey: "authorized_gamemasters",
-        header: "Authorized Gamemasters",
-        cell: ({ row }) => {
-            const gmList = row.original.authorized_gamemasters;            
-            return (
-                <div className="flex flex-wrap space-x-1 gap-1">
-                    {gmList
-                        .sort((a, b) => a.surname.localeCompare(b.given_name))
-                        .map((gm) => (
-                            <span 
-                                key={gm.id} 
-                                className="px-2 py-1 text-sm font-medium text-white bg-blue-500 rounded-full"
-                            >
-                                {gm.given_name} {gm.surname}
-                            </span>
-                        ))}
-                </div>
-            )            
-        }
-    },
-    {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {
             const location = row.original;
+            const { scope } = location;
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                        <Button variant="outline" size="sm" className="h-8 w-8 p-0" disabled={scope !== 'gm'}>
                             <span className="sr-only">Open menu</span>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -128,14 +107,6 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<AdminLocat
                                 size="sm"                                
                             >
                                 Edit Location
-                            </Button>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onOpenModal('manageGMs', location)}>
-                            <Button
-                                variant="outline"
-                                size="sm"                                    
-                            >
-                                Manage Authorized GMs
                             </Button>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onOpenModal('removeLocation', location)}>
