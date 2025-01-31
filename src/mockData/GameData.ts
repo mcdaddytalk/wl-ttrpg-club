@@ -19,8 +19,10 @@ export const mockScheduledGames: GMGameData[] = [
             "name": "My Home",
             "address": "123 Main St, Anytown, USA",
             "type": "physical",
+            "scope": "disabled",
             "created_at": new Date("2024-11-30T20:20:42.481248"),
-            "updated_at": new Date("2024-11-30T20:20:42.481248")
+            "updated_at": new Date("2024-11-30T20:20:42.481248"),
+            "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         }
     },
     {
@@ -41,8 +43,10 @@ export const mockScheduledGames: GMGameData[] = [
             "name": "My Home",
             "address": "123 Main St, Anytown, USA",
             "type": "physical",
+            "scope": "disabled",
             "created_at": new Date("2024-11-30T20:20:42.481248"),
-            "updated_at": new Date("2024-11-30T20:20:42.481248")
+            "updated_at": new Date("2024-11-30T20:20:42.481248"),
+            "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         }
     },
     {
@@ -63,8 +67,10 @@ export const mockScheduledGames: GMGameData[] = [
             "name": "My Home",
             "address": "123 Main St, Anytown, USA",
             "type": "physical",
+            "scope": "disabled",
             "created_at": new Date("2024-11-30T20:20:42.481248"),
-            "updated_at": new Date("2024-11-30T20:20:42.481248")
+            "updated_at": new Date("2024-11-30T20:20:42.481248"),
+            "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         }
     },
     {
@@ -85,8 +91,10 @@ export const mockScheduledGames: GMGameData[] = [
             "name": "My Home",
             "address": "123 Main St, Anytown, USA",
             "type": "physical",
+            "scope": "disabled",
             "created_at": new Date("2024-11-30T20:20:42.481248"),
-            "updated_at": new Date("2024-11-30T20:20:42.481248")
+            "updated_at": new Date("2024-11-30T20:20:42.481248"),
+            "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         }
     },
     {
@@ -107,8 +115,10 @@ export const mockScheduledGames: GMGameData[] = [
             "name": "My Home",
             "address": "123 Main St, Anytown, USA",
             "type": "physical",
+            "scope": "disabled",
             "created_at": new Date("2024-11-30T20:20:42.481248"),
-            "updated_at": new Date("2024-11-30T20:20:42.481248")
+            "updated_at": new Date("2024-11-30T20:20:42.481248"),
+            "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         }
     }
 ];
