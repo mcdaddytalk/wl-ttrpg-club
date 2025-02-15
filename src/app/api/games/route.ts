@@ -1,9 +1,10 @@
-import { GameData, GameRegistration, SupaGameScheduleData } from "@/lib/types/custom";
+import { GameData, GameRegistration, SupabaseGameInviteListResponse, SupaGameScheduleData } from "@/lib/types/custom";
 import { fetchFavorites } from "@/queries/fetchFavorites";
 import { fetchRegistrants } from "@/queries/fetchRegistrants";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { getInitialSession } from "@/server/authActions";
 
 
 
@@ -12,6 +13,16 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
     }
 
+    const session = await getInitialSession();
+    if (!session) {
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { user } = session;
+    if (!user) {
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    
     const supabase = await createSupabaseServerClient();
     const { data: gamesData, error: gamesError } = await supabase
       .from("game_schedule")
@@ -34,6 +45,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
           image,
           max_seats,
           starting_seats,
+          visibility,
           gamemaster_id,
           gamemaster:members!fk_games_members (
             id,
@@ -70,9 +82,15 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ message: favoritesError.message }, { status: 500 });
     }
 
+    const { data: invitesData, error: invitesError } = await supabase
+      .from('game_invites')
+      .select('*')
+      .order('expires_at', { ascending: true }) as unknown as SupabaseGameInviteListResponse;
+
     const { data: registrationData, error: registrationsError } = await fetchRegistrants(supabase);
     const registrations = registrationData ? registrationData as GameRegistration[] : [];
     
+    if (invitesError) throw invitesError
     if (registrationsError) throw registrationsError
     if (!registrations) throw new Error("Registrations not found")
 
@@ -86,7 +104,14 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         return acc;
       }, {} as Record<string, number>);
 
-    const scheduledGames: GameData[] = (gamesData as unknown as SupaGameScheduleData[]).map((gameSchedule) => {
+    const scheduledGames: GameData[] = (gamesData as unknown as SupaGameScheduleData[])
+    .filter((gameSchedule) => 
+      gameSchedule.games.visibility == 'public' 
+      || (gameSchedule.games.visibility == 'private' && gameSchedule.games.gamemaster_id === user.id)
+      ||  registrations?.some((reg) => reg.game_id === gameSchedule.game_id && reg.member_id === user.id)
+      ||  invitesData?.some((invite) => invite.game_id === gameSchedule.game_id && invite.invitee === user.id)
+    )
+    .map((gameSchedule) => {
       return {
         id: gameSchedule.id,
         game_id: gameSchedule.game_id,
@@ -102,6 +127,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         system: gameSchedule.games.system,
         image: gameSchedule.games.image,
         maxSeats: gameSchedule.games.max_seats,
+        visibility: gameSchedule.games.visibility,
         startingSeats: gameSchedule.games.starting_seats,
         currentSeats: seatCounts![gameSchedule.game_id] || 0,
         favorite: false,

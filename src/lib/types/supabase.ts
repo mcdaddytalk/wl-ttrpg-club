@@ -220,6 +220,67 @@ export type Database = {
           },
         ]
       }
+      game_invites: {
+        Row: {
+          accepted: boolean | null
+          display_name: string | null
+          expires_at: string | null
+          external_email: string | null
+          external_phone: string | null
+          game_id: string | null
+          id: string
+          invited_at: string | null
+          invitee: string | null
+          notified: boolean | null
+        }
+        Insert: {
+          accepted?: boolean | null
+          display_name?: string | null
+          expires_at?: string | null
+          external_email?: string | null
+          external_phone?: string | null
+          game_id?: string | null
+          id?: string
+          invited_at?: string | null
+          invitee?: string | null
+          notified?: boolean | null
+        }
+        Update: {
+          accepted?: boolean | null
+          display_name?: string | null
+          expires_at?: string | null
+          external_email?: string | null
+          external_phone?: string | null
+          game_id?: string | null
+          id?: string
+          invited_at?: string | null
+          invitee?: string | null
+          notified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_invites_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_invites_invitee_fkey"
+            columns: ["invitee"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "game_invites_invitee_fkey"
+            columns: ["invitee"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_registrations: {
         Row: {
           game_id: string
@@ -360,6 +421,7 @@ export type Database = {
           title: string
           updated_at: string
           updated_by: string | null
+          visibility: string | null
         }
         Insert: {
           created_at?: string | null
@@ -374,6 +436,7 @@ export type Database = {
           title: string
           updated_at?: string
           updated_by?: string | null
+          visibility?: string | null
         }
         Update: {
           created_at?: string | null
@@ -388,6 +451,7 @@ export type Database = {
           title?: string
           updated_at?: string
           updated_by?: string | null
+          visibility?: string | null
         }
         Relationships: [
           {
@@ -450,8 +514,10 @@ export type Database = {
         Row: {
           address: string | null
           created_at: string | null
+          created_by: string | null
           id: string
           name: string
+          scope: Database["public"]["Enums"]["LocationScope"]
           type: Database["public"]["Enums"]["location_type"]
           updated_at: string | null
           url: string | null
@@ -459,8 +525,10 @@ export type Database = {
         Insert: {
           address?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name: string
+          scope?: Database["public"]["Enums"]["LocationScope"]
           type?: Database["public"]["Enums"]["location_type"]
           updated_at?: string | null
           url?: string | null
@@ -468,13 +536,30 @@ export type Database = {
         Update: {
           address?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name?: string
+          scope?: Database["public"]["Enums"]["LocationScope"]
           type?: Database["public"]["Enums"]["location_type"]
           updated_at?: string | null
           url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "locations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "locations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       member_roles: {
         Row: {
@@ -569,6 +654,7 @@ export type Database = {
           id: string
           is_archived: boolean
           is_read: boolean
+          message_type: string | null
           recipient_id: string
           sender_id: string
           subject: string | null
@@ -580,6 +666,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_read?: boolean
+          message_type?: string | null
           recipient_id: string
           sender_id: string
           subject?: string | null
@@ -591,6 +678,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_read?: boolean
+          message_type?: string | null
           recipient_id?: string
           sender_id?: string
           subject?: string | null
@@ -743,51 +831,15 @@ export type Database = {
       }
     }
     Functions: {
+      clean_expired_invites: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       custom_access_token_hook: {
         Args: {
           event: Json
         }
         Returns: Json
-      }
-      get_scheduled_games_with_counts: {
-        Args: {
-          member_id: string
-        }
-        Returns: {
-          game_id: string
-          game_name: string
-          description: string
-          system: string
-          gamemaster_id: string
-          gm_given_name: string
-          gm_surname: string
-          status: string
-          first_game_date: string
-          last_game_date: string
-          user_id: string
-          registered_at: string
-          num_players: number
-        }[]
-      }
-      get_upcoming_games_with_counts: {
-        Args: {
-          member_id: string
-        }
-        Returns: {
-          game_id: string
-          game_name: string
-          description: string
-          system: string
-          gamemaster_id: string
-          gm_given_name: string
-          gm_surname: string
-          status: string
-          first_game_date: string
-          last_game_date: string
-          user_id: string
-          registered_at: string
-          num_players: number
-        }[]
       }
       transfer_game_ownership: {
         Args: {
@@ -839,6 +891,7 @@ export type Database = {
         | "canceled"
       gamemaster_interest_enum: "yes" | "no" | "maybe"
       location_type: "vtt" | "discord" | "physical"
+      LocationScope: "admin" | "gm" | "disabled"
       registrant_status_enum: "banned" | "approved" | "rejected" | "pending"
     }
     CompositeTypes: {

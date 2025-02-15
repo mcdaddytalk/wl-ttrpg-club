@@ -39,6 +39,7 @@ async function fetchGames(userId: string): Promise<GameData[]> {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
 
   if (!response.ok) {

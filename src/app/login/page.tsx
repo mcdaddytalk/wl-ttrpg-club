@@ -1,7 +1,7 @@
 "use client";
 
 // import { createClient } from '@/utils/supabase/client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,27 +20,43 @@ import { Provider } from '@/lib/types/custom';
 import { FcGoogle } from 'react-icons/fc';
 import { FaDiscord } from 'react-icons/fa';
 import { 
+  getInitialSession,
 // signInWithOTP,
   signInWithPassword,
   signInWithProvider 
 } from '@/server/authActions';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Login() {
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirect = searchParams.get('redirect') || '/member';
+
+    useEffect(() => {
+      async function checkAuth() {
+        const session = await getInitialSession();
+        if (session?.user) {
+          router.push(redirect);
+        } 
+      }
+      checkAuth()
+    }, [router, redirect])
+
     const handleEmailLogin = async () => {
         setLoading(true);
-        await signInWithPassword(email, password);
+        await signInWithPassword(email, password, redirect);
         // toast.success('Check your email for a login link!');
         setLoading(false);
     };
 
     const handleProviderLogin = async (provider: Provider) => {
         setLoading(true);
-        await signInWithProvider(provider);
+        await signInWithProvider(provider, redirect);
         setLoading(false);
     };
   return (

@@ -1,59 +1,27 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { GMLocationDO, DataTableFilterField } from "@/lib/types/custom";
 import { useDataTable } from "@/hooks/use-data-table";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import { getColumns } from "./columns";
-import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { DataTable } from "@/components/DataTable/data-table";
 import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
 import { useRemoveLocation } from "@/hooks/useRemoveLocation";
 import { AddLocationModal } from "@/components/Modal/AddLocationModal";
 import { EditLocationModal } from "@/components/Modal/EditLocationModal";
-import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
-
-const fetchLocations = async (gm_id: string): Promise<GMLocationDO[]> => {
-    const response = await fetch(`/api/gamemaster/${gm_id}/locations`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-  
-    switch (response.status) {
-      case 500:
-        toast.error("Error fetching locations");
-        return [];   
-      case 404:
-        toast.error("Locations not found");
-        return [];
-      case 200:
-        const locations = await response.json();
-        return locations as GMLocationDO[] || [];
-      default:
-        toast.error("Error fetching locations");
-        return [];
-    }
-  }
-
 
 interface LocationsTableProps {
     className?: string;
+    locations: GMLocationDO[];
+    gamemaster: User;
 }
 
-const LocationsTable = ({ className }: LocationsTableProps): React.ReactElement => {
-    const session = useSession();
-    const user: User = (session?.user as User) ?? null;
-    
+const LocationsTable = ({ className, locations, gamemaster }: LocationsTableProps): React.ReactElement => {
     const { mutate: removeLocation } = useRemoveLocation();
 
     const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -62,11 +30,6 @@ const LocationsTable = ({ className }: LocationsTableProps): React.ReactElement 
     const [isRemoveLocationModalOpen, setRemoveLocationModalOpen] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState<GMLocationDO | null>(null);
 
-    const { data: locations, isLoading, isError } = useQuery<GMLocationDO[], Error>({
-        queryKey: ['locations', 'gm', 'full', user?.id],
-        queryFn: () => fetchLocations(user?.id as string),
-        enabled: !!user,
-      });
     
     const openModal = (modal: string, location?: GMLocationDO) => {
         if (location) setSelectedLocation(location);
@@ -102,7 +65,7 @@ const LocationsTable = ({ className }: LocationsTableProps): React.ReactElement 
     
     const filterFields: DataTableFilterField<GMLocationDO>[] = [];
     const pageSize = 5;
-    const pageCount = (Math.ceil(locations?.length || 0 / pageSize));
+    const pageCount = (Math.ceil(locations.length / pageSize));
 
     const { table } = useDataTable<GMLocationDO>({
         data: locations || [],
@@ -120,11 +83,7 @@ const LocationsTable = ({ className }: LocationsTableProps): React.ReactElement 
         shallow: false,
         clearOnDefault: true
     })
-
-    if (isError) {
-        redirect('/error');
-    }
-
+    
     return (
         <section>
             <Card className={className}>
@@ -135,37 +94,35 @@ const LocationsTable = ({ className }: LocationsTableProps): React.ReactElement 
                     <div className="flex justify-between items-center mb-4">
                         <Button
                             className="bg-green-400 hover:bg-green-600 text-slate-700 rounded-md px-4 py-2"
-                            disabled={isLoading}
                             onClick={() => openModal("addLocation")}
                         >
                             Add Location
                         </Button>
                     </div>
-                    {isLoading ? (
-                        <DataTableSkeleton 
-                            rowCount={6}
-                            columnCount={7}
-                            searchableColumnCount={3}
-                            filterableColumnCount={5}
-                            cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
-                            shrinkZero
-                            />
-                    ) : (
+                    { locations && locations.length > 0 
+                    ? (
                         <DataTable
                             table={table}
                         >
                             <DataTableToolbar table={table} filterFields={filterFields}>
-                                
+                                    
                             </DataTableToolbar>
                         </DataTable>
+                    )
+                    : (
+                        <div className="text-center p-4">
+                            <span className="text-gray-500">No locations found.</span>
+                            <br />
+                            <span className="text-gray-500">Click the &ldquo;Add New Invite&rdquo; button to create a new location.</span>
+                        </div>
                     )}
                 </CardContent>
             </Card>
             {activeModal === 'addLocation' && (
                 <AddLocationModal
                     isOpen={isAddLocationModalOpen}
-                    gamemasters={[{ id: user.id, given_name: user.user_metadata.given_name, surname: user.user_metadata.surname }]}
-                    userId={user.id}
+                    gamemasters={[{ id: gamemaster.id, given_name: gamemaster.user_metadata.given_name, surname: gamemaster.user_metadata.surname }]}
+                    userId={gamemaster.id}
                     scope={'gm'}
                     onCancel={closeModal}
                     onConfirm={handleAddLocationConfirm}

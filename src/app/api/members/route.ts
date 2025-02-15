@@ -1,50 +1,63 @@
-import { NextRequest, NextResponse } from 'next/server';
+// import { ContactListDO } from "@/lib/types/custom";
+import { MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
+import { createSupabaseServerClient } from "@/utils/supabase/server";
+import { NextRequest, NextResponse } from "next/server";
 
-const api = {
-  key: process.env.EXPRESS_API_KEY as string,
-  url: process.env.EXPRESS_BASE_URL as string
-}
-
-export async function POST(request: NextRequest) {
-
-  const body = await request.json();
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { email, firstName, surname } = body;
-
-  /*
-  if (email == 'no-contact@email.com') {
-    body.email = 'no-contact-' + firstName.toLowerCase() + '-'+ surname.toLowerCase() + '@email.com'
-  }
-  */
-
-  const response = await fetch(api.url + '/members', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': api.key
-    },
-    body: JSON.stringify(body)
-  })
-  
-  if (response.status === 200) {
-    return NextResponse.json({ message: `Form is submit`, response }, { status: 200 })
-  }
-  else if (response.status === 409) {
-    return NextResponse.json({ message: `Email Already In Use.  Please use a different email address.` }, { status: 409 })
-  }
-  else {
-    return NextResponse.json({ message: `something wrong`, response }, { status: response.status })
-  }
-
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
-  return NextResponse.json({ message: `Form is get` }, { status: 200 })
-}
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function DELETE(request: NextRequest) {
-  return NextResponse.json({ message: `Form is delete` }, { status: 200 })
-}   
+    if (request.method !== 'GET') {
+        return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
+    }
+
+    const supabase = await createSupabaseServerClient();
+  
+    const { data: memberData, error: memberError } = await supabase
+        .from('members')
+        .select(`
+            id,
+            email,
+            phone,
+            provider,
+            is_admin,
+            is_minor,
+            profiles!inner(
+                given_name,
+                surname,
+                avatar
+            ),
+            member_roles!inner(
+                roles!inner(
+                    name
+                )
+            )
+        `) as unknown as SupabaseMemberListResponse;
+        // ;
+
+    if (memberError) {
+        console.error(memberError)
+        return NextResponse.json({ message: memberError.message }, { status: 500 });
+    }
+
+    if (!memberData) {
+        return NextResponse.json({ message: 'No members found' }, { status: 404 });
+    }
+    
+    const memberList: MemberDO[] = memberData.map((member) => ({
+        id: member.id,
+        provider: member.provider || '',
+        given_name: member.profiles.given_name!,
+        surname: member.profiles.surname!,
+        displayName: `${member.profiles.given_name} ${member.profiles.surname}`,
+        email: member.email,
+        phone: member.phone || '',
+        isMinor: member.is_minor,
+        isAdmin: member.is_admin,
+        avatar: member.profiles.avatar || 'default',
+        roles: member.member_roles.map((role) => role.roles),        
+    }));
+
+    memberList.sort((a, b) => a.surname.localeCompare(b.surname));
+  // console.log('Contact list:', memberList);
+
+    return NextResponse.json(memberList, { status: 200 });
+  }

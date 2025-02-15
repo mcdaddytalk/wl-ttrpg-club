@@ -52,21 +52,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         const results = await Promise.all(
             recipients.map(async (recipient: BroadcastRecipient) => {
                 if (recipient.delivery_method === 'email') {
-                    return sendEmail(recipient.members.email, message.subject, message.message);
+                    return sendEmail({ to: recipient.members.email, subject:  message.subject, body: message.message });
                 } else if (recipient.delivery_method === 'sms') {
                     if (!recipient.members.phone) {
                         console.log('No phone number found for recipient:', recipient.members);
-                        return sendEmail(recipient.members.email, message.subject, message.message);
+                        return sendEmail({ to: recipient.members.email, subject: message.subject, body: message.message });
                     }
-                    return sendSMS(recipient.members.phone, message.message);
+                    return sendSMS({ to: recipient.members.phone, body: message.message });
                 } else if (recipient.delivery_method === 'both') {
                     const result: { email: string | CreateEmailResponse, sms: string | MessageInstance } = {
                         email: 'not sent',
                         sms: 'not sent'
                     }
-                    result['email'] = await sendEmail(recipient.members.email, message.subject, message.message);
+                    result['email'] = await sendEmail({ to: recipient.members.email, subject: message.subject, body: message.message });
                     if (recipient.members.phone)
-                        result['sms'] = await sendSMS(recipient.members.phone, message.message);
+                        result['sms'] = await sendSMS({ to: recipient.members.phone, body: message.message });
                     return result;
                 }
             })

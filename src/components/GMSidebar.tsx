@@ -10,6 +10,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 const navItems = [
     { href: "/gamemaster/games", label: "My Games", icon: '👤' },
     { href: "/gamemaster/locations", label: "My Locations", icon: '📍' },
+    { href: "/gamemaster/invites", label: "My Invites", icon: '📫' }
 ]
 
 export default function GMSidebar(): React.ReactElement {

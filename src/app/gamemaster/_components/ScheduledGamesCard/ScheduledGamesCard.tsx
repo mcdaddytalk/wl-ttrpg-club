@@ -10,10 +10,12 @@ import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
 import { SetGameTimeModal } from "@/components/Modal/SetGameTimeModal";
 import { TransferGameModal } from "@/components/Modal/TransferGameModal";
+import { GameInviteModal } from "@/components/Modal/GameInviteModal";
 
 type ScheduledGamesCardProps = {
     scheduledGames: GMGameData[];
     locations: Location[];
+    members: MemberDO[];
     gamemasters: MemberDO[];
     onShowDetails: (game: GMGameData) => void;
     onGameAdded: () => void;
@@ -22,9 +24,10 @@ type ScheduledGamesCardProps = {
     gamemaster_id: string
 }
 
-const ScheduledGamesCard= ({ scheduledGames, onShowDetails, onGameAdded, onGameEdit, onGameDelete, gamemaster_id, locations, gamemasters }: ScheduledGamesCardProps): React.ReactElement => {
+const ScheduledGamesCard= ({ scheduledGames, onShowDetails, onGameAdded, onGameEdit, onGameDelete, gamemaster_id, locations,members, gamemasters }: ScheduledGamesCardProps): React.ReactElement => {
     const [activeModal, setActiveModal] = useState<string | null>(null);
     const [isNewGameModalOpen, setNewGameModalOpen] = useState(false);
+    const [isInvitesGameModalOpen, setInvitesGameModalOpen] = useState(false);
     const [isEditGameModalOpen, setEditGameModalOpen] = useState(false);
     const [isTimeGameModalOpen, setTimeGameModalOpen] = useState(false);
     const [isTransferGameModalOpen, setTransferGameModalOpen] = useState(false);
@@ -36,6 +39,9 @@ const ScheduledGamesCard= ({ scheduledGames, onShowDetails, onGameAdded, onGameE
       switch(modal) {
         case 'addNew':
           setNewGameModalOpen(true);
+          break;
+        case 'invites':
+          setInvitesGameModalOpen(true);
           break;
         case 'edit':
           setEditGameModalOpen(true);
@@ -57,6 +63,9 @@ const ScheduledGamesCard= ({ scheduledGames, onShowDetails, onGameAdded, onGameE
       switch(activeModal) {
         case 'addNew':
           setNewGameModalOpen(false);
+          break;
+        case 'invites':
+          setInvitesGameModalOpen(false);
           break;
         case 'edit':
           setEditGameModalOpen(false);
@@ -155,6 +164,16 @@ const ScheduledGamesCard= ({ scheduledGames, onShowDetails, onGameAdded, onGameE
             onGameAdded={onGameAdded}
             gamemaster_id={gamemaster_id}
             locations={locations}
+          />
+        )}
+        {activeModal === 'invites' && selectedGame && (
+          <GameInviteModal
+            isOpen={isInvitesGameModalOpen}
+            gameId={selectedGame.id}
+            members={members}
+            gamemasterId={gamemaster_id}
+            onConfirm={ () => closeModal() }
+            onCancel={ () => closeModal() }
           />
         )}
         {activeModal === 'edit' && selectedGame && (

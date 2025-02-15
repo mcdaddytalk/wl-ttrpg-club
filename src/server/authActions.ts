@@ -109,7 +109,7 @@ export async function signOut(): Promise<{ error: AuthError | null }> {
     redirect('/')
 }
 
-export async function signInWithProvider(provider: Provider): Promise<void> {
+export async function signInWithProvider(provider: Provider, redirectUrl = '/member'): Promise<void> {
     const supabase = await createSupabaseServerClient();
     const origin = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
     const credentials: SignInWithOAuthCredentials = {
@@ -122,10 +122,10 @@ export async function signInWithProvider(provider: Provider): Promise<void> {
     if (data.url) redirect(data.url)
     console.error(error);
     if (error) throw new Error(error.message)
-    redirect('/member/dashboard')
+    redirect(redirectUrl)
 }
 
-export async function signInWithPassword(email: string, password: string): Promise<AuthTokenResponsePassword> {
+export async function signInWithPassword(email: string, password: string, redirectUrl = '/member'): Promise<AuthTokenResponsePassword> {
     const supabase = await createSupabaseServerClient();
     const credentials: SignInWithPasswordCredentials = {
         email,
@@ -134,7 +134,7 @@ export async function signInWithPassword(email: string, password: string): Promi
     const { error } = await supabase.auth.signInWithPassword(credentials);
     if (error) throw new Error(error.message)
     revalidatePath('/', 'layout')
-    redirect('/member/dashboard')
+    redirect(redirectUrl)
 }
 
 export async function signInWithPhone(phone: string): Promise<AuthOtpResponse> {
@@ -163,7 +163,7 @@ export async function signInWithOTP(email: string): Promise<AuthOtpResponse> {
         email,
         options: {
             shouldCreateUser: false,
-            emailRedirectTo: `${origin}/member/dashboard`
+            emailRedirectTo: `${origin}/member`
         }
     };
     
