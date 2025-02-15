@@ -38,6 +38,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
           image,
           max_seats,
           starting_seats,
+          visibility,
           gamemaster_id,
           gamemaster:members!fk_games_members (
             id,
@@ -90,6 +91,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         location_id: gameData.location_id,
         location: gameData.location,
         dayOfWeek: gameData.day_of_week,
+        visibility: gameData.games.visibility,
         title: gameData.games.title,
         description: gameData.games.description,
         system: gameData.games.system,

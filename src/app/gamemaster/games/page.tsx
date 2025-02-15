@@ -38,6 +38,20 @@ async function fetchGames(gamemasterId: string): Promise<GMGameData[]> {
   }
 };
 
+const fetchMembers = async (): Promise<MemberDO[]> => {
+  const response = await fetch(`/api/members`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  if (!response.ok) throw new Error('Failed to fetch members');
+  const data = await response.json();
+  return data as MemberDO[]
+}
+
 const fetchPlayers = async (gameId: string): Promise<Player[]> => {
   const response = await fetch(`/api/games/${gameId}/registrants`,
     {
@@ -113,6 +127,12 @@ export default function GamemasterDashboard(): React.ReactElement {
   const gamemasterId = user?.id;
 
   const contactList = queryClient.getQueryData<ContactListDO[]>(['members', 'full']) || [];
+  
+  const { data: members }  = useQuery<MemberDO[], Error>({
+    queryKey: ['members', 'full'],
+    queryFn: () => fetchMembers(),
+    enabled: !!gamemasterId,
+  });
 
   const { data: games, isLoading } = useQuery<GMGameData[], Error>({
     queryKey: ['games', gamemasterId, 'gm', 'full'],
@@ -197,23 +217,22 @@ export default function GamemasterDashboard(): React.ReactElement {
       <div className="space-y-2 p-2">
         {isLoading ? (
           <DataTableSkeleton 
-                      columnCount={7}
+                      columnCount={5}
                       searchableColumnCount={3}
                       filterableColumnCount={5}
-                      cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem", "8rem"]}
+                      cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
                       shrinkZero
                     />
-        ) : !games || games?.length === 0 ? (
-          <div className="text-center">No scheduled games found.</div>
         ): (
           <ScheduledGamesCard 
             onGameAdded={handleGameAdded} 
             onShowDetails={onShowDetails} 
             onGameEdit={onGameEdit}
             onGameDelete={onGameDelete} 
-            scheduledGames={games} 
+            scheduledGames={games || []} 
             gamemaster_id={gamemasterId}
-            gamemasters={gamemasters || []} 
+            gamemasters={gamemasters || []}
+            members={members || []} 
             locations={locations || []}
           />        
         )}

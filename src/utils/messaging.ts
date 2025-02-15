@@ -10,11 +10,13 @@ const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_A
  * @param subject Email subject
  * @param body Email content (HTML or plain text)
  */
-export const sendEmail = async (
-    to: string | string[], 
-    subject: string, 
-    body: string
-) => {
+
+type EmailParams = {
+  to: string | string[], 
+  subject: string, 
+  body: string
+}
+export const sendEmail = async ({ to, subject, body }: EmailParams) => {
   try {
     console.log(`Sending email to ${to} with subject ${subject} and body ${body}`)
     const response = await resend.emails.send({
@@ -40,7 +42,12 @@ export const sendEmail = async (
  * @param to Recipient phone number
  * @param body SMS content
  */
-export const sendSMS = async (to: string, body: string) => {
+
+type SMSParams = {
+  to: string, 
+  body: string
+}
+export const sendSMS = async ({ to, body }: SMSParams) => {
   try {
     const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
     const response = await twilioClient.messages.create({

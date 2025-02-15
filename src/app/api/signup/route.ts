@@ -12,7 +12,7 @@ const calculateIsMinor = (birthday: string): boolean => {
 };
 
 export async function POST(request: Request) {
-  const { email, phone, preferredContact, consent, password, firstName, surname, birthday } = await request.json();
+  const { email, phone, preferredContact, consent, password, firstName, surname, birthday, inviteId } = await request.json();
 
   const supabase = await createSupabaseServerClient()
   // Check if email is already in use in auth.
@@ -86,6 +86,21 @@ export async function POST(request: Request) {
     if (profileError) {
       console.error(profileError)
       return NextResponse.json({ error: 'Error creating profile' }, { status: 500 });
+    }
+  }
+
+  if (inviteId) {
+    const { error: inviteError } = await supabase
+      .from('game_invites')
+      .update({
+        invitee: userId,
+        external_email: null,
+        external_phone: null
+      })
+      .eq('id', inviteId);
+    if (inviteError) {
+      console.error(inviteError)
+      // return NextResponse.json({ error: 'Error deleting invite' }, { status: 500 });
     }
   }
 

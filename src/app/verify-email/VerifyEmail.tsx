@@ -1,13 +1,16 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import useSession from "@/utils/supabase/use-session";
 
 const VerifyEmail = (): React.ReactElement => {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const session = useSession();
   const email = searchParams.get("email");
   const [loading, setLoading] = useState(false);
   const [resendStatus, setResendStatus] = useState<null | string>(null);
@@ -42,6 +45,24 @@ const VerifyEmail = (): React.ReactElement => {
       setLoading(false);
     }
   };
+
+
+  useEffect(() => {
+    async function checkVerification() {
+      
+      if (session?.user) {
+        const pendingInvite = localStorage.getItem("pendingInvite");
+        if (pendingInvite) {
+          localStorage.removeItem("pendingInvite");
+          router.push(`/accept-invite?invite=${pendingInvite}`);
+        } else {
+          router.push("/member");
+        }
+      }
+    }
+
+    checkVerification();
+  }, [router, session?.user]);
 
   return (
       <section className="flex items-center justify-center p-6">

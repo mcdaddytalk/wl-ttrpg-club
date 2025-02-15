@@ -6,6 +6,7 @@ export const mockScheduledGames: GMGameData[] = [
         "title": "Game 1",
         "description": "Game 1 is a thrilling DND 5e adventure that happens every biweekly on sundays. Join us for an exciting journey!",
         "system": "DND 5e",
+        "visibility": "public",
         "interval": "biweekly",
         "dow": "sunday",
         "scheduled_next": new Date("2024-11-30T20:20:42.481248"),
@@ -23,13 +24,15 @@ export const mockScheduledGames: GMGameData[] = [
             "created_at": new Date("2024-11-30T20:20:42.481248"),
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
-        }
+        },
+        invites: 0
     },
     {
         "id": "fa87bec6-bb03-46f4-899d-b5674634395f",
         "title": "Game 2",
         "description": "Game 2 is a thrilling PF2e adventure that happens every weekly on thursdays. Join us for an exciting journey!",
         "system": "PF2e",
+        "visibility": "public",
         "interval": "weekly",
         "dow": "thursday",
         "scheduled_next": new Date("2024-11-24T20:20:42.481265"),
@@ -47,13 +50,15 @@ export const mockScheduledGames: GMGameData[] = [
             "created_at": new Date("2024-11-30T20:20:42.481248"),
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
-        }
+        },
+        invites: 0
     },
     {
         "id": "3bd8219f-c1e3-4cab-ba25-fc4803a77dcc",
         "title": "Game 3",
         "description": "Game 3 is a thrilling DND 5e adventure that happens every biweekly on wednesdays. Join us for an exciting journey!",
         "system": "DND 5e",
+        "visibility": "public",
         "interval": "biweekly",
         "dow": "wednesday",
         "scheduled_next": new Date("2024-11-26T20:20:42.481270"),
@@ -71,13 +76,15 @@ export const mockScheduledGames: GMGameData[] = [
             "created_at": new Date("2024-11-30T20:20:42.481248"),
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
-        }
+        },
+        invites: 0
     },
     {
         "id": "83e2f7f4-5b5d-4b6b-8a0e-4f1b2c3d4e5f",
         "title": "Game 4",
         "description": "Game 4 is a thrilling DND 5e adventure that happens every biweekly on wednesdays. Join us for an exciting journey!",
         "system": "DND 5e",
+        "visibility": "public",
         "interval": "biweekly",
         "dow": "wednesday",
         "scheduled_next": new Date("2024-11-28T20:20:42.481274"),
@@ -95,13 +102,15 @@ export const mockScheduledGames: GMGameData[] = [
             "created_at": new Date("2024-11-30T20:20:42.481248"),
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
-        }
+        },
+        invites: 0
     },
     {
         "id": "2d6eb983-9c3a-416f-a01b-23a0a47bef04",
         "title": "Game 5",
         "description": "Game 5 is a thrilling DND 5e adventure that happens every biweekly on wednesdays. Join us for an exciting journey!",
         "system": "DND 5e",
+        "visibility": "public",
         "interval": "biweekly",
         "dow": "wednesday",
         "scheduled_next": new Date("2024-12-01T20:20:42.481277"),
@@ -119,7 +128,8 @@ export const mockScheduledGames: GMGameData[] = [
             "created_at": new Date("2024-11-30T20:20:42.481248"),
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
-        }
+        },
+        invites: 0
     }
 ];
 

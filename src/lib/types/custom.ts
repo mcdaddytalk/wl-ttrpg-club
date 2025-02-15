@@ -50,6 +50,7 @@ export type LocationType = 'vtt' | 'discord' | 'physical';
 export type DeliveryStatus = 'pending' | 'sent' | 'failed';
 export type DeliveryMethod = 'email' | 'sms' | 'both';
 export type LocationScope = 'admin' | 'gm' | 'disabled';
+export type GameVisibility = 'public' | 'private';
 
 /* DO Types */
 export type ContactListDO = {
@@ -64,6 +65,16 @@ export type AdminLocationDO = Location & {
 
 export type GMLocationDO = Location & {
   authorized_gamemasters: ContactListDO[];
+}
+
+export type InvitedPlayer = {
+  id?: string;
+  provider?: string;
+  given_name: string;
+  surname: string;
+  displayName: string;
+  email?: string;
+  phone?: string;
 }
 
 export type MemberDO = {
@@ -291,6 +302,7 @@ export type GameData = {
   location_id: string;
   location: Location;
   dayOfWeek: DOW;
+  visibility: GameVisibility;
   title: string;
   description: string;
   system: string;
@@ -329,6 +341,7 @@ export type SupaGameData = {
   system: string;
   image: string;
   max_seats: number;
+  visibility: GameVisibility;
   starting_seats: number;
   gamemaster_id: string;
   gamemaster: MemberData;
@@ -347,6 +360,7 @@ export type SupaGMGameData = {
   image: string;
   max_seats: number;
   starting_seats: number;
+  visibility: GameVisibility;
   game_schedule: SupaGameScheduleData[];
 }
 export type SupabaseGMGameDataResponse = SupabaseDataResponseSingle<SupaGMGameData>
@@ -364,6 +378,8 @@ export type GMGameData = {
   status: GameStatus;
   location_id: string;
   location: Location;
+  visibility: GameVisibility;
+  invites: number;
   pending: number;
   registered: number;
   onShowDetails?: (game: GMGameData) => void;
@@ -405,6 +421,26 @@ export type SupabaseAdminLocationPermListResponse = SupabaseDataResponse<AdminLo
 
 export type SupabaseLocationPermResponse = SupabaseDataResponseSingle<LocationPermData>
 export type SupabaseLocationPermListResponse = SupabaseDataResponse<LocationPermData>
+
+export type InviteData = {
+  id: string;
+  game_id: string;
+  invitee: string;
+  display_name: string;
+  external_email?: string;
+  external_phone?: string;
+  invited_at: Date;
+  expires_at: Date;
+  accepted: boolean;
+  notified: boolean;
+  gamemaster_id: string;
+  game?: GameData;
+}
+
+export type SupabaseGameInviteResponse = SupabaseDataResponseSingle<InviteData>
+export type SupabaseGameInviteListResponse = SupabaseDataResponse<InviteData>
+
+
 
 export type NewContact = {
   firstName: string;

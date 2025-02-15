@@ -24,7 +24,8 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameData
             return row.getValue("title")
         },
         enableSorting: true,
-        enableHiding: false
+        enableHiding: false,
+        size: 600
     },
     {
         accessorKey: "system",
@@ -76,6 +77,15 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameData
         size: 400      
     },
     {
+        accessorKey: "invites",
+        header: "Invites Pending",
+        cell: ({ row }) => {
+            return row.getValue("invites")
+        },
+        enableSorting: true,
+        enableHiding: false
+    },
+    {
         accessorKey: "pending",
         header: "Approvals Pending",
         cell: ({ row }) => {
@@ -121,6 +131,15 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameData
         enableHiding: true
     },
     {
+        accessorKey: "visibility",
+        header: "Visibility",
+        cell: ({ row }) => {
+            return row.getValue("visibility")
+        },
+        enableSorting: true,
+        enableHiding: true
+    },
+    {
         id: 'actions', // A custom column for the button
         header: 'Actions',
         cell: ({ row }) => {
@@ -142,7 +161,15 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameData
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />                        
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem disabled={game.visibility === 'public'} onClick={() => onOpenModal('invites', game)}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                        >
+                            Add Invites
+                        </Button>
+                    </DropdownMenuItem>                        
                     <DropdownMenuItem onClick={() => onOpenModal('edit', game)}>
                         <Button
                             variant="outline"
