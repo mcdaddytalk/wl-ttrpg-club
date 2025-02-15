@@ -27,6 +27,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         system,
         image, 
         max_seats,
+        visibility,
         starting_seats, 
         game_schedule(
           id,
@@ -84,6 +85,23 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
       return NextResponse.json({ message: registrationsError.message }, { status: 500 })
     }
 
+    const { data: invites, error: invitesError } = await supabase
+      .from('game_invites')
+      .select(`*`)
+      .in('game_id', gameIds);
+
+    if (invitesError) {
+      console.error(invitesError);
+      return NextResponse.json({ message: invitesError.message }, { status: 500 })
+    }
+
+    const inviteCounts = invites?.reduce((acc, invite) => {
+      const game = gamesData?.find((game) => game.id === invite.game_id);
+      if (!game) return acc;
+      acc[invite.game_id as string] = (acc[invite.game_id as string] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
     const seatCounts = registrations?.reduce((acc, reg) => {
       const game = gamesData?.find((game) => game.id === reg.game_id && reg.status === 'approved');
         if (game) {
@@ -109,12 +127,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
       interval: game.game_schedule[0]?.interval,
       dow: game.game_schedule[0]?.day_of_week as DOW,
       maxSeats: game.max_seats as number,
+      visibility: game.visibility,
       startingSeats: game.starting_seats as number,
       status: game.game_schedule[0]?.status,
       location_id: game.game_schedule[0]?.location_id,
       location: game.game_schedule[0]?.location ?? '',
-      pending: pending![game.id] || 0,
-      registered: seatCounts![game.id] || 0,
+      invites: inviteCounts[game.id] ?? 0,
+      pending: pending[game.id] ?? 0,
+      registered: seatCounts[game.id] ?? 0,
     })) ?? [];
     // const combinedData = mockScheduledGames;
 
@@ -134,13 +154,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<G
 
   const supabase = await createSupabaseServerClient();
 
-  const { title, description, system, interval, dayOfWeek, nextGameDate, maxSeats, startingSeats, location_id } = body;
+  const { title, description, system, visibility, interval, dayOfWeek, nextGameDate, maxSeats, startingSeats, location_id } = body;
 
   try {
     const { data, error } = await supabase.from('games').insert({
       title,
       description,
       system,
+      visibility,
       max_seats: maxSeats,
       starting_seats: startingSeats || 0,
       gamemaster_id: gm_id

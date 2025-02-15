@@ -36,6 +36,7 @@ export default function NewGameModal({
   const [interval, setInterval] = useState<GameInterval>('weekly');
   const [dayOfWeek, setDayOfWeek] = useState<DOW>('sunday');
   const [maxSeats, setMaxSeats] = useState<number | ''>('');
+  const [visibility, setVisibility] = useState('public');
   const [gameLocationId, setGameLocationId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
@@ -60,6 +61,7 @@ export default function NewGameModal({
                     title,
                     description,
                     system,
+                    visibility,
                     interval,
                     dayOfWeek,
                     nextGameDate,
@@ -106,6 +108,21 @@ export default function NewGameModal({
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="block font-medium">System</Label>
             <Input value={system} onChange={(e) => setSystem(e.target.value)} className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="block font-medium">Visibility</Label>
+            <span className="col-span-3">Determines if a game is private or public</span>
+            <Select value={visibility} onValueChange={(value) => setVisibility(value as 'public' | 'private')}>
+              <SelectTrigger  className="col-span-3">
+                <SelectValue placeholder="Select Visibility" />
+              </SelectTrigger>
+              <SelectContent>
+                {['public', 'private'].map((visOption) => (<SelectItem key={visOption} value={visOption}>
+                    {visOption.charAt(0).toUpperCase() + visOption.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="block font-medium">Interval</Label>
