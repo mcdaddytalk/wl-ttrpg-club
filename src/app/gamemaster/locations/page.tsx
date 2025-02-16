@@ -21,7 +21,6 @@ const GMLocationsPage = (): React.ReactElement => {
             }>            
                 <GMLocationsDashboard />
             </Suspense>
-            
         </HydrationBoundary>
     )
 }

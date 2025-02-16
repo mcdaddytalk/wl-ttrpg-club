@@ -30,7 +30,6 @@ const LocationsTable = ({ className, locations, gamemaster }: LocationsTableProp
     const [isRemoveLocationModalOpen, setRemoveLocationModalOpen] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState<GMLocationDO | null>(null);
 
-    
     const openModal = (modal: string, location?: GMLocationDO) => {
         if (location) setSelectedLocation(location);
         if (modal === 'addLocation') setAddLocationModalOpen(true);
@@ -99,13 +98,13 @@ const LocationsTable = ({ className, locations, gamemaster }: LocationsTableProp
                             Add Location
                         </Button>
                     </div>
+
                     { locations && locations.length > 0 
                     ? (
                         <DataTable
                             table={table}
                         >
                             <DataTableToolbar table={table} filterFields={filterFields}>
-                                    
                             </DataTableToolbar>
                         </DataTable>
                     )

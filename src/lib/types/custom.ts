@@ -440,8 +440,6 @@ export type InviteData = {
 export type SupabaseGameInviteResponse = SupabaseDataResponseSingle<InviteData>
 export type SupabaseGameInviteListResponse = SupabaseDataResponse<InviteData>
 
-
-
 export type NewContact = {
   firstName: string;
   surname: string;
