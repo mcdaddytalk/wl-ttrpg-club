@@ -2,6 +2,7 @@ import { NextRequest , NextResponse} from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
 // import { createSupabaseReqResClient } from "./utils/supabase/server"
 import { getInitialSession } from "./server/authActions"
+import logger from "@/utils/logger"
 // import { RoleData, SupabaseRoleListResponse } from "./lib/types/custom";
 
 const protectedApiRoutes = [
@@ -33,6 +34,7 @@ export async function middleware(request: NextRequest) {
        response.headers.set('Authorization', `Bearer ${token}`)
        return NextResponse.next()
     } else {
+       logger.error(`Unauthorized API request: ${request.nextUrl.pathname}`)
        response.headers.set('Authorization', '')
        return new NextResponse('unauthorized', { status: 401 })
     }

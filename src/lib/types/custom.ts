@@ -263,16 +263,21 @@ export type RegisteredGame = {
   gm_member_id: string;
 }
 
-export type RegisteredCharacter = {
+export type RegisteredGameDO = {
   id: string;
-  name: string;
+  title: string;
   description: string;
   system: string;
-  registered_at: Date;
-  member_id: string;
-  game_id: string;
-  gm_name: string;
-  gm_member_id: string;
+  visibility: GameVisibility
+  coverImage: string;
+  scheduled_for: Date | null;
+  location: Location;
+  status: GameStatus;
+  interval: GameInterval;
+  dayOfWeek: DOW;
+  gamemasterId: string;
+  gm_given_name: string;
+  gm_surname: string;
 }
 
 export type UpcomingGame = {
@@ -290,6 +295,18 @@ export type UpcomingGame = {
   registered: boolean;
   registration_status: GameRegStatus;
   registration_date: Date | null;  
+}
+
+export type RegisteredCharacter = {
+  id: string;
+  name: string;
+  description: string;
+  system: string;
+  registered_at: Date;
+  member_id: string;
+  game_id: string;
+  gm_name: string;
+  gm_member_id: string;
 }
 
 export type GameData = {

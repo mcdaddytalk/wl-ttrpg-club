@@ -10,7 +10,20 @@ const nextConfig: NextConfig = {
         hostname: 'kthrpfzafznkkvalszoi.supabase.co'
       }
     ]
-  }
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Prevent Webpack from bundling Node.js modules in client-side builds
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        child_process: false, // Fixes the "UnhandledSchemeError"
+        fs: false,
+        path: false,
+        os: false,
+      };
+    }
+    return config;
+  },
 };
 
 export default withSentryConfig(nextConfig, {
