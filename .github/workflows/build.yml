@@ -15,9 +15,8 @@ jobs:
         name: Checking for Build Errors
         runs-on: ubuntu-latest
         env:
+            CI: true
             NEXT_PRIVATE_LOGGING_BUFFERED: false
-            NODE_ENV: development
-            DEBUG: true
             NEXT_PUBLIC_SITE_URL: http://localhost:3000
             NEXT_PUBLIC_SUPABASE_URL: https://test-url.com
             NEXT_PUBLIC_SUPABASE_ANON_KEY: not_a_real+key
