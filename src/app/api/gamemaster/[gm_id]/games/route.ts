@@ -29,7 +29,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         max_seats,
         visibility,
         starting_seats, 
-        gamemaster: members (
+        gamemaster: members!fk_games_members (
           id,
           profiles (
             given_name,

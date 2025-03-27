@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { GameData } from "@/lib/types/custom";
-import { LuCalendar, LuUsers2 } from "react-icons/lu";
+import { LuCalendar, LuUsers } from "react-icons/lu";
 // import { TiStopwatch } from "react-icons/ti";
 import { MdOutlineEventRepeat } from "react-icons/md";
 
@@ -97,7 +97,7 @@ const GameCarouselCard = ({ game, onToggleFavorite, className }: GameCarouselCar
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {/* Icon and Text on the Same Line */}
-                                    <LuUsers2 />
+                                    <LuUsers />
                                     <span>{seatsAvailable(game)} Seats Filled</span>
                                 </div>
                             </div>

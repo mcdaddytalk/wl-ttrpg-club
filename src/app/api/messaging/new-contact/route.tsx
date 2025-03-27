@@ -1,19 +1,31 @@
 import { NextResponse } from 'next/server';
-import { NewContactEmail } from '@/components/EmailTemplate';
+
 import { Resend } from 'resend';
 import logger from '@/utils/logger';
 import { ENVS } from "@/utils/constants/envs"
+import { NewContactEmail } from '@/components/EmailTemplate';
+import { contactSchema } from '@/lib/validation/contactSchema';
 
 const resend = new Resend(ENVS.RESEND_API_KEY);
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const contactData = await request.json();
+  const json = await request.json();
+
+  const parseResult = contactSchema.safeParse(json);
+  if (!parseResult.success) {
+    return NextResponse.json(
+      { error: 'Invalid contact form submission', issues: parseResult.error.format() },
+      { status: 400 }
+    );
+  }
+
+  const contactData = parseResult.data;
   try {
     const { error } = await resend.emails.send({
       from: 'WL-TTRPG <onboarding@kaje.org>',
       to: ['kbtalkin+newcontact+wlttrpg@gmail.com'],
       subject: 'New Contact Form Submission',
-      react: NewContactEmail({ ...contactData }),
+      react: <NewContactEmail {...contactData} />,
     });
 
     if (error) {
@@ -27,3 +39,4 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error }, { status: 500 });
   }
 }
+

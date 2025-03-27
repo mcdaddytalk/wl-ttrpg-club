@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { GameData, MessageUserDO } from "@/lib/types/custom";
 import { toast } from "sonner";
 import { MdOutlineEventRepeat } from "react-icons/md";
-import { LuCalendar, LuUsers2 } from "react-icons/lu";
+import { LuCalendar, LuUsers } from "react-icons/lu";
 import { SiStatuspal } from "react-icons/si";
 import { Badge } from "@/components/ui/badge";
 import { useToggleFavorite } from "@/hooks/useToggleFavorite";
@@ -27,7 +27,7 @@ const enhanceStatus = (game: GameData) => {
         if (seatsNeeded <= 0) return 'Active';
         return (
             <Badge variant="default" className="bg-blue-300 text-slate-700 rounded-lg" >
-                <LuUsers2 />
+                <LuUsers />
                 <span>{seatsNeeded} NEEDED TO START</span>
             </Badge>        
         )
@@ -173,7 +173,7 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                         </div>
                         <div className="flex items-center gap-2">
                             {/* Icon and Text on the Same Line */}
-                            <LuUsers2 className="text-xl" />
+                            <LuUsers className="text-xl" />
                             <span>{seatsAvailable(game)} Seats Filled</span>
                         </div>
                     </div>
