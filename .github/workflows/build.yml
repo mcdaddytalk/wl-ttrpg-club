@@ -15,6 +15,7 @@ jobs:
         name: Checking for Build Errors
         runs-on: ubuntu-latest
         env:
+            CI: true
             NEXT_PRIVATE_LOGGING_BUFFERED: false
             NODE_ENV: development
             DEBUG: true
@@ -28,11 +29,11 @@ jobs:
             SUPABASE_DB_PASSWORD: NOT_A_CHANCE
             SUPABASE_DB_URL: postgresql://postgres.user:some_password@some_host:6543/postgres
             RESEND_API_KEY: not_a_real+key
-            TWILIO_ACCOUNT_SID: not_a_real_sid
+            TWILIO_ACCOUNT_SID: AC_not_a_real_sid
             TWILIO_AUTH_TOKEN: not_a_real_token
-            TWILIO_API_SID: not_a_real_sid
+            TWILIO_API_SID: SK_not_a_real_sid
             TWILIO_API_SECRET: not_a_real_secret
-            TWILIO_MESSAGING_SERVICE_SID: not_a_real_sid
+            TWILIO_MESSAGING_SERVICE_SID: MG_not_a_real_sid
             SENTRY_DSN: "https://NOTREAL.ingest.us.sentry.io/4508502494019584"
             SENTRY_AUTH_TOKEN: sample_auth_token
 
