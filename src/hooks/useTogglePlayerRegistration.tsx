@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "./useQueryClient";
+import logger from "@/utils/logger";
 
 export const useTogglePlayerRegistration = () => {
     const queryClient = useQueryClient();
@@ -40,7 +41,7 @@ export const useTogglePlayerRegistration = () => {
             return response.json();
         },
         onError: (error) => {
-            console.error(
+            logger.error(
                 'Error toggling player registration:',
                 error
             )

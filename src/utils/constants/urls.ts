@@ -1,0 +1,5 @@
+const URLS = {
+
+}
+
+export { URLS }

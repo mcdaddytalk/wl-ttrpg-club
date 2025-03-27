@@ -21,6 +21,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import useToastStore from "@/store/toastStore";
 import { jwtDecode, JwtPayload } from "jwt-decode";
+import logger from '@/utils/logger';
+import { ENVS } from "@/utils/constants/envs"
 
 type JwtPayloadWithRoles = JwtPayload & { roles: string[] };
 export const getInitialSession = async (): Promise<{ session: Session | null; user: User | null; error: AuthError | null }> => {
@@ -90,7 +92,7 @@ export const getUserRoles = async (): Promise<string[]> => {
     if (!user) return []
     const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleListResponse;
     if (roleError) {
-        console.error(roleError)
+        logger.error(roleError)
         if (roleError.message) throw new Error(roleError.message)
         else throw new Error("RoleQuery failed")
     }
@@ -111,7 +113,7 @@ export async function signOut(): Promise<{ error: AuthError | null }> {
 
 export async function signInWithProvider(provider: Provider, redirectUrl = '/member'): Promise<void> {
     const supabase = await createSupabaseServerClient();
-    const origin = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+    const origin = ENVS.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
     const credentials: SignInWithOAuthCredentials = {
         provider,
         options: {
@@ -120,7 +122,7 @@ export async function signInWithProvider(provider: Provider, redirectUrl = '/mem
     }
     const { data, error } = await supabase.auth.signInWithOAuth(credentials);
     if (data.url) redirect(data.url)
-    console.error(error);
+    logger.error(error);
     if (error) throw new Error(error.message)
     redirect(redirectUrl)
 }
@@ -148,7 +150,7 @@ export async function signInWithPhone(phone: string): Promise<AuthOtpResponse> {
     const { error } = await supabase.auth.signInWithOtp(credentials);
     if (error) {
         if (error instanceof AuthApiError && error.status === 422) {
-            console.error('Throwing new AuthApiError');
+            logger.error('Throwing new AuthApiError');
             throw new AuthApiError(error.message,  error.status, error.code);
         }
         throw new Error(error.message);
@@ -170,7 +172,7 @@ export async function signInWithOTP(email: string): Promise<AuthOtpResponse> {
     const { error } = await supabase.auth.signInWithOtp(credentials);
     if (error) {
         if (error instanceof AuthApiError && error.status === 422) {
-            console.error('Throwing new AuthApiError');
+            logger.error('Throwing new AuthApiError');
             throw new AuthApiError(error.message,  error.status, error.code);
         }
         throw new Error(error.message);
@@ -194,7 +196,7 @@ export async function sendInviteEmail({email, given_name, surname, is_minor}: Em
             displayName: `${given_name} ${surname}`,
             is_minor
         },
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`
+        redirectTo: `${ENVS.NEXT_PUBLIC_SITE_URL}/login`
     });
 
     if (error) throw new Error(error.message)

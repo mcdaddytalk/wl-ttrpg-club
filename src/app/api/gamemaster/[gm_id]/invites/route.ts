@@ -28,7 +28,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
     `)
     .eq('gamemaster_id', gm_id) as unknown as SupabaseGameInviteListResponse;
 
-    // console.log('Invites pulled from db:', inviteData);
+    // logger.log('Invites pulled from db:', inviteData);
 
   if (inviteError) {
     logger.error(inviteError);
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
     return NextResponse.json({ message: 'No invites found' }, { status: 404 });
   }
 
-  // console.log('Invites fetched:', inviteData);
+  // logger.log('Invites fetched:', inviteData);
 
   return NextResponse.json(inviteData);
 }

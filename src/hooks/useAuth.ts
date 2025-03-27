@@ -12,6 +12,7 @@ import {
     signOut,
     getInitialSession
 } from '@/server/authActions';
+import logger from '@/utils/logger';
 
 interface AuthContext {
     session: Session | null;
@@ -73,7 +74,7 @@ export function useAuth(): AuthContext {
           setError(null);
           await refreshSession(); // Refresh session state after sign-in
         } catch (error: unknown) {
-          console.error(error);
+          logger.error(error);
           setError(error instanceof AuthError ? error.message : "An error occurred during password sign-in");
         }
       }, [refreshSession]);
@@ -84,7 +85,7 @@ export function useAuth(): AuthContext {
           setError(null);
           await refreshSession(); // Refresh session state after sign-in
         } catch (error: unknown) {
-            console.error(error);
+            logger.error(error);
             setError(error instanceof AuthError ? error.message : "An error occurred during OAuth sign-in");
         }
       }, [refreshSession]);
@@ -95,7 +96,7 @@ export function useAuth(): AuthContext {
           setError(null);
           await refreshSession(); // Refresh session state after sign-in
         } catch (error: unknown) {
-            console.error(error);
+            logger.error(error);
             setError(error instanceof AuthError ? error.message : "An error occurred during Passwordless sign-in");
         }
       }, [refreshSession]);

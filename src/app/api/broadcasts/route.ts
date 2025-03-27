@@ -1,4 +1,5 @@
 import { DeliveryMethod, SupabaseBroadcastMessageListResponse, SupabaseBroadcastMessageResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .order('created_at', { ascending: false }) as unknown as SupabaseBroadcastMessageListResponse;
 
     if (messagesError) {
-        console.error(messagesError);
+        logger.error(messagesError);
         return NextResponse.json({ error: messagesError.message }, { status: 500 });
     }
 
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       .single() as SupabaseBroadcastMessageResponse;
 
     if (messageError) {
-        console.error(messageError);
+        logger.error(messageError);
         return NextResponse.json({ error: messageError.message }, { status: 500 });
     }
 
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         .insert(recipients.map((recipient: string) => ({ message_id: broadcast.id, recipient_id: recipient, delivery_method: mode })));
 
     if (recipientsError) {
-        console.error(recipientsError);
+        logger.error(recipientsError);
         return NextResponse.json({ error: recipientsError.message }, { status: 500 });
     }
 

@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "./useQueryClient";
+import logger from "@/utils/logger";
 
 export const useTransferGame = () => {
     const queryClient = useQueryClient();
@@ -44,7 +45,7 @@ export const useTransferGame = () => {
                 queryClient.invalidateQueries({ queryKey: ["games", new_gm_id, "gm", "full"] });
         },
         onError: (error) => {
-            console.error(error);
+            logger.error(error);
         }
     });
 };

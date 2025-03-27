@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import useSession from "@/utils/supabase/use-session";
+import logger from '@/utils/logger';
 
 const ResetPassword = (): React.ReactNode => {
     const [newPassword, setNewPassword] = useState("");
@@ -13,7 +14,7 @@ const ResetPassword = (): React.ReactNode => {
     const [statusMessage, setStatusMessage] = useState<null | string>(null);
     const session = useSession();
     
-  // console.log(session); // Log the session?.access_token
+  // logger.log(session); // Log the session?.access_token
     const accessToken = session?.access_token;
 
     const handleResetPassword = async () => {
@@ -38,7 +39,7 @@ const ResetPassword = (): React.ReactNode => {
             setStatusMessage(data.message || "Your password has been updated successfully!");
         } catch (err) {
             toast.error((err as Error).message || "Failed to reset password.");
-            console.error(err);
+            logger.error(err);
             setStatusMessage((err as Error).message || "Failed to reset password.");
         } finally {
             setLoading(false);

@@ -1,5 +1,6 @@
 // import { ContactListDO } from "@/lib/types/custom";
 import { ContactListDO, SupabaseContactListResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
         // ;
 
     if (contactError) {
-        console.error(contactError)
+        logger.error(contactError)
         return NextResponse.json({ message: contactError.message }, { status: 500 });
     }
 
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
     }));
 
     contactList.sort((a, b) => a.surname.localeCompare(b.surname));
-  // console.log('Contact list:', contactList);
+  // logger.log('Contact list:', contactList);
 
     return NextResponse.json(contactList, { status: 200 });
   }

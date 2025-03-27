@@ -1,6 +1,7 @@
 import { createSupabaseServerClient } from '@/utils/supabase/server'
 import { AuthError, type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
+import logger from '@/utils/logger';
 
 
 // Creating a handler to a GET request to route /auth/confirm
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(redirectTo)
     } else {
       if (error instanceof AuthError) {
-        console.error(error.message)
+        logger.error(error.message)
       }
     }
   }

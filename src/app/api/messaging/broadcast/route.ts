@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { BroadcastRecipient, SupabaseBroadcastMessageResponse, SupabaseBroadcastRecipientListResponse } from '@/lib/types/custom';
 import { CreateEmailResponse } from 'resend';
 import { MessageInstance } from 'twilio/lib/rest/api/v2010/account/message';
+import logger from '@/utils/logger';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
     if (request.method !== 'POST') {
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             throw new Error('No recipients found.');
         }
 
-        console.log('Recipients:', recipients);
+        logger.log('Recipients:', recipients);
         // Send messages
         const results = await Promise.all(
             recipients.map(async (recipient: BroadcastRecipient) => {
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                     return sendEmail({ to: recipient.members.email, subject:  message.subject, body: message.message });
                 } else if (recipient.delivery_method === 'sms') {
                     if (!recipient.members.phone) {
-                        console.log('No phone number found for recipient:', recipient.members);
+                        logger.log('No phone number found for recipient:', recipient.members);
                         return sendEmail({ to: recipient.members.email, subject: message.subject, body: message.message });
                     }
                     return sendSMS({ to: recipient.members.phone, body: message.message });
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         // Update delivery status in the database
         await Promise.all(
-        results.map((result, index) =>
+        results.map((_result, index) =>
             supabase
             .from('broadcast_recipients')
             .update({ delivery_status: 'sent' })
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Error broadcasting message:', error);
+        logger.error('Error broadcasting message:', error);
         return NextResponse.json({ error }, { status: 500 });
     }
 }

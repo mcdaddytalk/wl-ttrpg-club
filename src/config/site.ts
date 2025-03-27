@@ -1,3 +1,5 @@
+import { ENVS } from "@/utils/constants/envs"
+
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
@@ -20,8 +22,8 @@ export const siteConfig = {
   ],
   manifest: "/manifest.json",
   url:
-    process.env.NEXT_PUBLIC_SITE_URL
-        ?? process.env.NODE_ENV === "development"
+    ENVS.NEXT_PUBLIC_SITE_URL
+        ?? ENVS.IS_DEV
             ? "http://localhost:3000"
             : "https://wl-ttrpg.kaje.org",
   links: { github: "https://github.com/mcdaddytalk/wl-ttrpg" },

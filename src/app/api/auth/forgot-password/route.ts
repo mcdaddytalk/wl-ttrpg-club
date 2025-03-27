@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
+import { ENVS } from "@/utils/constants/envs";
 
 export async function POST(req: Request) {
   const { email } = await req.json();
@@ -11,7 +12,7 @@ export async function POST(req: Request) {
   try {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password`, // Ensure this matches your reset password page
+      redirectTo: `${ENVS.NEXT_PUBLIC_SITE_URL}/reset-password`, // Ensure this matches your reset password page
     });
 
     if (error) {

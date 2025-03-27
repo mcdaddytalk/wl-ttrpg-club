@@ -64,7 +64,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
     return NextResponse.json({ message: 'Not the gamemaster of this game' }, { status: 403 });
   }
   
-  console.log('GM Games', gamemasterId, game_id, gameData);
+  logger.log('GM Games', gamemasterId, game_id, gameData);
 
   const { data: existingReg } = await supabase
     .from('game_registrations')
@@ -97,8 +97,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
     const inviteRecords: InternalInvite[] = [];
     const externalInvites: ExternalInvite[] = [];
 
-    if (existingMembers) console.log('Existing Members', existingMembers);
-    console.log('Invites', invitees);
+    if (existingMembers) logger.log('Existing Members', existingMembers);
+    logger.log('Invites', invitees);
 
     for (const invitee of invitees) {
         const invite_id = uuidv4(); // Generate a unique invite ID
@@ -152,13 +152,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
     }
    
     if (inviteRecords.length > 0) {
-      console.log('Invite Records', inviteRecords);
+      logger.log('Invite Records', inviteRecords);
       const { error } = await supabase.from("game_invites").insert(inviteRecords);
       if (error) throw new Error(error.message)
     }
 
     if (externalInvites.length > 0) {
-      console.log('External Invites', externalInvites);
+      logger.log('External Invites', externalInvites);
       const { error } = await supabase.from("game_invites").insert(externalInvites);
       if (error) throw new Error(error.message)
     }

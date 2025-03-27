@@ -1,7 +1,7 @@
 // components/Avatar.tsx
 import React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import useSupabaseBrowserClient from "@/utils/supabase/client";
+import createSupabaseBrowserClient from "@/utils/supabase/client";
 
 interface AvatarProps {
   avatarUrl?: string;
@@ -18,7 +18,7 @@ const UserAvatar: React.FC<AvatarProps> = ({ avatarUrl, fullName, size=8 }) => {
     return initials.toUpperCase();
   };
 
-  const supabase = useSupabaseBrowserClient();
+  const supabase = createSupabaseBrowserClient();
   let avatar = avatarUrl;
   if (avatar && !avatar.startsWith('https://')) {
     avatar = supabase.storage.from('avatars').getPublicUrl(avatar).data.publicUrl;

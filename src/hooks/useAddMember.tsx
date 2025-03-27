@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "./useQueryClient";
+import logger from '@/utils/logger';
 
 export const useAddMember = () => {
     const queryClient = useQueryClient();
@@ -39,7 +40,7 @@ export const useAddMember = () => {
             queryClient.invalidateQueries({ queryKey:['members', 'admin', 'full'] });
         },
         onError: (error) => {
-            console.error("Error adding member:", error);
+            logger.error("Error adding member:", error);
         },
     });
 };

@@ -1,17 +1,14 @@
 import { DOW, GameInterval, GameStatus } from "@/lib/types/custom";
+import { ENVS } from "@/utils/constants/envs"
+import { NextRequest } from "next/server";
 
 export const getURL = (path: string = '') => {
     // Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
     let url =
-        process?.env?.NEXT_PUBLIC_SITE_URL &&
-            process.env.NEXT_PUBLIC_SITE_URL.trim() !== ''
-            ? process.env.NEXT_PUBLIC_SITE_URL
-            : // If not set, check for NEXT_PUBLIC_VERCEL_URL, which is automatically set by Vercel.
-            process?.env?.NEXT_PUBLIC_VERCEL_URL &&
-                process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ''
-                ? process.env.NEXT_PUBLIC_VERCEL_URL
-                : // If neither is set, default to localhost for local development.
-                'http://localhost:3000/';
+        ENVS.NEXT_PUBLIC_SITE_URL &&
+            ENVS.NEXT_PUBLIC_SITE_URL.trim() !== ''
+            ? ENVS.NEXT_PUBLIC_SITE_URL
+            : 'http://localhost:3000/';
 
     // Trim the URL and remove trailing slash if exists.
     url = url.replace(/\/+$/, '');
@@ -81,3 +78,26 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
     const to = from + limit - 1;
     return { from, to };
   }
+
+  // ✅ In-Memory Rate Limiting
+  export const rateLimitMap = new Map<string, { count: number; lastRequest: number }>();
+  export const RATE_LIMIT = { maxRequests: 10, timeWindow: 60 * 1000 }; // 10 requests per minute
+  
+  // ✅ Role Hierarchy (Admins inherit all permissions)
+  export const ROLE_HIERARCHY: Record<string, string[]> = {
+    admin: ["admin", "gamemaster", "member"],
+    gamemaster: ["gamemaster", "member"],
+    member: ["member"],
+  };
+  
+  // Function to safely extract IP from request headers
+  export const getClientIp = (req: NextRequest): string => {
+    // Try to get IP from standard "x-forwarded-for" header (proxy-aware)
+    const forwardedFor = req.headers.get("x-forwarded-for");
+    if (forwardedFor) {
+      return forwardedFor.split(",")[0].trim(); // Take the first IP in the list
+    }
+  
+    // Fallback for environments without a proxy
+    return req.headers.get("cf-connecting-ip") || "127.0.0.1"; // Default to localhost for safety
+  };

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import useSupabaseBrowserClient from '@/utils/supabase/client'
+import createSupabaseBrowserClient from '@/utils/supabase/client'
 import { type User } from '@supabase/supabase-js'
 import { useMutation,  useQuery } from '@tanstack/react-query'
 // import { useQuery, useUpdateMutation, useUpsertMutation } from '@supabase-cache-helpers/postgrest-react-query'
@@ -15,6 +15,7 @@ import { ProfileData, ExperienceLevel } from '@/lib/types/custom'
 import { redirect } from 'next/navigation'
 import { Label } from '@/components/ui/label'
 import { useQueryClient } from '@/hooks/useQueryClient'
+import logger from '@/utils/logger';
 // import { fetchUserProfile } from '@/queries/fetchProfile'
 // import { fetchProfile } from '@/queries/fetchProfile'
 
@@ -23,7 +24,7 @@ type ProfileFormProps = {
 }
 
 export default function ProfileForm({ user }: ProfileFormProps): React.ReactElement {
-  const supabase = useSupabaseBrowserClient()
+  const supabase = createSupabaseBrowserClient()
   const queryClient = useQueryClient()
 
   const { data: profile, isLoading: profileLoading, isError, error } = useQuery({
@@ -35,14 +36,14 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
         throw new Error('Failed to fetch profile');
       }
       const data = await response.json();
-    // console.log('Profile Response: ', data);
+    // logger.log('Profile Response: ', data);
       return data;
     },
     enabled: !!user.id,
   });
   
   // const profile = profileData.data as ProfileData;
-  if (error) console.error(error)
+  if (error) logger.error(error)
   
   // Mutation to update profile
   const updateProfile = useMutation({
@@ -59,9 +60,9 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
       return data;
     },
     onSuccess: (data, updatedProfile, context) => {
-      console.debug('Updated profile:', data);
-      console.debug('Updated profile:', updatedProfile);
-      console.debug('Context: ', context);
+      logger.debug('Updated profile:', data);
+      logger.debug('Updated profile:', updatedProfile);
+      logger.debug('Context: ', context);
       queryClient.setQueryData(["members", "profile", user?.id], updatedProfile);
       toast.success("Profile updated successfully!");
     },
