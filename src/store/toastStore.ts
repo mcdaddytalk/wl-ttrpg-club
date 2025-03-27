@@ -7,6 +7,7 @@ import {
     StorageValue 
 } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
+import logger from '@/utils/logger';
 
 type ToastStore = {
     showToast: boolean;
@@ -27,7 +28,7 @@ const createCustomStorage = (): PersistStorage<ToastStore> => {
           const value = localStorage.getItem(name);
           return value ? JSON.parse(value) : null;
         } catch (error) {
-          console.error('Error accessing localStorage', error);
+          logger.error('Error accessing localStorage', error);
           return null;
         }
       },
@@ -37,7 +38,7 @@ const createCustomStorage = (): PersistStorage<ToastStore> => {
             localStorage.setItem(name, JSON.stringify(value));
           }
         } catch (error) {
-          console.error('Error setting localStorage', error);
+          logger.error('Error setting localStorage', error);
         }
       },
       removeItem: (name: string) => {
@@ -46,7 +47,7 @@ const createCustomStorage = (): PersistStorage<ToastStore> => {
             localStorage.removeItem(name);
           }
         } catch (error) {
-          console.error('Error removing localStorage item', error);
+          logger.error('Error removing localStorage item', error);
         }
       },
     };

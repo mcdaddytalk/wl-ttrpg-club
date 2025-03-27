@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { Resend } from 'resend';
 import { ContactUsEmail } from "@/components/EmailTemplate";
+import logger from "@/utils/logger";
+import { ENVS } from "@/utils/constants/envs";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(ENVS.RESEND_API_KEY);
 
 interface ContactData {
     name: string;
@@ -21,13 +23,13 @@ export async function POST(request: Request): Promise<NextResponse> {
         });
 
         if (error) {
-            console.error(error);
+            logger.error(error);
             return NextResponse.json({ error }, { status: 500 });
         }    
 
         return NextResponse.json({ status: 200 });
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         return NextResponse.json({ error }, { status: 500 });
     }
 }

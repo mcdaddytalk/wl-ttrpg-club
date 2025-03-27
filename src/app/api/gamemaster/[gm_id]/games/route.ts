@@ -25,10 +25,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         title, 
         description,
         system,
-        image, 
+        cover_image, 
         max_seats,
         visibility,
         starting_seats, 
+        gamemaster: members!fk_games_members (
+          id,
+          profiles (
+            given_name,
+            surname,
+            avatar
+          )
+        ),
         game_schedule(
           id,
           game_id,
@@ -46,7 +54,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
     .eq('gamemaster_id', gm_id) as unknown as SupabaseGMGameDataListResponse;
 
     if (gamesError) {
-      console.error(gamesError);
+      logger.error(gamesError);
       return NextResponse.json({ message: gamesError.message }, { status: 500 })
     }
 
@@ -81,7 +89,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
       .in('game_id', gameIds);
     
     if (registrationsError) {
-      console.error(registrationsError);
+      logger.error(registrationsError);
       return NextResponse.json({ message: registrationsError.message }, { status: 500 })
     }
 
@@ -91,7 +99,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
       .in('game_id', gameIds);
 
     if (invitesError) {
-      console.error(invitesError);
+      logger.error(invitesError);
       return NextResponse.json({ message: invitesError.message }, { status: 500 })
     }
 
@@ -123,6 +131,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
       title: game.title,
       description: game.description ?? '',
       system: game.system ?? '',
+      coverImage: game.cover_image ?? 'default',
+      gamemaster: game.gamemaster,
       scheduled_next: new Date(game.game_schedule[0]?.next_game_date),
       interval: game.game_schedule[0]?.interval,
       dow: game.game_schedule[0]?.day_of_week as DOW,
@@ -219,7 +229,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       .eq('id', id);
 
     if (error) {
-      console.error(error);
+      logger.error(error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -231,7 +241,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       .eq('game_id', id);
     
     if (gameScheduleError) {
-      console.error(gameScheduleError);
+      logger.error(gameScheduleError);
       return NextResponse.json({ error: gameScheduleError.message }, { status: 500 });
     }
 
@@ -282,7 +292,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
       .eq('id', id);
 
     if (error) {
-      console.error(error);
+      logger.error(error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
     const { error: gameScheduleError } = await supabase
@@ -299,7 +309,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
         .select('*');
     
     if (gameScheduleError) {
-        console.error(gameScheduleError);
+        logger.error(gameScheduleError);
         return NextResponse.json({ error: gameScheduleError.message }, { status: 500 });
     }
 
@@ -334,7 +344,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }).eq('id', id);
 
     if (error) {
-      console.error(error);
+      logger.error(error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
     
@@ -350,7 +360,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         .eq('game_id', id)
 
     if (gameScheduleError) {
-        console.error(gameScheduleError);
+        logger.error(gameScheduleError);
         return NextResponse.json({ error: gameScheduleError.message }, { status: 500 });
     }
 

@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
             {/* Fill empty rows to maintain table height */}
             {Array.from({ length: emptyRowsCount }).map((_, index) => (
                 <TableRow key={`empty-${index}`} className="bg-white">
-                {columns.map((column, colIndex) => (
+                {columns.map((_column, colIndex) => (
                     <TableCell key={`empty-cell-${colIndex}`}>
                     <Skeleton className="h-8 w-full" />
                     </TableCell>

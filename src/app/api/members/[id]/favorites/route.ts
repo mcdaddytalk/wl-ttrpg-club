@@ -1,4 +1,5 @@
 import { SupabaseGameFavoriteListResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Fa
         .eq('member_id', id) as unknown as SupabaseGameFavoriteListResponse;
 
     if (favoriteError) {
-        console.error(favoriteError)
+        logger.error(favoriteError)
         return NextResponse.json({ message: favoriteError.message }, { status: 500 });
     }
   
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<F
         .upsert({ game_id, member_id: id });
 
     if (favoriteError) {
-        console.error(favoriteError)
+        logger.error(favoriteError)
         return NextResponse.json({ message: favoriteError.message }, { status: 500 });
     }
 
@@ -61,7 +62,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         .eq('game_id', game_id);
 
     if (favoriteError) {
-        console.error(favoriteError)
+        logger.error(favoriteError)
         return NextResponse.json({ message: favoriteError.message }, { status: 500 });
     }
 

@@ -128,9 +128,9 @@ export const ContactForm = () => {
         if ( currentStep < steps.length - 1) {
             if (currentStep === steps.length - 2) {
                 // last step
-                //console.log('last step')
-                //console.log('Form Errors:  ', form.formState.errors)
-                //console.log('Form Values:  ', form.getValues())
+                //logger.log('last step')
+                //logger.log('Form Errors:  ', form.formState.errors)
+                //logger.log('Form Values:  ', form.getValues())
                 await form.handleSubmit(processForm)()
             }
             setPreviousStep(currentStep)

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { fetchMembersFull } from '@/queries/fetchMembers';
 import { useQueryClient } from '@/hooks/useQueryClient';
+import logger from '@/utils/logger';
 
 export default function BroadcastDetailsPage() {
   const { id } = useParams();
@@ -35,17 +36,17 @@ export default function BroadcastDetailsPage() {
       body: JSON.stringify({ messageId: id }),
     });
     const data = await res.json();
-    console.log(data);
+    logger.log(data);
   };
 
   const sendMessage = useMutation({
     mutationFn: async () => await sendMessageFn(),
     onSuccess: () => {
-      console.log('Message sent successfully');
+      logger.log('Message sent successfully');
       queryClient.invalidateQueries({ queryKey: ['broadcast', 'messages', id] });
     },
     onError: (error) => {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message:', error);
     },
   })
 

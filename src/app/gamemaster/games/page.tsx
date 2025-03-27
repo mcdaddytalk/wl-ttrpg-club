@@ -170,7 +170,7 @@ export default function GamemasterDashboard(): React.ReactElement {
   const playersMutation = useMutation({
     mutationFn: () => fetchPlayers(selectedGame?.id as string),
     onSuccess: () => {
-    // console.log('Players updated');
+    // logger.log('Players updated');
       // Invalidate the `players` query to refresh the data
       queryClient.invalidateQueries({ queryKey: ['players', user?.id, selectedGame?.id] });
     }

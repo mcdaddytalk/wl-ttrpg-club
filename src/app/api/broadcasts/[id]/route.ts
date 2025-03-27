@@ -1,4 +1,5 @@
 import { SupabaseBroadcastMessageResponse, SupabaseBroadcastRecipientListResponse  } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Br
         .single() as SupabaseBroadcastMessageResponse;
 
     if (messagesError) {
-        console.error(messagesError);
+        logger.error(messagesError);
         return NextResponse.json({ error: messagesError.message }, { status: 500 });
     }
 

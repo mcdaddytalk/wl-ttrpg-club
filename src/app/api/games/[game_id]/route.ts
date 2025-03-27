@@ -1,6 +1,7 @@
 import { GameData, GameFavorite, GameRegistration, SupabaseGameDataResponse } from "@/lib/types/custom";
 import { fetchFavorites } from "@/queries/fetchFavorites";
 import { fetchRegistrants } from "@/queries/fetchRegistrants";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
           title,
           description,
           system,
-          image,
+          cover_image,
           max_seats,
           starting_seats,
           visibility,
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
       .maybeSingle() as unknown as SupabaseGameDataResponse;
 
     if (gameError) {
-        console.error(gameError)
+        logger.error(gameError)
         return NextResponse.json({ message: gameError.message }, { status: 500 });
     }
 
@@ -95,7 +96,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         title: gameData.games.title,
         description: gameData.games.description,
         system: gameData.games.system,
-        image: gameData.games.image,
+        coverImage: gameData.games.cover_image,
         maxSeats: gameData.games.max_seats,
         currentSeats: seatCounts || 0,
         startingSeats: gameData.games.starting_seats,

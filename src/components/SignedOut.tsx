@@ -11,8 +11,8 @@ const SignedOut: React.FC<SignedOutProps> = ({children}) => {
   //const user: User | null = await getUser();
   const session = useSession();
   const user: User = (session?.user as User) ?? {};
-// console.log(`USER`, user);
-// console.log('SESSION', session);
+// logger.log(`USER`, user);
+// logger.log('SESSION', session);
   return (
     <div className="app-container">
         {session && user ? (

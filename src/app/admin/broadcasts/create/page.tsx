@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DeliveryMethod, MemberDO } from '@/lib/types/custom';
 import { SelectContent } from '@radix-ui/react-select';
 import useSession from '@/utils/supabase/use-session';
+import logger from '@/utils/logger';
 
 export default function CreateBroadcastPage() {
   const [subject, setSubject] = useState('');
@@ -33,7 +34,7 @@ export default function CreateBroadcastPage() {
             throw new Error('Failed to fetch members');
         }
         const data = await res.json();
-        console.log(data);
+        logger.log(data);
         setMembers(data)
     }
     fetchMembers();
@@ -57,7 +58,7 @@ export default function CreateBroadcastPage() {
     if (res.ok) {
       router.push('/admin/broadcasts');
     } else {
-      console.error('Failed to create broadcast');
+      logger.error('Failed to create broadcast');
     }
   };
 

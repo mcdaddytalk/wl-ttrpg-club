@@ -1,4 +1,5 @@
 import { sendPasswordResetEmail } from "@/server/authActions";
+import logger from "@/utils/logger";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         return NextResponse.json({ message: "Password reset email sent" }, { status: 200 });
     } catch (error) {
-        console.error("Error sending password reset email:", error);
+        logger.error("Error sending password reset email:", error);
         return NextResponse.json({ message: "Failed to send password reset email" }, { status: 500 });
     }
 }

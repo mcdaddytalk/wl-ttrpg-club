@@ -1,5 +1,6 @@
 import { SupabaseGameRegistrationListResponse } from "@/lib/types/custom";
 import { fetchGamesByUser } from "@/queries/fetchGames";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
     const { data: gameData, error: gameError } = await fetchGamesByUser(supabase, id) as unknown as SupabaseGameRegistrationListResponse;
 
     if (gameError) {
-        console.error(gameError)
+        logger.error(gameError)
         return NextResponse.json({ message: gameError.message }, { status: 500 });
     }
 

@@ -2,6 +2,9 @@ import { NextRequest , NextResponse} from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
 // import { createSupabaseReqResClient } from "./utils/supabase/server"
 import { getInitialSession } from "./server/authActions"
+import logger from "@/utils/logger"
+import { getClientIp, RATE_LIMIT } from "./utils/helpers"
+// import logger from "@/utils/logger"
 // import { RoleData, SupabaseRoleListResponse } from "./lib/types/custom";
 
 const protectedApiRoutes = [
@@ -17,6 +20,8 @@ const protectedApiRoutes = [
   '/api/roles',  
 ]
 
+const rateLimitMap = new Map<string, { count: number; lastRequest: number }>();
+
 export async function middleware(request: NextRequest) {
   await updateSession(request)
   const response = NextResponse.next({
@@ -28,24 +33,49 @@ export async function middleware(request: NextRequest) {
   const { session } = await getInitialSession();
 
   if (protectedApiRoutes.some((path) => request.nextUrl.pathname.startsWith(path))) {
-    const token = session?.access_token
-    if (token) {
-       response.headers.set('Authorization', `Bearer ${token}`)
-       return NextResponse.next()
+    const requestId = crypto.randomUUID();
+    const ip = getClientIp(request);
+    logger.debug(`[${requestId}] Incoming request from IP: ${ip}`);
+
+    // ✅ Rate Limiting
+    const rateLimitKey = `${ip}-${request.nextUrl.pathname}`;
+    const now = Date.now();
+    const rateData = rateLimitMap.get(rateLimitKey);
+
+    if (rateData && now - rateData.lastRequest < RATE_LIMIT.timeWindow) {
+      rateData.count += 1;
+      if (rateData.count > RATE_LIMIT.maxRequests) {
+        logger.warn(`[${requestId}] Rate limit exceeded for IP: ${ip}`);
+        return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+      }
     } else {
-       response.headers.set('Authorization', '')
-       return new NextResponse('unauthorized', { status: 401 })
+      rateLimitMap.set(rateLimitKey, { count: 1, lastRequest: now });
     }
+
+    const token = session?.access_token
+    // logger.debug('TOKEN', token)
+    if (!token) {
+      logger.error(`Unauthorized API request: ${request.nextUrl.pathname}`)
+      // logger.error(`Unauthorized API request: ${request.nextUrl.pathname}`)
+      response.headers.set('Authorization', '')
+      return new NextResponse('unauthorized', { status: 401 })
+    }
+    const headers = new Headers(request.headers)
+    headers.set("x-user-id", session.user.id);
+    headers.set("x-user-email", session.user.email ?? "");
+    headers.set('Authorization', `Bearer ${token}`);
+
+    return NextResponse.next({ headers })
   }
 
   const url = request.nextUrl;
   
   // const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleListResponse;
   // if (roleError) {
-  //   console.error('ROLE ERROR ', roleError)
+  //   logger.error('ROLE ERROR ', roleError)
   // }
   // if (!roleData) {
-  //   console.error('NO ROLE DATA ', roleData)
+  //   logger.error('NO ROLE DATA ', roleData)
   // }
   
   // const roles = roleData ? (roleData as RoleData[])?.map((role) => role.roles.name) : [];

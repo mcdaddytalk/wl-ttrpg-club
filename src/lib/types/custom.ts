@@ -263,6 +263,40 @@ export type RegisteredGame = {
   gm_member_id: string;
 }
 
+export type RegisteredGameDO = {
+  id: string;
+  title: string;
+  description: string;
+  system: string;
+  visibility: GameVisibility
+  coverImage: string;
+  scheduled_for: Date | null;
+  location: Location;
+  status: GameStatus;
+  interval: GameInterval;
+  dayOfWeek: DOW;
+  gamemasterId: string;
+  gm_given_name: string;
+  gm_surname: string;
+}
+
+export type UpcomingGame = {
+  id: string;
+  title: string;
+  description: string;
+  system: string;
+  coverImage: string;
+  scheduled_for: Date | null;
+  status: string;
+  num_players: number;
+  max_seats: number;
+  gm_name: string;
+  gm_member_id: string;
+  registered: boolean;
+  registration_status: GameRegStatus;
+  registration_date: Date | null;  
+}
+
 export type RegisteredCharacter = {
   id: string;
   name: string;
@@ -273,23 +307,6 @@ export type RegisteredCharacter = {
   game_id: string;
   gm_name: string;
   gm_member_id: string;
-}
-
-export type UpcomingGame = {
-  id: string;
-  title: string;
-  description: string;
-  system: string;
-  image: string;
-  scheduled_for: Date | null;
-  status: string;
-  num_players: number;
-  max_seats: number;
-  gm_name: string;
-  gm_member_id: string;
-  registered: boolean;
-  registration_status: GameRegStatus;
-  registration_date: Date | null;  
 }
 
 export type GameData = {
@@ -306,7 +323,7 @@ export type GameData = {
   title: string;
   description: string;
   system: string;
-  image: string;
+  coverImage: string;
   maxSeats: number;
   currentSeats: number;
   startingSeats: number;
@@ -339,7 +356,7 @@ export type SupaGameData = {
   title: string;
   description: string;
   system: string;
-  image: string;
+  cover_image: string;
   max_seats: number;
   visibility: GameVisibility;
   starting_seats: number;
@@ -357,11 +374,12 @@ export type SupaGMGameData = {
   title: string;
   description: string;
   system: string;
-  image: string;
+  cover_image: string;
   max_seats: number;
   starting_seats: number;
   visibility: GameVisibility;
   game_schedule: SupaGameScheduleData[];
+  gamemaster: MemberData;
 }
 export type SupabaseGMGameDataResponse = SupabaseDataResponseSingle<SupaGMGameData>
 export type SupabaseGMGameDataListResponse = SupabaseDataResponse<SupaGMGameData>
@@ -371,6 +389,7 @@ export type GMGameData = {
   title: string;
   description: string;
   system: string;
+  coverImage: string;
   scheduled_next: Date;
   interval: GameInterval;
   dow: DOW;
@@ -382,6 +401,7 @@ export type GMGameData = {
   invites: number;
   pending: number;
   registered: number;
+  gamemaster: MemberData;
   onShowDetails?: (game: GMGameData) => void;
   onEditGame?: (game: GMGameData) => void;
 }

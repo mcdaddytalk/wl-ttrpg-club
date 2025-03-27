@@ -1,4 +1,5 @@
 import { RoleDO } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .order('name', { ascending: true });
 
     if (rolesError) {
-        console.error(rolesError)
+        logger.error(rolesError)
         return NextResponse.json({ message: rolesError.message }, { status: 500 });
     }
 

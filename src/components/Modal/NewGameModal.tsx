@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from '@/components/ui/textarea';
 import { calculateNextGameDate, daysOfWeek, intervals } from '@/utils/helpers';
+import logger from '@/utils/logger';
 
 interface NewModalProps {
     isOpen: boolean;
@@ -80,7 +81,7 @@ export default function NewGameModal({
         onClose();
     } catch (err) {
       setError('Failed to add the game. Please try again.');
-      console.error(err);      
+      logger.error(err);      
     }
   };
 

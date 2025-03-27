@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { GameRegistration, Player, SupabaseGameRegistrationListResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 
 type RegistrantsParams = {
   game_id: string;
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Re
     .eq('game_id', game_id) as unknown as SupabaseGameRegistrationListResponse
 
   if (playerError) {
-    console.error('Error fetching players:', playerError);
+    logger.error('Error fetching players:', playerError);
     return NextResponse.json({ message: playerError.message }, { status: 500 });
   }
 
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<R
     })
   
   if (playerError) {
-    console.error('Error registering player:', playerError);
+    logger.error('Error registering player:', playerError);
     return NextResponse.json({ message: playerError.message }, { status: 500 });
   }
 
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<R
 
 
   if (messageError) {
-    console.error(messageError)
+    logger.error(messageError)
     return NextResponse.json({ message: messageError.message }, { status: 500 });
   }
 
@@ -135,7 +136,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     .eq('member_id', body.userId)
 
   if (playerError) {
-    console.error('Error kicking player:', playerError);
+    logger.error('Error kicking player:', playerError);
     return NextResponse.json({ message: playerError.message }, { status: 500 });  
   }
 
@@ -149,7 +150,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     })
 
   if (messageError) {
-    console.error(messageError)
+    logger.error(messageError)
     return NextResponse.json({ message: messageError.message }, { status: 500 });
   }
 
@@ -183,7 +184,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Re
     .eq('member_id', body.member_id)
 
   if (playerError) {
-    console.error('Error registering player:', playerError);
+    logger.error('Error registering player:', playerError);
     return NextResponse.json({ message: playerError.message }, { status: 500 });  
   }
 

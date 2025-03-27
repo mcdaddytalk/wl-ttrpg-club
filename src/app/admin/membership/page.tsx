@@ -9,7 +9,7 @@ export default async function AdminMembersDashboard() {
     //     await queryClient.prefetchQuery(fetchMembersFull());
     //     await queryClient.prefetchQuery(fetchRoles());
     // } catch (error) {
-    //     console.error('Error prefetching queries:', error);
+    //     logger.error('Error prefetching queries:', error);
     // }
     
     return (<HydrationBoundary state={dehydrate(queryClient)}>

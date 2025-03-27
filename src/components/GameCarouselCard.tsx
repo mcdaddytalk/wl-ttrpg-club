@@ -2,11 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { GameData } from "@/lib/types/custom";
-import { LuCalendar, LuUsers2 } from "react-icons/lu";
+import { LuCalendar, LuUsers } from "react-icons/lu";
 // import { TiStopwatch } from "react-icons/ti";
 import { MdOutlineEventRepeat } from "react-icons/md";
-import GameImage from "./GameImage";
+
 import { redirect } from "next/navigation";
+import GameImage from "@/components/GameImage";
 
 
 
@@ -36,7 +37,14 @@ const GameCarouselCard = ({ game, onToggleFavorite, className }: GameCarouselCar
                 className={`cursor-pointer border hover:shadow-lg transition p-2`}
                 >
                 <CardHeader className="p-0">
-                    <GameImage game={game} className="w-full h-auto" />
+                    <GameImage 
+                        src={game.coverImage} 
+                        alt={game.title}
+                        system={game.system} 
+                        width={400} 
+                        height={200} 
+                        className="w-full h-auto" 
+                    />
                     <div className="flex flex-row gap-2">
                             {/* Clickable Favorite Badge */}
                             <Badge
@@ -89,7 +97,7 @@ const GameCarouselCard = ({ game, onToggleFavorite, className }: GameCarouselCar
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {/* Icon and Text on the Same Line */}
-                                    <LuUsers2 />
+                                    <LuUsers />
                                     <span>{seatsAvailable(game)} Seats Filled</span>
                                 </div>
                             </div>

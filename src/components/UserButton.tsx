@@ -10,9 +10,10 @@ import { User } from '@supabase/supabase-js';
 import { useQuery } from '@tanstack/react-query';
 import { MessageData, MessageDO } from '@/lib/types/custom';
 import { fetchMessages } from '@/queries/fetchMessages';
-import useSupabaseBrowserClient from '@/utils/supabase/client';
+import createSupabaseBrowserClient from '@/utils/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
+import logger from '@/utils/logger';
 
 interface UserButtonProps {
   user: User;
@@ -21,14 +22,14 @@ interface UserButtonProps {
 const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const supabase = useSupabaseBrowserClient();
+  const supabase = createSupabaseBrowserClient();
   const router = useRouter();
   
   const menuLinks = [
-    { href: '/games', label: 'Games', roles: ['member'] },
+    { href: '/member', label: 'Member Panel', roles: ['member'] },    
     { href: '/gamemaster', label: 'Gamemaster Panel', roles: ['gamemaster'] },
     { href: '/admin', label: 'Admin Panel', roles: ['admin'] },
-    { href: '/member', label: 'Account', roles: ['member'] },    
+    { href: '/games', label: 'Games', roles: ['member'] },    
   ];
 
   
@@ -50,9 +51,9 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
     }).catch((error) => {
       toast.error(`Logout failed - ${error.message}`);
     }).finally(() => {
-      // console.log('Logout successful');
+      // logger.log('Logout successful');
       setDropdownOpen(false);
-      // console.log('Refresh page...');
+      // logger.log('Refresh page...');
       router.refresh();
     })
   };
@@ -82,7 +83,7 @@ const UserButton = ({ user }: UserButtonProps): React.ReactElement => {
   });
 
   if (messagesHasError) {
-    console.error(messagesError);
+    logger.error(messagesError);
   }
 
   

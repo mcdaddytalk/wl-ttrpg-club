@@ -36,7 +36,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
                 title,
                 description,
                 system,
-                image,
+                cover_image,
                 max_seats,
                 gamemaster_id,
                 gamemaster:members!fk_games_members (
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         .gt('next_game_date', new Date().toISOString()) as unknown as SupabaseGameDataListResponse;
         
     if (gameError) {
-        console.error(gameError)
+        logger.error(gameError)
         return NextResponse.json({ message: gameError.message }, { status: 500 });
     }
 
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
                     title: game.games.title,
                     description: game.games.description,
                     system: game.games.system,
-                    image: game.games.image,
+                    coverImage: game.games.cover_image,
                     scheduled_for: new Date(game.next_game_date) || null,
                     status: game.status,
                     num_players: gameRegistrants.filter((gameRegistrant) => gameRegistrant.game_id === game.game_id).length,

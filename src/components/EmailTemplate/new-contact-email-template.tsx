@@ -15,8 +15,10 @@ interface EmailTemplateProps {
     availability: string;
     agreeToRules: boolean;
   }
+
+  export type { EmailTemplateProps };
   
-  export const NewContactEmail: React.FC<Readonly<EmailTemplateProps>> = ({
+  export const NewContactEmail: React.FC<EmailTemplateProps> = ({
     firstName,
     surname,
     email,

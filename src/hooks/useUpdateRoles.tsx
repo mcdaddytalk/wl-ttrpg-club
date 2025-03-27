@@ -1,9 +1,10 @@
-import useSupabaseBrowserClient from '@/utils/supabase/client';
+import createSupabaseBrowserClient from '@/utils/supabase/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import logger from '@/utils/logger';
 
 export const useUpdateRoles = () => {
   const queryClient = useQueryClient();
-  const supabase = useSupabaseBrowserClient();
+  const supabase = createSupabaseBrowserClient();
 
   return useMutation({
     mutationFn: async ({
@@ -44,7 +45,7 @@ export const useUpdateRoles = () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'members', 'full'] });
     },
     onError: (error) => {
-      console.error('Error updating roles:', error);
+      logger.error('Error updating roles:', error);
     },
   });
 };

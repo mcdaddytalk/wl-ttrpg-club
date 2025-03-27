@@ -2,12 +2,13 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import useSupabaseBrowserClient from "@/utils/supabase/client";
+import createSupabaseBrowserClient from "@/utils/supabase/client";
 import { toast } from "sonner";
+import logger from '@/utils/logger';
 
 
 const Logout = () => {
-    const supabase = useSupabaseBrowserClient();
+    const supabase = createSupabaseBrowserClient();
     const router = useRouter();
 
   useEffect(() => {
@@ -15,7 +16,7 @@ const Logout = () => {
       try {
         await supabase.auth.signOut();
       } catch (error) {
-        console.error("Could not sign out", error);
+        logger.error("Could not sign out", error);
         toast.error("Could not sign out");
       } finally {
         router.replace("/");

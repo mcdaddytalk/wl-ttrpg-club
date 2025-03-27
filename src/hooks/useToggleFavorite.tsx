@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "./useQueryClient";
+import logger from '@/utils/logger';
 
 interface ToggleFavoriteVariables {
   userId: string;
@@ -54,7 +55,7 @@ export const useToggleFavorite = () => {
             queryClient.invalidateQueries({ queryKey: ['games', userId, gameId] });
         },
         onError: (error) => {
-            console.error('Error toggling favorite:', error);
+            logger.error('Error toggling favorite:', error);
         }
     })
 }

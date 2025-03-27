@@ -1,7 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import useSupabaseBrowserClient from '@/utils/supabase/client'
+import createSupabaseBrowserClient from '@/utils/supabase/client'
 import Image from 'next/image'
+import logger from '@/utils/logger';
 
 interface AvatarProps {
   uid: string | null
@@ -16,7 +17,7 @@ export default function Avatar({
   size,
   onUpload,
 }: AvatarProps) {
-  const supabase = useSupabaseBrowserClient()
+  const supabase = createSupabaseBrowserClient()
   const [avatarUrl, setAvatarUrl] = useState<string | null>(url)
   const [uploading, setUploading] = useState(false)
 
@@ -33,8 +34,8 @@ export default function Avatar({
         }
         setAvatarUrl(url)
       } catch (error) {
-        console.error('Error downloading image: ')
-        console.error(error)
+        logger.error('Error downloading image: ')
+        logger.error(error)
       }
     }
 
@@ -61,7 +62,7 @@ export default function Avatar({
 
       onUpload(filePath)
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         alert('Error uploading avatar!')      
     } finally {
       setUploading(false)
