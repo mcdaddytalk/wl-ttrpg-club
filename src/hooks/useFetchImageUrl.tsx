@@ -1,4 +1,6 @@
 import { useMutation } from "@tanstack/react-query"
+import logger from '@/utils/logger';
+import createSupabaseBrowserClient from "@/utils/supabase/client";
 
 async function fetchImageUrl(imageStr: string, system?: string): Promise<string> {
     if (!imageStr || imageStr === "default") {
@@ -18,10 +20,17 @@ async function fetchImageUrl(imageStr: string, system?: string): Promise<string>
   
     try {
         if (imageStr.startsWith("http")) return imageStr;
-        const response = await fetch(`/api/image/${imageStr}`);
-        return response.url;
+        // eslint-ignore-next-line   react-hooks/rules-of-hooks
+        const supabase = createSupabaseBrowserClient();
+        const { data } = supabase.storage
+          .from("game-covers").getPublicUrl(imageStr);
+
+        if (!data.publicUrl) {
+            return "/images/defaults/default_game.webp";
+        }
+        return data.publicUrl;
     } catch (error) {
-        console.error("Error fetching image:", error);
+        logger.error("Error fetching image:", error);
         return "/images/defaults/default_game.webp";
     }
 }
@@ -33,7 +42,7 @@ export const useFetchImageUrl = () => {
             return await fetchImageUrl(imageStr, system);
         },
         onError: (error: Error) => {
-            console.error('Error fetching image:', error);
+            logger.error('Error fetching image:', error);
         }
     })
 }

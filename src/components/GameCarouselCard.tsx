@@ -5,8 +5,9 @@ import { GameData } from "@/lib/types/custom";
 import { LuCalendar, LuUsers2 } from "react-icons/lu";
 // import { TiStopwatch } from "react-icons/ti";
 import { MdOutlineEventRepeat } from "react-icons/md";
-import GameImage from "./GameImage";
+
 import { redirect } from "next/navigation";
+import GameImage from "@/components/GameImage";
 
 
 
@@ -36,7 +37,14 @@ const GameCarouselCard = ({ game, onToggleFavorite, className }: GameCarouselCar
                 className={`cursor-pointer border hover:shadow-lg transition p-2`}
                 >
                 <CardHeader className="p-0">
-                    <GameImage game={game} className="w-full h-auto" />
+                    <GameImage 
+                        src={game.coverImage} 
+                        alt={game.title}
+                        system={game.system} 
+                        width={400} 
+                        height={200} 
+                        className="w-full h-auto" 
+                    />
                     <div className="flex flex-row gap-2">
                             {/* Clickable Favorite Badge */}
                             <Badge

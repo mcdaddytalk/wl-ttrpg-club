@@ -42,7 +42,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
           title,
           description,
           system,
-          image,
+          cover_image,
           max_seats,
           starting_seats,
           visibility,
@@ -78,7 +78,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
     }) ?? [];
 
     if (favoritesError) {
-        console.error(favoritesError)
+        logger.error(favoritesError)
         return NextResponse.json({ message: favoritesError.message }, { status: 500 });
     }
 
@@ -125,7 +125,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         title: gameSchedule.games.title,
         description: gameSchedule.games.description,
         system: gameSchedule.games.system,
-        image: gameSchedule.games.image,
+        coverImage: gameSchedule.games.cover_image,
         maxSeats: gameSchedule.games.max_seats,
         visibility: gameSchedule.games.visibility,
         startingSeats: gameSchedule.games.starting_seats,

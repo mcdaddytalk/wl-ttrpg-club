@@ -1,6 +1,7 @@
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { ENVS } from "@/utils/constants/envs"
 
 type GameParams = {
     game_id: string
@@ -15,7 +16,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
     const { game_id } = await params;
 
     const body = await request.json();
-    console.log(body)
+    logger.log(body)
     const { game_title, updated_by: old_gamemaster_id, updated_by_name, gamemaster_id: new_gamemaster_id } = body;
 
     if (!game_id || !game_title || !old_gamemaster_id || !new_gamemaster_id) {
@@ -40,7 +41,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<Ga
     logger.debug(`Game ${game_title} with id ${game_id} transfered to ${new_gamemaster_id} from ${old_gamemaster_id}`);
 
     let message = `Game '${game_title}' was transfered to you by ${updated_by_name}\n\n`;
-    message += `Game Link: ${process.env.NEXT_PUBLIC_BASE_URL}/games/${game_id}\n\n`;
+    message += `Game Link: ${ENVS.NEXT_PUBLIC_SITE_URL}/games/${game_id}\n\n`;
     message += `If this was done in error, please send a message to the originating gamemaster or contact an admin`;
 
     const { error: messageError } = await supabase

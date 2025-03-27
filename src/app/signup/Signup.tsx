@@ -23,6 +23,7 @@ import { Provider } from "@/lib/types/custom";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SelectItem } from "@radix-ui/react-select";
 import { Checkbox } from "@/components/ui/checkbox";
+import logger from '@/utils/logger';
 
 // Regular expression for password and phone validation
 const passwordValidation = new RegExp(
@@ -133,7 +134,7 @@ export default function Signup() {
             } else {
                 const { error } = signUpData;
                 toast.error(error.message);
-                console.error(error.message);
+                logger.error(error.message);
             }
         } else {
             if (inviteId) {
@@ -144,7 +145,7 @@ export default function Signup() {
             }
         }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -156,7 +157,7 @@ export default function Signup() {
     try {
       await signInWithProvider(provider);      
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       if (error instanceof Error) toast.error(error.message);
     } finally {
       setLoading(false);

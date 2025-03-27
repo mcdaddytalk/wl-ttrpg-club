@@ -1,43 +1,55 @@
 "use client"
 
-import { useFetchImageUrl } from "@/hooks/useFetchImageUrl";
-import { GameData } from "@/lib/types/custom";
+import { useEffect } from "react";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import { useFetchImageUrl } from "@/hooks/useFetchImageUrl";
 
 type GameImageProps = {
-    game: GameData;
-    size?: number;
+    src: string | null;
+    system?: string;
+    alt: string;
+    width?: number;
+    height?: number;
     className?: string;
+    onClick?: (e: React.MouseEvent<HTMLImageElement>) => void;
 }
 
-const GameImage = ({ game, size, className }: GameImageProps): React.ReactElement => {
+const GameImage: React.FC<GameImageProps> = ({ 
+    src, 
+    system, 
+    alt, 
+    width = 400, 
+    height = 400,
+    className, 
+    onClick 
+}) => {
     const fetchImageUrlMutation = useFetchImageUrl();
     const { mutate: fetchImageUrl } = fetchImageUrlMutation;
-  
+
     // Fetch the image URL when the game data is available
     useEffect(() => {
-      if (game.image) {
-        fetchImageUrl({ imageStr: game.image, system: game.system });
-      }
-    }, [fetchImageUrl, game.image, game.system]);
-  
+        if (src && system) {
+            fetchImageUrl({ imageStr: src, system });
+          }
+    }, [fetchImageUrl, src, system]);
+      
     const imageUrl =
-      fetchImageUrlMutation.isSuccess && fetchImageUrlMutation.data
-        ? fetchImageUrlMutation.data
-        : "/images/defaults/default_game.webp"; // Fallback image
-  
+        fetchImageUrlMutation.isSuccess && fetchImageUrlMutation.data
+            ? fetchImageUrlMutation.data
+            : "/images/defaults/default_game.webp"; // Fallback image
+
     return (
-      <Image
-        src={imageUrl}
-        alt={game.title}
-        width={size ?? 0}
-        height={size ?? 0}
-        priority
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className={`object-cover ${className}`}
-      />
+        <Image
+            src={imageUrl}
+            alt={alt}
+            width={width}
+            height={height}
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className={`object-cover ${className}`}
+            onClick={onClick}
+        />
     );
-  };
-  
-  export default GameImage;
+}
+
+export default GameImage

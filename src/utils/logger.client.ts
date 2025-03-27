@@ -1,3 +1,6 @@
+import * as Sentry from '@sentry/nextjs';
+import { ENVS } from '@/utils/constants/envs';
+
 export interface ConsoleLogger {
     error: (...msg: unknown[]) => void;
     info: (...msg: unknown[]) => void;
@@ -10,10 +13,15 @@ type Level = 'ERROR' | 'INFO' | 'WARN' | 'DEBUG' | 'LOG';
 
 const log = (level: Level, ...messages: unknown[]) => {
     const timestamp = new Date().toISOString();
+    const formattedPrefix = `[${timestamp}] [${level}] `;
+
     if (level === 'ERROR') {
-        console.error(`[${timestamp}] [${level}] `, ...messages);
-    } else {
-        console.log(`[${timestamp}] [${level}] `, ...messages);
+        console.error(formattedPrefix, ...messages);
+        // Capture errors in Sentry
+        Sentry.captureException(messages.length === 1 ? messages[0] : messages);
+    } else if (level !== "DEBUG" || ENVS.DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log(formattedPrefix, ...messages);
     }
 }
 

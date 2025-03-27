@@ -1,4 +1,5 @@
 import { SupabaseMessageResponse, type MessageDO } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         .maybeSingle() as unknown as SupabaseMessageResponse;
 
     if (messageError) {
-        console.error(messageError)
+        logger.error(messageError)
         return NextResponse.json({ message: messageError.message }, { status: 500 });
     }
 
@@ -87,7 +88,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         .eq('id', id);
 
     if (messageError) {
-        console.error(messageError)
+        logger.error(messageError)
         return NextResponse.json({ message: messageError.message }, { status: 500 });
     }
 
@@ -115,7 +116,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         .select().single();
 
     if (messageError) {
-        console.error(messageError)
+        logger.error(messageError)
         return NextResponse.json({ message: messageError.message }, { status: 500 });
     }
 

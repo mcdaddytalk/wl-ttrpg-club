@@ -1,4 +1,6 @@
 import { MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
+import { ENVS } from "@/utils/constants/envs";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .order("created_at", { ascending: false }) as unknown as SupabaseMemberListResponse;
 
     if (membersError) {
-        console.error('Error fetching members:', membersError)
+        logger.error('Error fetching members:', membersError)
         return NextResponse.json({ error: membersError.message }, { status: 500 });
     }
 
@@ -78,10 +80,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             displayName: `${given_name} ${surname}`,
             is_minor
         },
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`
+        redirectTo: `${ENVS.NEXT_PUBLIC_SITE_URL}/login`
     });
     if (error) {
-        console.error('Error sending email invite:',   error)
+        logger.error('Error sending email invite:',   error)
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 

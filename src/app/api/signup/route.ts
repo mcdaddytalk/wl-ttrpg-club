@@ -1,6 +1,7 @@
 // app/api/signup/route.ts
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
+import logger from '@/utils/logger';
 
 const calculateIsMinor = (birthday: string): boolean => {
   const birthDate = new Date(birthday);
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Email is already in use' }, { status: 409 });
   }
 
-  console.debug(`No existing user, creating user for ${email}...`)
+  logger.debug(`No existing user, creating user for ${email}...`)
 
   const isMinor = calculateIsMinor(birthday);
   // Create user in Supabase auth
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
   });
 
   if (authError) {
-    console.error(authError)
+    logger.error(authError)
     return NextResponse.json({ error: 'Error creating user' }, { status: 500 });
   }
 
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
     });
 
     if (memberError) {
-      console.error(memberError)
+      logger.error(memberError)
       return NextResponse.json({ error: 'Error adding member' }, { status: 500 });
     }
 
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
     });
 
     if (profileError) {
-      console.error(profileError)
+      logger.error(profileError)
       return NextResponse.json({ error: 'Error creating profile' }, { status: 500 });
     }
   }
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
       })
       .eq('id', inviteId);
     if (inviteError) {
-      console.error(inviteError)
+      logger.error(inviteError)
       // return NextResponse.json({ error: 'Error deleting invite' }, { status: 500 });
     }
   }

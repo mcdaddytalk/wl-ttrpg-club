@@ -25,7 +25,29 @@ export const mockScheduledGames: GMGameData[] = [
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         },
-        invites: 0
+        invites: 0,
+        coverImage: "",
+        gamemaster: {
+            id: "a27d1c04-df26-4c87-8c2a-8045cf4b6335",
+            email: "gamemaster@kaje.org",
+            phone: "1-000-000-0000",
+            provider: "discord",
+            is_admin: false,
+            is_minor: false,
+            created_at: new Date(),
+            updated_at: new Date(),
+            profiles: {
+                id: "6c29c9a8-74e4-4927-85ec-bfc7890259f0",
+                given_name: "Game",
+                surname: "Master",
+                birthday: null,
+                phone: "1-000-000-0000",
+                bio: null,
+                avatar: null,
+                experience_level: "forever-gm"
+            },
+            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+        }
     },
     {
         "id": "fa87bec6-bb03-46f4-899d-b5674634395f",
@@ -51,7 +73,29 @@ export const mockScheduledGames: GMGameData[] = [
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         },
-        invites: 0
+        invites: 0,
+        coverImage: "",
+        gamemaster: {
+            id: "a27d1c04-df26-4c87-8c2a-8045cf4b6335",
+            email: "gamemaster@kaje.org",
+            phone: "1-000-000-0000",
+            provider: "discord",
+            is_admin: false,
+            is_minor: false,
+            created_at: new Date(),
+            updated_at: new Date(),
+            profiles: {
+                id: "6c29c9a8-74e4-4927-85ec-bfc7890259f0",
+                given_name: "Game",
+                surname: "Master",
+                birthday: null,
+                phone: "1-000-000-0000",
+                bio: null,
+                avatar: null,
+                experience_level: "forever-gm"
+            },
+            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+        }
     },
     {
         "id": "3bd8219f-c1e3-4cab-ba25-fc4803a77dcc",
@@ -77,7 +121,29 @@ export const mockScheduledGames: GMGameData[] = [
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         },
-        invites: 0
+        invites: 0,
+        coverImage: "",
+        gamemaster: {
+            id: "a27d1c04-df26-4c87-8c2a-8045cf4b6335",
+            email: "gamemaster@kaje.org",
+            phone: "1-000-000-0000",
+            provider: "discord",
+            is_admin: false,
+            is_minor: false,
+            created_at: new Date(),
+            updated_at: new Date(),
+            profiles: {
+                id: "6c29c9a8-74e4-4927-85ec-bfc7890259f0",
+                given_name: "Game",
+                surname: "Master",
+                birthday: null,
+                phone: "1-000-000-0000",
+                bio: null,
+                avatar: null,
+                experience_level: "forever-gm"
+            },
+            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+        }
     },
     {
         "id": "83e2f7f4-5b5d-4b6b-8a0e-4f1b2c3d4e5f",
@@ -103,7 +169,29 @@ export const mockScheduledGames: GMGameData[] = [
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         },
-        invites: 0
+        invites: 0,
+        coverImage: "",
+        gamemaster: {
+            id: "a27d1c04-df26-4c87-8c2a-8045cf4b6335",
+            email: "gamemaster@kaje.org",
+            phone: "1-000-000-0000",
+            provider: "discord",
+            is_admin: false,
+            is_minor: false,
+            created_at: new Date(),
+            updated_at: new Date(),
+            profiles: {
+                id: "6c29c9a8-74e4-4927-85ec-bfc7890259f0",
+                given_name: "Game",
+                surname: "Master",
+                birthday: null,
+                phone: "1-000-000-0000",
+                bio: null,
+                avatar: null,
+                experience_level: "forever-gm"
+            },
+            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+        }
     },
     {
         "id": "2d6eb983-9c3a-416f-a01b-23a0a47bef04",
@@ -129,7 +217,29 @@ export const mockScheduledGames: GMGameData[] = [
             "updated_at": new Date("2024-11-30T20:20:42.481248"),
             "created_by": "5d6eb983-9c3a-416f-a01b-23a0a47bef04"
         },
-        invites: 0
+        invites: 0,
+        coverImage: "",
+        gamemaster: {
+            id: "a27d1c04-df26-4c87-8c2a-8045cf4b6335",
+            email: "gamemaster@kaje.org",
+            phone: "1-000-000-0000",
+            provider: "discord",
+            is_admin: false,
+            is_minor: false,
+            created_at: new Date(),
+            updated_at: new Date(),
+            profiles: {
+                id: "6c29c9a8-74e4-4927-85ec-bfc7890259f0",
+                given_name: "Game",
+                surname: "Master",
+                birthday: null,
+                phone: "1-000-000-0000",
+                bio: null,
+                avatar: null,
+                experience_level: "forever-gm"
+            },
+            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+        }
     }
 ];
 

@@ -5,7 +5,8 @@ import { useMemo } from 'react';
 
 let client: TypedSupabaseClient | undefined;
 
-function useSupabaseBrowserClient() {
+function createSupabaseBrowserClient() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMemo(getSupabaseBrowserClient, []);
 }
 
@@ -18,11 +19,11 @@ function getSupabaseBrowserClient() {
   }
   return client;
 }
-// export function useSupabaseBrowserClient() {
+// export function createSupabaseBrowserClient() {
 //   return createBrowserClient(
-//     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-//     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+//     ENVS.NEXT_PUBLIC_SUPABASE_URL!,
+//     ENVS.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 //   )
 // }
 
-export default useSupabaseBrowserClient;
+export default createSupabaseBrowserClient;

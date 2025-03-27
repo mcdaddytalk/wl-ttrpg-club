@@ -1,8 +1,10 @@
 import { Resend } from 'resend';
 import twilio from 'twilio';
+import logger from './logger';
+import { ENVS } from "@/utils/constants/envs"
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const resend = new Resend(ENVS.RESEND_API_KEY);
+const twilioClient = twilio(ENVS.TWILIO_ACCOUNT_SID, ENVS.TWILIO_AUTH_TOKEN);
 
 /**
  * Send an email using Resend.
@@ -18,7 +20,7 @@ type EmailParams = {
 }
 export const sendEmail = async ({ to, subject, body }: EmailParams) => {
   try {
-    console.log(`Sending email to ${to} with subject ${subject} and body ${body}`)
+    logger.log(`Sending email to ${to} with subject ${subject} and body ${body}`)
     const response = await resend.emails.send({
     // from: 'WL-TTRPG <onboarding@kaje.org>',
       from: 'WL-TTRPG Announcements <wl-ttrpg-announcements@kaje.org>',
@@ -29,10 +31,10 @@ export const sendEmail = async ({ to, subject, body }: EmailParams) => {
     if (response.error) {
         throw Error(response.error.message);
     }
-    console.log('Email sent successfully:', response);
+    logger.log('Email sent successfully:', response);
     return response;
   } catch (error) {
-    console.error('Error sending email:', error);
+    logger.error('Error sending email:', error);
     throw new Error('Failed to send email.');
   }
 };
@@ -49,7 +51,7 @@ type SMSParams = {
 }
 export const sendSMS = async ({ to, body }: SMSParams) => {
   try {
-    const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
+    const messagingServiceSid = ENVS.TWILIO_MESSAGING_SERVICE_SID;
     const response = await twilioClient.messages.create({
       messagingServiceSid,
       body,
@@ -58,10 +60,10 @@ export const sendSMS = async ({ to, body }: SMSParams) => {
     if (response.status == 'failed' || response.status == 'undelivered') {
       throw Error(response.errorMessage);
     }
-    console.log('SMS sent successfully:', response);
+    logger.log('SMS sent successfully:', response);
     return response;
   } catch (error) {
-    console.error('Error sending SMS:', error);
+    logger.error('Error sending SMS:', error);
     throw new Error('Failed to send SMS.');
   }
 };

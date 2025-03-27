@@ -1,4 +1,5 @@
 import { MessageDO, SupabaseMessageListResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')
     const method = searchParams.get('method')
-    console.debug('GET /api/messages', { userId, method })
+    logger.debug('GET /api/messages', { userId, method })
 
     if (!userId) {
         return NextResponse.json({ message: `User ID is required` }, { status: 403 })
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                 .order('created_at', { ascending: false }) as unknown as SupabaseMessageListResponse;
 
             if (messagesError) {
-                console.error(messagesError)
+                logger.error(messagesError)
                 return NextResponse.json({ message: messagesError.message }, { status: 500 });
             }           
             messagesData = data.map((message) => {
@@ -117,7 +118,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                 .order('created_at', { ascending: false }) as unknown as SupabaseMessageListResponse;
 
             if (messagesError) {
-                console.error(messagesError)
+                logger.error(messagesError)
                 return NextResponse.json({ message: messagesError.message }, { status: 500 });
             }           
             messagesData = data.map((message) => {
@@ -180,7 +181,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                 .order('created_at', { ascending: false }) as unknown as SupabaseMessageListResponse;
 
             if (messagesError) {
-                console.error(messagesError)
+                logger.error(messagesError)
                 return NextResponse.json({ message: messagesError.message }, { status: 500 });
             }
             messagesData = data.map((message) => {
@@ -222,7 +223,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json();
-  // console.log(body)
+  // logger.log(body)
     
     const { sender, recipient, subject, content } = body;
 
@@ -238,7 +239,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         })
     
     if (messageError) {
-        console.error(messageError)
+        logger.error(messageError)
         return NextResponse.json({ message: messageError.message }, { status: 500 });
     }
 

@@ -285,7 +285,7 @@ export type UpcomingGame = {
   title: string;
   description: string;
   system: string;
-  image: string;
+  coverImage: string;
   scheduled_for: Date | null;
   status: string;
   num_players: number;
@@ -323,7 +323,7 @@ export type GameData = {
   title: string;
   description: string;
   system: string;
-  image: string;
+  coverImage: string;
   maxSeats: number;
   currentSeats: number;
   startingSeats: number;
@@ -356,7 +356,7 @@ export type SupaGameData = {
   title: string;
   description: string;
   system: string;
-  image: string;
+  cover_image: string;
   max_seats: number;
   visibility: GameVisibility;
   starting_seats: number;
@@ -374,11 +374,12 @@ export type SupaGMGameData = {
   title: string;
   description: string;
   system: string;
-  image: string;
+  cover_image: string;
   max_seats: number;
   starting_seats: number;
   visibility: GameVisibility;
   game_schedule: SupaGameScheduleData[];
+  gamemaster: MemberData;
 }
 export type SupabaseGMGameDataResponse = SupabaseDataResponseSingle<SupaGMGameData>
 export type SupabaseGMGameDataListResponse = SupabaseDataResponse<SupaGMGameData>
@@ -388,6 +389,7 @@ export type GMGameData = {
   title: string;
   description: string;
   system: string;
+  coverImage: string;
   scheduled_next: Date;
   interval: GameInterval;
   dow: DOW;
@@ -399,6 +401,7 @@ export type GMGameData = {
   invites: number;
   pending: number;
   registered: number;
+  gamemaster: MemberData;
   onShowDetails?: (game: GMGameData) => void;
   onEditGame?: (game: GMGameData) => void;
 }

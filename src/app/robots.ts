@@ -1,3 +1,4 @@
+import { ENVS } from "@/utils/constants/envs";
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: "/",
             disallow: "/private/",
         },
-        sitemap: `${process.env.NEXT_PUBLIC_SITE_URL}/sitemap.xml`,
+        sitemap: `${ENVS.NEXT_PUBLIC_SITE_URL}/sitemap.xml`,
     };
 }

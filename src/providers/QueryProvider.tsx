@@ -4,6 +4,7 @@ import React from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useQueryClient } from "@/hooks/useQueryClient";
+import { ENVS } from "@/utils/constants/envs"
 
 export default function QueryProviderWrapper({ children }: { children: React.ReactNode }) {
     const queryClient = useQueryClient();
@@ -11,7 +12,7 @@ export default function QueryProviderWrapper({ children }: { children: React.Rea
     return (
         <QueryClientProvider client={queryClient}>
             {children}
-            {process.env.NODE_ENV === "development" && <ReactQueryDevtools initialIsOpen={false} />}
+            {ENVS.IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}
         </QueryClientProvider>
     )
 }

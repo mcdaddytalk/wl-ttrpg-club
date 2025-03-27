@@ -426,13 +426,12 @@ export type Database = {
       }
       games: {
         Row: {
-          cover_image: string | null
+          cover_image: string
           created_at: string | null
           deleted_at: string | null
           description: string | null
           gamemaster_id: string | null
           id: string
-          image: string
           max_seats: number | null
           starting_seats: number | null
           system: string | null
@@ -442,13 +441,12 @@ export type Database = {
           visibility: string | null
         }
         Insert: {
-          cover_image?: string | null
+          cover_image?: string
           created_at?: string | null
           deleted_at?: string | null
           description?: string | null
           gamemaster_id?: string | null
           id?: string
-          image?: string
           max_seats?: number | null
           starting_seats?: number | null
           system?: string | null
@@ -458,13 +456,12 @@ export type Database = {
           visibility?: string | null
         }
         Update: {
-          cover_image?: string | null
+          cover_image?: string
           created_at?: string | null
           deleted_at?: string | null
           description?: string | null
           gamemaster_id?: string | null
           id?: string
-          image?: string
           max_seats?: number | null
           starting_seats?: number | null
           system?: string | null

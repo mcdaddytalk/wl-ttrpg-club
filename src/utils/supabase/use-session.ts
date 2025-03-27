@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import useSupabaseBrowserClient from "./client";
+import createSupabaseBrowserClient from "./client";
 import { useRouter } from 'next/navigation';
 import { Session } from "@supabase/supabase-js";
 import { jwtDecode, JwtPayload } from 'jwt-decode'
@@ -9,7 +9,7 @@ import { getUser } from "@/server/authActions";
 
 export default function useSession() {
   const router = useRouter();
-  const supabase = useSupabaseBrowserClient();
+  const supabase = createSupabaseBrowserClient();
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function useSession() {
 
     type JwtPayloadWithRoles = JwtPayload & { roles: string[] };
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, updatedSession) => {
-      // console.log('Event Triggered', event, updatedSession);
+      // logger.log('Event Triggered', event, updatedSession);
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
         if (updatedSession) {
           const jwt: JwtPayloadWithRoles = jwtDecode(updatedSession?.access_token);
@@ -42,7 +42,7 @@ export default function useSession() {
           setSession(updatedSession);
         }
       } else if (event === 'SIGNED_OUT') {
-        // console.log('Signed out Event Triggered');
+        // logger.log('Signed out Event Triggered');
         setSession(null);
         router.push('/'); // Or '/login'
       }

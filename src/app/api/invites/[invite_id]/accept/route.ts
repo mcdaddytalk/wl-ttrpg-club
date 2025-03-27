@@ -48,19 +48,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
     return NextResponse.json({ message: 'Invite has expired' }, { status: 400 });
   }
 
-  console.log('Invite accepted:', inviteData);
-  console.log('UserID:  ', user.id);
+  logger.log('Invite accepted:', inviteData);
+  logger.log('UserID:  ', user.id);
 
   // If this was an external invite, link it to the new member
   if (inviteData.external_email || inviteData.external_phone) {
-    console.log('Linking invite to user id from email: ', inviteData.external_email);
+    logger.log('Linking invite to user id from email: ', inviteData.external_email);
     const { data: linkData, error: linkError } = await supabase
       .from("game_invites")
       .update({ invitee: user.id, external_email: null, external_phone: null })
       .eq("id", invite_id)
       .select("*").single(); // Debugging
 
-    console.log("Updated Invite Rows:", linkData);
+    logger.log("Updated Invite Rows:", linkData);
 
     if (linkError) {
       logger.error(linkError);
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
     .eq("id", invite_id)
     .select("*").single();
 
-  console.log("Updated Acceptance in Invite Rows:", acceptData);
+  logger.log("Updated Acceptance in Invite Rows:", acceptData);
 
   if (acceptError) {
     logger.error(acceptError);

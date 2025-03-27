@@ -80,7 +80,7 @@ export default function GamesDashboard(): React.ReactElement {
     
   useEffect(() => {
     if (!!games && !!favorites) {
-    // console.log('Enhancing games...');
+    // logger.log('Enhancing games...');
       setEnhancedGames(games.map((game) => ({
         ...game,
         favorite: favorites.some((favorite) => favorite.game_id === game.game_id) || false,

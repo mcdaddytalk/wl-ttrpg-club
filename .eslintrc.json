@@ -11,6 +11,15 @@
     "sourceType": "module"
   },
   "rules": {
+    "no-console": [
+      "warn",
+      { "allow": ["debug", "warn", "error"] }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "vars": "all", "args": "all", "ignoreRestSiblings": true, "argsIgnorePattern": "^_" }
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-expressions": [
       "error",
       { "allowShortCircuit": true, "allowTernary": true }

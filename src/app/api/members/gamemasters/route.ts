@@ -1,5 +1,6 @@
 // import { ContactListDO } from "@/lib/types/custom";
 import { MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
         // ;
 
     if (gamemasterError) {
-        console.error(gamemasterError)
+        logger.error(gamemasterError)
         return NextResponse.json({ message: gamemasterError.message }, { status: 500 });
     }
 
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
     }));
 
     gamemasterList.sort((a, b) => a.surname.localeCompare(b.surname));
-  // console.log('Contact list:', gamemasterList);
+  // logger.log('Contact list:', gamemasterList);
 
     return NextResponse.json(gamemasterList, { status: 200 });
   }

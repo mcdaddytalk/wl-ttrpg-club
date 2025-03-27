@@ -47,8 +47,8 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
     
     const { mutate: markMessageAsRead } = useMutation({
         mutationFn: async (messageId: string) => {
-          // console.log('Marking message as read:', messageId);
-          // console.log('SelectedMessage:  ', selectedMessage);
+          // logger.log('Marking message as read:', messageId);
+          // logger.log('SelectedMessage:  ', selectedMessage);
             const response = await fetch(`/api/messages/${messageId}`, {
                 method: 'PATCH',
                 headers: {
@@ -64,12 +64,12 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
             return response.json();
         },
         onSuccess: (data) => {
-            console.debug('Message marked as read:', data);
+            logger.debug('Message marked as read:', data);
             queryClient.invalidateQueries({ queryKey: ['messages', 'unread', user?.id] });
             queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
         },
         onError: () => {
-            console.error('Error marking message as read');
+            logger.error('Error marking message as read');
         },
     })
     
@@ -87,7 +87,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
             queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
         },
         onError: () => {
-            console.error('Error archiving message');
+            logger.error('Error archiving message');
         },
     })
     
@@ -156,7 +156,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
     // };
     
     if (messagesError || membersError) {
-        console.error(messagesError);
+        logger.error(messagesError);
     }
 
     if (messagesLoading || membersLoading) {

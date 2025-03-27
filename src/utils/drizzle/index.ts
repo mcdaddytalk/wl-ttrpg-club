@@ -1,7 +1,8 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import { ENVS } from "@/utils/constants/envs"
 
-const connectionString = process.env.SUPABASE_DB_URL // Use your Supabase database URL
+const connectionString = ENVS.SUPABASE_DB_URL // Use your Supabase database URL
 
 if (!connectionString) {
     throw new Error('Missing environment variable: SUPABASE_DB_URL');

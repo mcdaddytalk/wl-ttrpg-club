@@ -1,4 +1,5 @@
 import { MemberDO, SupabaseMemberResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         .single() as unknown as SupabaseMemberResponse;
 
     if (memberError) {
-        console.error(memberError)
+        logger.error(memberError)
         return NextResponse.json({ message: memberError.message }, { status: 500 });
     }
     

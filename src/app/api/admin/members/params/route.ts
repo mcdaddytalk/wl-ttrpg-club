@@ -35,7 +35,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         .order("created_at", { ascending: false }) as unknown as SupabaseMemberListResponse;
 
     if (membersError) {
-        console.error('Error fetching members:', membersError)
+        logger.error('Error fetching members:', membersError)
         return NextResponse.json({ error: membersError.message }, { status: 500 });
     }
 
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data: membersData, error, count } = await query;
     
     if (error) {
-        console.error('Error fetching members with params:',   error)
+        logger.error('Error fetching members with params:',   error)
         return NextResponse.json({ error }, { status: 500 });
     }
 

@@ -1,5 +1,6 @@
 
 import { removeUser } from "@/server/authActions";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -30,7 +31,7 @@ if (request.method !== 'POST') {
  
     return NextResponse.json({ message: `Member removed` }, { status: 200 })  
   } catch (error) {
-    console.error('Error removing member:', error);
+    logger.error('Error removing member:', error);
     return NextResponse.json({ message: (error as Error).message }, { status: 500 });
   }
 }

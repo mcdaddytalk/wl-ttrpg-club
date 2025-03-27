@@ -1,4 +1,5 @@
 import { SupabaseProfileResponse } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pr
         .single() as unknown as SupabaseProfileResponse;
 
     if (profileError) {
-        console.error(profileError)
+        logger.error(profileError)
         return NextResponse.json({ message: profileError.message }, { status: 500 });
     }
     

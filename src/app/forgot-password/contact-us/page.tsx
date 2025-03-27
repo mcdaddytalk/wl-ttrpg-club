@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import React from "react"
 import { toast } from "sonner"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import logger from '@/utils/logger';
 
 const ContactFormSchema = z.object({
     name: z.string().min(2, {
@@ -55,7 +56,7 @@ export default function ContactUs(): React.ReactElement {
                 toast.error(error);
             }
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             toast.error("Failed to send message. Please try again.");
         }
     }

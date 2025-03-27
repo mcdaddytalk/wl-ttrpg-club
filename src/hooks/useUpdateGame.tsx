@@ -1,6 +1,7 @@
 import { DOW, GameInterval, GameStatus } from "@/lib/types/custom";
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "./useQueryClient";
+import logger from '@/utils/logger';
 
 export const useUpdateGame = () => {
     const queryClient = useQueryClient();
@@ -59,7 +60,7 @@ export const useUpdateGame = () => {
                 queryClient.invalidateQueries({ queryKey: ["games", gm_id, "gm", "full"] });
         },
         onError: (error) => {
-            console.error(error);
+            logger.error(error);
         }
     });
 };

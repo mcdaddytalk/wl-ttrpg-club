@@ -1,3 +1,4 @@
+import logger from '@/utils/logger';
 import * as React from 'react';
 
 interface InfiniteScrollProps {
@@ -28,7 +29,7 @@ export default function InfiniteScroll({
     (element: HTMLElement | null) => {
       let safeThreshold = threshold;
       if (threshold < 0 || threshold > 1) {
-        console.warn(
+        logger.warn(
           'threshold should be between 0 and 1. You are exceed the range. will use default value: 1',
         );
         safeThreshold = 1;
@@ -61,8 +62,6 @@ export default function InfiniteScroll({
     <>
       {flattenChildren.map((child, index) => {
         if (!React.isValidElement(child)) {
-          //process.env.NODE_ENV === 'development' &&
-          //  console.warn('You should use a valid element with InfiniteScroll');
           return child;
         }
 

@@ -1,4 +1,5 @@
 import { GameStatus, GameVisibility, Location, RegisteredGameDO } from "@/lib/types/custom";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -28,7 +29,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
     let query = supabase
         .from("game_registrations")    
         .select(`
-            game_id, 
+            game_id,
+            status, 
             games(
                 id, 
                 title, 
@@ -36,7 +38,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
                 system, 
                 cover_image, 
                 gamemaster_id,
-                gamemaster: members (
+                gamemaster: members!fk_games_members (
                     id,
                     profiles(
                         given_name,
@@ -44,14 +46,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
                     )
                 ),
                 visibility, 
-                game_schedule(
-                    id, 
+                game_schedule!fk_game_schedule_games(
+                    game_id, 
                     first_game_date, 
                     next_game_date, 
                     interval, 
                     day_of_week, 
                     status,
-                    location (
+                    locations (
                         id,
                         name,
                         address,
@@ -66,14 +68,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
 
     if (startDate && endDate) {
         query = query
-            .gte("games.game_schedule.first_game_date", startDate)
-            .lte("games.game_schedule.first_game_date", endDate);
+            .gte("games.game_schedule.next_game_date",  startDate)
+            .lte("games.game_schedule.next_game_date", endDate)
+            .not("games.game_schedule", "is", null);
     }
 
     const { data: gamesData, error: gamesError } = await query;
 
     if (gamesError) {
-        console.error(gamesError)
+        logger.error(gamesError)
         return NextResponse.json({ message: gamesError.message }, { status: 500 });
     }
 
@@ -81,7 +84,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         return NextResponse.json({ message: 'No games found' }, { status: 404 });
     }
 
-    const myGames: RegisteredGameDO[] = gamesData.map((gr) => ({
+    // logger.info(gamesData[0].games)
+
+    const myGames: RegisteredGameDO[] = gamesData.filter((gr) => gr.games !== null).map((gr) => ({
         id: gr.games.id,
         title: gr.games.title,
         description: gr.games.description ?? '',
@@ -92,7 +97,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
             ? new Date(gr.games.game_schedule[0].next_game_date)
             : new Date(),
         status: (gr.games.game_schedule[0].status ?? '') as GameStatus,
-        location: (gr.games.game_schedule[0].location ?? { id: '', name: '', address: '', url: '', type: ''}) as unknown as Location,
+        location: (gr.games.game_schedule[0].locations ?? { id: '', name: '', address: '', url: '', type: ''}) as unknown as Location,
         gamemasterId: gr.games.gamemaster_id ?? '',
         interval: gr.games.game_schedule[0].interval,
         dayOfWeek: gr.games.game_schedule[0].day_of_week ?? 'sunday',

@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { GameData, MessageUserDO } from "@/lib/types/custom";
 import { toast } from "sonner";
-import GameImage from "@/components/GameImage";
 import { MdOutlineEventRepeat } from "react-icons/md";
 import { LuCalendar, LuUsers2 } from "react-icons/lu";
 import { SiStatuspal } from "react-icons/si";
@@ -19,6 +18,7 @@ import { EmailOptions } from "@/lib/types/social-share";
 import EmailShareIcon from "@/components/EmailShareIcon";
 import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
 import GameLocation from "@/components/GameLocation";
+import GameImage from "@/components/GameImage";
 
 const enhanceStatus = (game: GameData) => {
     const { status, currentSeats, startingSeats } = game;
@@ -117,7 +117,14 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
         ?
         <div className="flex flex-col lg:gap-4 p-4 lg:grid lg:grid-cols-3 lg:auto-rows-auto">
             <div id="game-image" className="flex justify-center items-center mb-4 lg:mb-0 lg:col-span-3">
-                    <GameImage game={game} size={256} className="rounded-md shadow w-full lg:max-w-none" />
+                    <GameImage 
+                        src={game.coverImage}
+                        alt={game.title}
+                        system={game.system}
+                        width={256}
+                        height={256} 
+                        className="rounded-md shadow w-full lg:max-w-none" 
+                    />
             </div>
             {/* <div id="game-info"className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-4 p-4 border border-green-500"> */}
                 <div id="game-title" 
