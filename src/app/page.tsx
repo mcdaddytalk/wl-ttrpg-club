@@ -1,21 +1,13 @@
 //import Image from "next/image";
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { PublicAnnouncementsWidget } from "@/components/widgets/PublicAnnouncementsWidget"
 
 export default function Home() {
   return (
     <>
+      <PublicAnnouncementsWidget />
       <section className="relative flex flex-col"> 
-        {/* Gradient background */}
-        {/*}
-        <div
-          aria-hidden="true"
-          className="flex absolute -top-96 start-1/2 transform -translate-x-1/2"
-        >
-          <div className="bg-gradient-to-r from-background/50 to-background blur-3xl w-[25rem] h-[44rem] rotate-[-60deg] transform -translate-x-[10rem]" />
-          <div className="bg-gradient-to-tl blur-3xl w-[90rem] h-[50rem] rounded-full origin-top-left -rotate-12 -translate-x-[15rem] from-primary-foreground via-primary-foreground to-background" />
-        </div>
-        */}
         <div className="bg-slate-200 dark:bg-slate-700 opacity-50 max-w-4xl mt-4">
           <div className="pt-4 pl-4 opacity-100">
             <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl text-slate-900 dark:text-white">Western Loudoun</h1>
@@ -55,20 +47,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/*
-      <section className="bg-white dark:bg-slate-600">
-        <p className="text-center font-bold text-xl pt-5">
-          Disclaimer
-        </p>
-        <p className="text-center font-light p-2">
-          This is a demo app.  Please do not use this in a production environment.
-        </p>
-        <p className="text-center font-light p-2">
-          This video is made for informational and educational purposes only.  
-          The Copyright Disclaimer under section 107 of the Copyright Act 1976, allowance is made for “fair use” for purposes such as criticism, comment, news reporting, teaching, scholarship, education and training.
-        </p>
-      </section>
-      */}
     </>
   )
 }

@@ -48,14 +48,14 @@ export default function Sidebar(): React.ReactElement {
                         )}
                     >
                         {isCollapsed ? (
-                            <Tooltip delayDuration={0}>
-                                <TooltipTrigger asChild>
-                                    <span>{item.icon}</span>
-                                </TooltipTrigger>
-                                <TooltipContent side="right">{item.label}</TooltipContent>
-                            </Tooltip>
+                                <Tooltip delayDuration={0}>
+                                    <TooltipTrigger asChild>
+                                        <span>{item.icon}</span>
+                                    </TooltipTrigger>
+                                    <TooltipContent sideOffset={5} side="right">{item.label}</TooltipContent>
+                                </Tooltip>
                             ) : ( 
-                                <span className="mr-4">{item.label}</span>
+                                <span className="mr-4">{item.icon} {item.label}</span>
                             )}
                     </Link>
                 ))}

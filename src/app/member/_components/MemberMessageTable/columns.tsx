@@ -5,6 +5,7 @@ import { MessageDO } from "@/lib/types/custom";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Archive, MailOpen, Mail, Reply, Forward  } from "lucide-react";
+import { DateCell, LinkCell, TextUppercaseCell } from "@/components/DataTable/data-table-cell-helpers";
 
 export const columns: ColumnDef<MessageDO>[] = [
     {
@@ -40,8 +41,29 @@ export const columns: ColumnDef<MessageDO>[] = [
     },
     {
         accessorKey: "created_at",
-        header: "Time",
+        header: "Received At",
+        cell: ({ row }) => {
+            const { created_at} = row.original;
+            return (
+                <DateCell
+                    date={created_at}
+                    label="Received At"
+                />
+            );
+        }
     },
+    { 
+        accessorKey: "category",
+        header: "Category",
+        cell: ({ row }) => {
+            const { category } = row.original;
+            return (
+                <TextUppercaseCell
+                    value={category}
+                />
+            );
+        }
+    },  
     {
         accessorKey: "subject",
         header: "Subject",
@@ -49,6 +71,29 @@ export const columns: ColumnDef<MessageDO>[] = [
     {
         accessorKey: "content",
         header: "Message",
+    },
+    {
+        accessorKey: "link_url",
+        header: "Associated Link",
+        cell: ({ row }) => {
+            const { link_url } = row.original;
+            if (!link_url) {
+                return null;
+            }
+            if (link_url.startsWith("http")) {
+                return (
+                    <LinkCell
+                        href={link_url}
+                        external={true}
+                    />
+                );
+            }
+            return (
+                <LinkCell
+                    href={link_url}
+                />
+            );
+        }
     },
     {
         accessorKey: "id",

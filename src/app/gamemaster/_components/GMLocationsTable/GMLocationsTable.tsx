@@ -64,7 +64,7 @@ const LocationsTable = ({ className, locations, gamemaster }: LocationsTableProp
     
     const filterFields: DataTableFilterField<GMLocationDO>[] = [];
     const pageSize = 5;
-    const pageCount = (Math.ceil(locations.length / pageSize));
+    const pageCount = Math.ceil((locations?.length || 0) / pageSize);
 
     const { table } = useDataTable<GMLocationDO>({
         data: locations || [],

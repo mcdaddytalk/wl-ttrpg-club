@@ -76,7 +76,7 @@ export default function GMInvitesCard({invites, gamemasterId, onInviteAdded, onI
     }
     
     const pageSize = 5;
-    const pageCount = Math.ceil(invites.length / pageSize);
+    const pageCount = Math.ceil((invites?.length || 0) / pageSize);
     const filterFields: DataTableFilterField<InviteData>[] = [];
     
     const { table } = useDataTable({

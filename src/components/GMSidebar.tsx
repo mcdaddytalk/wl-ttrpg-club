@@ -15,7 +15,7 @@ const navItems = [
 
 export default function GMSidebar(): React.ReactElement {
     const { isCollapsed, toggleCollapse } = useGMSidebarStore()
-    const pathname = usePathname();
+    const pathName = usePathname();
 
     return (
         <div
@@ -37,27 +37,27 @@ export default function GMSidebar(): React.ReactElement {
 
             {/* Navigation */}
             <nav id="sidebar-nav" className="flex-1 overflow-y-auto">
-                <ul className="p-2">
-                    {navItems.map((item) => (
-                        <Tooltip key={item.href}>
-                            <TooltipTrigger asChild>
-                                <li className="my-2">
-                                    <Link
-                                        href={item.href}
-                                        className={cn(
-                                            'flex items-center rounded-md p-2 text-sm font-medium hover:bg-slate-700',
-                                            item.href === pathname ? 'bg-slate-700' : ''
-                                        )}
-                                    >
-                                        <span className="mr-2">{item.icon}</span>
-                                        <span>{item.label}</span>
-                                    </Link>
-                                </li>
-                            </TooltipTrigger>
-                            <TooltipContent>{item.label}</TooltipContent>
-                        </Tooltip>
-                    ))}
-                </ul>
+                {navItems.map((item) => (
+                    <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                            'group flex items-center rounded-md px-3 py-2 text-sm font-medium leading-6 text-slate-400 hover:text-white',
+                            pathName === item.href ? 'bg-slate-900 text-white' : 'text-slate-400 hover:bg-slate-700 hover:text-white'
+                        )}
+                    >
+                        {isCollapsed ? (
+                                <Tooltip delayDuration={0}>
+                                    <TooltipTrigger asChild>
+                                        <span>{item.icon}</span>
+                                    </TooltipTrigger>
+                                    <TooltipContent sideOffset={5} side="right">{item.label}</TooltipContent>
+                                </Tooltip>
+                            ) : ( 
+                                <span className="mr-4">{item.icon} {item.label}</span>
+                            )}
+                    </Link>
+                ))}
             </nav>
         </div>
     )

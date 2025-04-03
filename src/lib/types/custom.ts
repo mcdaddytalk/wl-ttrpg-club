@@ -51,6 +51,8 @@ export type DeliveryStatus = 'pending' | 'sent' | 'failed';
 export type DeliveryMethod = 'email' | 'sms' | 'both';
 export type LocationScope = 'admin' | 'gm' | 'disabled';
 export type GameVisibility = 'public' | 'private';
+export type Audience = 'public' | 'members' | 'gamemasters' | 'admins';
+export type MessageCategory = 'admin' | 'announcement' |'general' | 'gm' | 'invite' | 'support';
 
 /* DO Types */
 export type ContactListDO = {
@@ -61,6 +63,23 @@ export type ContactListDO = {
 
 export type AdminLocationDO = Location & {
   authorized_gamemasters: ContactListDO[];
+}
+
+export type AnnouncementDO = {
+  id: string;
+  title: string;
+  body: string;
+  audience: Audience;
+  pinned: boolean;
+  published: boolean;
+  notify_on_publish: boolean;
+  published_at: string | null;
+  expires_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  author_id: string;
+  approved_by: string | null;
 }
 
 export type GMLocationDO = Location & {
@@ -103,17 +122,9 @@ export type MessageUserDO = {
   given_name: string;
   surname: string;
 }
-export type MessageDO = {
-  id: string;
-  sender_id: string;
+export type MessageDO = Omit<MessageData, "sender" | "recipient"> & {
   sender: MessageUserDO;
-  recipient_id: string;
   recipient: MessageUserDO;
-  content: string;
-  subject: string;
-  is_read: boolean;
-  is_archived: boolean;
-  created_at: string;
   onDelete?: (id: string) => void;
   onArchive?: (id: string) => void;
   onMarkRead?: (id: string) => void;
@@ -144,6 +155,33 @@ type SupabaseDataResponseSingle<T> = {
 }
 
 /* Supabase Query Responses */
+
+export interface Announcement {
+  id: string;
+  title: string;
+  body: string;
+  audience: Audience;
+  pinned: boolean;
+  published: boolean;
+  notify_on_publish: boolean;
+  published_at: string | null;
+  expires_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  author_id: string;
+  approved_by: string | null;
+}
+
+export interface AnnouncementRead {
+  announcement_id: string;
+  member_id: string;
+  read_at: string;
+}
+
+export type SupabaseAnnouncementListResponse = SupabaseDataResponse<Announcement>
+export type SupabaseAnnouncementResponse = SupabaseDataResponseSingle<Announcement>
+
 export type ContactListData = {
   id: string;
   member_roles?: RoleData[];
@@ -190,6 +228,15 @@ export type MemberData = {
 export type SupabaseMemberResponse = SupabaseDataResponseSingle<MemberData>
 export type SupabaseMemberListResponse = SupabaseDataResponse<MemberData>
 
+export interface CreateMessage {
+  sender_id: string;
+  recipient_id: string;
+  subject: string;
+  content: string;
+  category: MessageCategory;
+  link_url: string;
+}
+
 export type MessageData = {
   id: string;
   sender_id: string;
@@ -198,6 +245,8 @@ export type MessageData = {
   recipient: MemberData;
   content: string;
   subject: string;
+  category: MessageCategory;
+  link_url: string;
   is_read: boolean;
   is_archived: boolean;
   created_at: string;

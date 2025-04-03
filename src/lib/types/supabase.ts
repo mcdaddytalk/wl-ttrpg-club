@@ -9,6 +9,126 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      announcement_reads: {
+        Row: {
+          announcement_id: string
+          member_id: string
+          read_at: string | null
+        }
+        Insert: {
+          announcement_id: string
+          member_id: string
+          read_at?: string | null
+        }
+        Update: {
+          announcement_id?: string
+          member_id?: string
+          read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_reads_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_reads_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "announcement_reads_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      announcements: {
+        Row: {
+          approved_by: string | null
+          audience: string
+          author_id: string | null
+          body: string
+          created_at: string | null
+          deleted_at: string | null
+          expires_at: string | null
+          id: string
+          notify_on_publish: boolean | null
+          pinned: boolean | null
+          published: boolean | null
+          published_at: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved_by?: string | null
+          audience: string
+          author_id?: string | null
+          body: string
+          created_at?: string | null
+          deleted_at?: string | null
+          expires_at?: string | null
+          id?: string
+          notify_on_publish?: boolean | null
+          pinned?: boolean | null
+          published?: boolean | null
+          published_at?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved_by?: string | null
+          audience?: string
+          author_id?: string | null
+          body?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          expires_at?: string | null
+          id?: string
+          notify_on_publish?: boolean | null
+          pinned?: boolean | null
+          published?: boolean | null
+          published_at?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcements_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "announcements_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcements_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "announcements_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       broadcast_messages: {
         Row: {
           created_at: string | null
@@ -665,37 +785,40 @@ export type Database = {
       }
       messages: {
         Row: {
+          category: string | null
           content: string
           created_at: string
           deleted_at: string | null
           id: string
           is_archived: boolean
           is_read: boolean
-          message_type: string | null
+          link_url: string | null
           recipient_id: string
           sender_id: string
           subject: string | null
         }
         Insert: {
+          category?: string | null
           content: string
           created_at?: string
           deleted_at?: string | null
           id?: string
           is_archived?: boolean
           is_read?: boolean
-          message_type?: string | null
+          link_url?: string | null
           recipient_id: string
           sender_id: string
           subject?: string | null
         }
         Update: {
+          category?: string | null
           content?: string
           created_at?: string
           deleted_at?: string | null
           id?: string
           is_archived?: boolean
           is_read?: boolean
-          message_type?: string | null
+          link_url?: string | null
           recipient_id?: string
           sender_id?: string
           subject?: string | null
@@ -857,6 +980,15 @@ export type Database = {
           event: Json
         }
         Returns: Json
+      }
+      get_announcement_recipients: {
+        Args: {
+          audience: string
+        }
+        Returns: {
+          id: string
+          consent: boolean
+        }[]
       }
       transfer_game_ownership: {
         Args: {

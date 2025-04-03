@@ -137,7 +137,7 @@ const LocationsTable = ({ className }: LocationsTableProps): React.ReactElement 
     
     const filterFields: DataTableFilterField<AdminLocationDO>[] = [];
     const pageSize = 5;
-    const pageCount = (Math.ceil(locations?.length || 0 / pageSize));
+    const pageCount = Math.ceil((locations?.length || 0) / pageSize);
 
     const { table } = useDataTable<AdminLocationDO>({
         data: locations || [],

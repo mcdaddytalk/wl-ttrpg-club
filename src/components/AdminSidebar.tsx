@@ -8,9 +8,11 @@ import { useAdminSidebarStore } from "@/store/adminSidebarStore"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 const navItems = [
+    { href: "/admin", label: "Dashboard", icon: '📊' },
     { href: "/admin/membership", label: "My Members", icon: '👤' },
     { href: "/admin/locations", label: "Locations", icon: '📍' },
-    { href: "/admin/broadcasts", label: "Broadcasts", icon: '📫' }
+    { href: "/admin/broadcasts", label: "Broadcasts", icon: '📫' },
+    { href: "/admin/announcements", label: "Announcements", icon: '📣' }
 ]
 
 export default function AdminSidebar(): React.ReactElement {
@@ -54,7 +56,7 @@ export default function AdminSidebar(): React.ReactElement {
                                     <TooltipContent sideOffset={5} side="right">{item.label}</TooltipContent>
                                 </Tooltip>
                             ) : ( 
-                                <span className="mr-4">{item.label}</span>
+                                <span className="mr-4">{item.icon} {item.label}</span>
                             )}
                     </Link>
                 ))}

@@ -7,20 +7,30 @@ const flags = {
     IS_TEST: process.env.NODE_ENV === "test"
 } as const;
 
-const createEnvs = (
-    parsed: MergedSafeParseReturn,
-): Record<Exclude<ServerEnvsKeys, 'DEBUG'>, string> & {
+type EnvShape = Omit<ServerEnvs, 'DEBUG' | 'NEXT_PUBLIC_DEBUG'> & {
     DEBUG: boolean;
-} & typeof flags => {
-    if (parsed.success === false) {
+    NEXT_PUBLIC_DEBUG: boolean;
+  } & typeof flags;
+
+// const createEnvs = (
+//     parsed: MergedSafeParseReturn,
+// ): Record<Exclude<ServerEnvsKeys, 'DEBUG'>, string> & {
+//     DEBUG: boolean;
+// } & typeof flags => {
+const createEnvs = (parsed: MergedSafeParseReturn): EnvShape => {    
+    if (!parsed.success) {
         const message = 'Invalid environment variables';
         console.error(`${message}: `, parsed.error.flatten().fieldErrors);
         throw new Error(message)
     }
 
-    const extendedEnvs = {
-        ...parsed.data,
-        ...flags
+    const { DEBUG, NEXT_PUBLIC_DEBUG, ...rest } = parsed.data;
+
+    const extendedEnvs: EnvShape = {
+        ...rest,
+        ...flags,
+        DEBUG: isServer() ? DEBUG : NEXT_PUBLIC_DEBUG,
+        NEXT_PUBLIC_DEBUG
     }
 
     const ENVS = new Proxy(extendedEnvs, {
@@ -31,7 +41,7 @@ const createEnvs = (
                 return Reflect.get(target, prop)
             }
 
-            if (!isServer() && !prop.startsWith('NEXT_PUBLIC_')) {
+            if (!isServer() && !prop.startsWith('NEXT_PUBLIC_') && prop !== 'DEBUG') {
                 const errorMessage = 'Not allowed to access server-side environment variables outside server';
                 throw new Error(
                     process.env.NODE_ENV === 'production'
@@ -46,7 +56,9 @@ const createEnvs = (
     return ENVS
 }
 
-const clientSchema = z.object({})
+const clientSchema = z.object({
+    NEXT_PUBLIC_DEBUG: z.string().optional().default('false').transform((val) => val.toLowerCase() === 'true'),
+})
 
 // Client-side env vars are also available on the server
 const serverSchema = z.object({
@@ -90,7 +102,6 @@ const parseEnvs = (
 }
 
 const processEnv: PROCESS_ENV = {
-    DEBUG: process.env.DEBUG,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -107,6 +118,8 @@ const processEnv: PROCESS_ENV = {
     TWILIO_MESSAGING_SERVICE_SID: process.env.TWILIO_MESSAGING_SERVICE_SID,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+    DEBUG: process.env.DEBUG,
+    NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG
 }
 
 const ENVS = createEnvs(parseEnvs(processEnv, clientSchema, serverSchema))
