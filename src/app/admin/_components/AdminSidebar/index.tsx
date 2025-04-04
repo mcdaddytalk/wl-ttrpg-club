@@ -12,7 +12,9 @@ const navItems = [
     { href: "/admin/membership", label: "My Members", icon: '👤' },
     { href: "/admin/locations", label: "Locations", icon: '📍' },
     { href: "/admin/broadcasts", label: "Broadcasts", icon: '📫' },
-    { href: "/admin/announcements", label: "Announcements", icon: '📣' }
+    { href: "/admin/announcements", label: "Announcements", icon: '📣' },
+    { href: "/admin/tasks", label: "Tasks", icon: '📝' },
+    { href: "/admin/tags", label: "Tags", icon: '🏷️' },
 ]
 
 export default function AdminSidebar(): React.ReactElement {

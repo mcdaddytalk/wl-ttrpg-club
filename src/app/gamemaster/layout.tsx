@@ -1,5 +1,5 @@
 import React from 'react';
-import GMSidebar from '@/components/GMSidebar';
+import GMSidebar from './_components/GMSidebar';
 
 export default function GMLayout({ children }: { children: React.ReactNode }) {
     return (

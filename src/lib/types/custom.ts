@@ -53,7 +53,10 @@ export type LocationScope = 'admin' | 'gm' | 'disabled';
 export type GameVisibility = 'public' | 'private';
 export type Audience = 'public' | 'members' | 'gamemasters' | 'admins';
 export type MessageCategory = 'admin' | 'announcement' |'general' | 'gm' | 'invite' | 'support';
-
+export const TASK_STATUSES = ['pending', 'in_progress', 'complete', 'archived'] as const;
+export type TaskStatus = (typeof TASK_STATUSES)[number];
+export const TASK_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
+export type TaskPriority = (typeof TASK_PRIORITIES)[number];
 /* DO Types */
 export type ContactListDO = {
   id: string;
@@ -328,6 +331,52 @@ export type RegisteredGameDO = {
   gm_given_name: string;
   gm_surname: string;
 }
+
+export type TagData = { 
+  id: string; 
+  name: string, 
+  admin_task_tags: AdminTaskTagData[]
+}
+export type SupabaseTagListResponse = SupabaseDataResponse<TagData>
+export type SupabaseTagResponse = SupabaseDataResponseSingle<TagData> 
+
+export type TagDO = Omit<TagData, "admin_task_tags"> & {
+  task_count: number;
+}
+
+export interface TaskData {
+  id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  priority: TaskPriority;
+  due_date: string | null; // ISO date string
+  created_by: string;
+  assigned_to: string | null;
+  assigned_to_user: MemberData | null;
+  admin_task_tags: AdminTaskTagData[]; // array of tag(tag_id),
+  tags: TagData[]; // array of tag(name)
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+export type AdminTaskTagData = { 
+  task_id: string;
+  tag_id: string;
+  count?: number  
+}
+
+export type TaskDO = Omit<TaskData, "assigned_to" | "assigned_to_user" | "created_at" | "updated_at" | "deleted_at"> & {
+  assigned_to: {
+    id: string | null;
+    given_name: string | null;
+    surname: string | null;
+    displayName: string | null;
+  }
+}
+export type SupabaseTaskListResponse = SupabaseDataResponse<TaskData>
+export type SupabaseTaskResponse = SupabaseDataResponseSingle<TaskData>
 
 export type UpcomingGame = {
   id: string;

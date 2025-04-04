@@ -9,6 +9,155 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_notes: {
+        Row: {
+          author_id: string
+          created_at: string
+          edited_at: string | null
+          id: string
+          member_id: string
+          note: string
+        }
+        Insert: {
+          author_id: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          member_id: string
+          note: string
+        }
+        Update: {
+          author_id?: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          member_id?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_admin_notes_member"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "fk_admin_notes_member"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_task_tags: {
+        Row: {
+          created_at: string | null
+          tag_id: string
+          task_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          tag_id: string
+          task_id: string
+        }
+        Update: {
+          created_at?: string | null
+          tag_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_task_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_task_tags_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "admin_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_tasks: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: Database["public"]["Enums"]["task_priority"]
+          status: Database["public"]["Enums"]["task_status"]
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["task_priority"]
+          status?: Database["public"]["Enums"]["task_status"]
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["task_priority"]
+          status?: Database["public"]["Enums"]["task_status"]
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "admin_tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "admin_tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       announcement_reads: {
         Row: {
           announcement_id: string
@@ -751,9 +900,12 @@ export type Database = {
           id: string
           is_admin: boolean
           is_minor: boolean
+          last_login_at: string | null
           phone: string | null
           provider: string
+          status: Database["public"]["Enums"]["member_status"]
           updated_at: string | null
+          updated_by: string | null
         }
         Insert: {
           consent?: boolean
@@ -764,9 +916,12 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_minor?: boolean
+          last_login_at?: string | null
           phone?: string | null
           provider: string
+          status?: Database["public"]["Enums"]["member_status"]
           updated_at?: string | null
+          updated_by?: string | null
         }
         Update: {
           consent?: boolean
@@ -777,9 +932,12 @@ export type Database = {
           id?: string
           is_admin?: boolean
           is_minor?: boolean
+          last_login_at?: string | null
           phone?: string | null
           provider?: string
+          status?: Database["public"]["Enums"]["member_status"]
           updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -952,6 +1110,24 @@ export type Database = {
         }
         Relationships: []
       }
+      tags: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       is_admin: {
@@ -1041,7 +1217,10 @@ export type Database = {
       gamemaster_interest_enum: "yes" | "no" | "maybe"
       location_type: "vtt" | "discord" | "physical"
       LocationScope: "admin" | "gm" | "disabled"
+      member_status: "active" | "inactive" | "pending" | "banned"
       registrant_status_enum: "banned" | "approved" | "rejected" | "pending"
+      task_priority: "low" | "medium" | "high" | "critical"
+      task_status: "pending" | "in_progress" | "complete" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
