@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
   const supabaseAdmin = await createSupabaseServerClient();
 
-  const query = supabaseAdmin
+  let query = supabaseAdmin
     .from('admin_tasks')
     .select(`
       *,
@@ -43,17 +43,17 @@ export async function GET(request: NextRequest) {
     `)
     .order('created_at', { ascending: false });
 
-  if (!include_archived) query.is('deleted_at', null);
-  if (status) query.eq('status', status);
-  if (priority) query.eq('priority', priority);
-  if (assigned_to) query.eq('assigned_to', assigned_to);
+  if (!include_archived) query = query.is('deleted_at', null);
+  if (status) query = query.eq('status', status);
+  if (priority) query = query.eq('priority', priority);
+  if (assigned_to) query = query.eq('assigned_to', assigned_to);
   if (due_before) {
-    query.lte('due_date', due_before);
+    query = query.lte('due_date', due_before);
   }
   // if (due_after) {
   //   query = query.gte('due_date', due_after);
   // }
-  if (search) query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+  if (search) query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
   if (tags?.length) {
     const tagIds = (
       await supabaseAdmin.from('tags').select('id').in('name', tags)
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     logger.debug('tagIds', tagIds);
 
     if (tagIds.length) {
-      query.in('admin_task_tags.tag_id', tagIds);
+      query = query.in('admin_task_tags.tag_id', tagIds);
     }
   }
 

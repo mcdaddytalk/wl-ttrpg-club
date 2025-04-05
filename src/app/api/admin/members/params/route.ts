@@ -70,7 +70,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json() as GetMembersSchema;
-    const { page, perPage, sort, email, experienceLevel, isAdmin, isMinor }  = body;
+    const { search, page, perPage, sort, email, experienceLevel, isAdmin, isMinor }  = body;
 
     const supabase = await createSupabaseServerClient();
     let query = supabase
@@ -102,6 +102,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // Apply filters
+    if (search) query = query.or(`profiles.given_name.ilike.%${search}%,profiles.surname.ilike.%${search}%`);
     if (email) query = query.ilike("email", `%${email}%`);
     if (experienceLevel && experienceLevel.length) query = query.in("profiles.experience_level", experienceLevel);
     if (isAdmin) query = query.eq("is_admin", isAdmin);
