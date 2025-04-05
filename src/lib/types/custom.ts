@@ -51,7 +51,12 @@ export type DeliveryStatus = 'pending' | 'sent' | 'failed';
 export type DeliveryMethod = 'email' | 'sms' | 'both';
 export type LocationScope = 'admin' | 'gm' | 'disabled';
 export type GameVisibility = 'public' | 'private';
-
+export type Audience = 'public' | 'members' | 'gamemasters' | 'admins';
+export type MessageCategory = 'admin' | 'announcement' |'general' | 'gm' | 'invite' | 'support';
+export const TASK_STATUSES = ['pending', 'in_progress', 'complete', 'archived'] as const;
+export type TaskStatus = (typeof TASK_STATUSES)[number];
+export const TASK_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
+export type TaskPriority = (typeof TASK_PRIORITIES)[number];
 /* DO Types */
 export type ContactListDO = {
   id: string;
@@ -61,6 +66,23 @@ export type ContactListDO = {
 
 export type AdminLocationDO = Location & {
   authorized_gamemasters: ContactListDO[];
+}
+
+export type AnnouncementDO = {
+  id: string;
+  title: string;
+  body: string;
+  audience: Audience;
+  pinned: boolean;
+  published: boolean;
+  notify_on_publish: boolean;
+  published_at: string | null;
+  expires_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  author_id: string;
+  approved_by: string | null;
 }
 
 export type GMLocationDO = Location & {
@@ -103,17 +125,9 @@ export type MessageUserDO = {
   given_name: string;
   surname: string;
 }
-export type MessageDO = {
-  id: string;
-  sender_id: string;
+export type MessageDO = Omit<MessageData, "sender" | "recipient"> & {
   sender: MessageUserDO;
-  recipient_id: string;
   recipient: MessageUserDO;
-  content: string;
-  subject: string;
-  is_read: boolean;
-  is_archived: boolean;
-  created_at: string;
   onDelete?: (id: string) => void;
   onArchive?: (id: string) => void;
   onMarkRead?: (id: string) => void;
@@ -144,6 +158,33 @@ type SupabaseDataResponseSingle<T> = {
 }
 
 /* Supabase Query Responses */
+
+export interface Announcement {
+  id: string;
+  title: string;
+  body: string;
+  audience: Audience;
+  pinned: boolean;
+  published: boolean;
+  notify_on_publish: boolean;
+  published_at: string | null;
+  expires_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  author_id: string;
+  approved_by: string | null;
+}
+
+export interface AnnouncementRead {
+  announcement_id: string;
+  member_id: string;
+  read_at: string;
+}
+
+export type SupabaseAnnouncementListResponse = SupabaseDataResponse<Announcement>
+export type SupabaseAnnouncementResponse = SupabaseDataResponseSingle<Announcement>
+
 export type ContactListData = {
   id: string;
   member_roles?: RoleData[];
@@ -190,6 +231,15 @@ export type MemberData = {
 export type SupabaseMemberResponse = SupabaseDataResponseSingle<MemberData>
 export type SupabaseMemberListResponse = SupabaseDataResponse<MemberData>
 
+export interface CreateMessage {
+  sender_id: string;
+  recipient_id: string;
+  subject: string;
+  content: string;
+  category: MessageCategory;
+  link_url: string;
+}
+
 export type MessageData = {
   id: string;
   sender_id: string;
@@ -198,6 +248,8 @@ export type MessageData = {
   recipient: MemberData;
   content: string;
   subject: string;
+  category: MessageCategory;
+  link_url: string;
   is_read: boolean;
   is_archived: boolean;
   created_at: string;
@@ -279,6 +331,52 @@ export type RegisteredGameDO = {
   gm_given_name: string;
   gm_surname: string;
 }
+
+export type TagData = { 
+  id: string; 
+  name: string, 
+  admin_task_tags: AdminTaskTagData[]
+}
+export type SupabaseTagListResponse = SupabaseDataResponse<TagData>
+export type SupabaseTagResponse = SupabaseDataResponseSingle<TagData> 
+
+export type TagDO = Omit<TagData, "admin_task_tags"> & {
+  task_count: number;
+}
+
+export interface TaskData {
+  id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  priority: TaskPriority;
+  due_date: string | null; // ISO date string
+  created_by: string;
+  assigned_to: string | null;
+  assigned_to_user: MemberData | null;
+  admin_task_tags: AdminTaskTagData[]; // array of tag(tag_id),
+  tags: TagData[]; // array of tag(name)
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+export type AdminTaskTagData = { 
+  task_id: string;
+  tag_id: string;
+  count?: number  
+}
+
+export type TaskDO = Omit<TaskData, "assigned_to" | "assigned_to_user" | "created_at" | "updated_at" | "deleted_at"> & {
+  assigned_to: {
+    id: string | null;
+    given_name: string | null;
+    surname: string | null;
+    displayName: string | null;
+  }
+}
+export type SupabaseTaskListResponse = SupabaseDataResponse<TaskData>
+export type SupabaseTaskResponse = SupabaseDataResponseSingle<TaskData>
 
 export type UpcomingGame = {
   id: string;

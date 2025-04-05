@@ -110,7 +110,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
                       recipient_id: existingMember.id,
                       sender_id: gamemasterId,
                       content: `You have been invited to join a private game. Visit your dashboard to accept.`,
-                      message_type: "invite",
+                      category: "invite",
                     },
                   ]);    
             } else {

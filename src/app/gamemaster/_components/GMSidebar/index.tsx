@@ -4,22 +4,22 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
-import { useAdminSidebarStore } from "@/store/adminSidebarStore"
+import { useGMSidebarStore } from "@/store/gmSidebarStore"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 const navItems = [
-    { href: "/admin/membership", label: "My Members", icon: '👤' },
-    { href: "/admin/locations", label: "Locations", icon: '📍' },
-    { href: "/admin/broadcasts", label: "Broadcasts", icon: '📫' }
+    { href: "/gamemaster/games", label: "My Games", icon: '👤' },
+    { href: "/gamemaster/locations", label: "My Locations", icon: '📍' },
+    { href: "/gamemaster/invites", label: "My Invites", icon: '📫' }
 ]
 
-export default function AdminSidebar(): React.ReactElement {
-    const { isCollapsed, toggleCollapse } = useAdminSidebarStore()
-    const pathName = usePathname()
+export default function GMSidebar(): React.ReactElement {
+    const { isCollapsed, toggleCollapse } = useGMSidebarStore()
+    const pathName = usePathname();
 
     return (
         <div
-            id="admin-sidebar"
+            id="gm-sidebar"
             className={cn(
                 'flex flex-col bg-slate-800 text-white transition-width duration-300',
                 isCollapsed ? 'w-16' : 'w-32'
@@ -35,8 +35,8 @@ export default function AdminSidebar(): React.ReactElement {
                 {isCollapsed ? 'Expand ➤' : 'Collapse ❮'}
             </Button>
 
-            {/* Navigation items */}
-            <nav id="sidebar-nav" className="mt-4 space-y-2">
+            {/* Navigation */}
+            <nav id="sidebar-nav" className="flex-1 overflow-y-auto">
                 {navItems.map((item) => (
                     <Link
                         key={item.href}
@@ -54,7 +54,7 @@ export default function AdminSidebar(): React.ReactElement {
                                     <TooltipContent sideOffset={5} side="right">{item.label}</TooltipContent>
                                 </Tooltip>
                             ) : ( 
-                                <span className="mr-4">{item.label}</span>
+                                <span className="mr-4">{item.icon} {item.label}</span>
                             )}
                     </Link>
                 ))}

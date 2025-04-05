@@ -36,6 +36,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
             ),
             subject,
             content,
+            category,
+            link_url,
             is_read,
             is_archived,
             created_at
@@ -67,6 +69,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         },
         subject: messageData.subject ?? "",
         content: messageData.content  ?? "",
+        category: messageData.category ?? "",
+        link_url: messageData.link_url ?? "",
         is_read: messageData.is_read,
         is_archived: messageData.is_archived,
         created_at: messageData.created_at

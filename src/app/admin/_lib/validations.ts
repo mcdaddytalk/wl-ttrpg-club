@@ -14,6 +14,7 @@ import {
     flags: parseAsArrayOf(z.enum(["advancedTable", "floatingBar"])).withDefault(
       []
     ),
+    search: parseAsString.withDefault(""),
     page: parseAsInteger.withDefault(1),
     perPage: parseAsInteger.withDefault(10),
     sort: getSortingStateParser<MemberData>().withDefault([

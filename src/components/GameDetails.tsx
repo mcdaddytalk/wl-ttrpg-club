@@ -19,6 +19,7 @@ import EmailShareIcon from "@/components/EmailShareIcon";
 import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
 import GameLocation from "@/components/GameLocation";
 import GameImage from "@/components/GameImage";
+import { toSentenceCase } from "@/lib/utils";
 
 const enhanceStatus = (game: GameData) => {
     const { status, currentSeats, startingSeats } = game;
@@ -155,7 +156,7 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                         <div className="flex items-center gap-2">
                             {/* Icon and Text on the Same Line */}
                             <MdOutlineEventRepeat className="text-xl" />
-                            <span>{game.interval} / {game.dayOfWeek}</span>
+                            <span>{toSentenceCase(game.interval)} / {toSentenceCase(game.dayOfWeek)}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             {/* Icon and Text on the Same Line */}
