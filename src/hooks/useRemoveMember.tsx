@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "./useQueryClient";
 import { useSearchParams } from "next/navigation";
-import { searchParamsCache } from "@/app/admin/_lib/validations";
+import { searchParamsCache } from "@/app/admin/_lib/adminMembers";
 
 interface RemoveMemberVariables {
     userId: string;

@@ -45,7 +45,13 @@ export const GameInviteModal: React.FC<InvitePlayerProps> = ({ gameId, gamemaste
     };
 
     // Updates an external invitee's field
-    const updateExternalInvitee = (index: number, key: keyof InvitedPlayer, value: string) => {
+    type EditableInviteeField = 'given_name' | 'surname' | 'email' | 'phone';
+
+    const updateExternalInvitee = (
+        index: number,
+        key: EditableInviteeField,
+        value: string
+    ) => {
         const updatedInvitees = [...externalInvitees];
         updatedInvitees[index][key] = value;
         updatedInvitees[index].displayName = `${updatedInvitees[index].given_name} ${updatedInvitees[index].surname}`.trim();

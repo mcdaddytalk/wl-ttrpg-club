@@ -30,6 +30,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                     id,
                     name
                 )
+            ),
+            admin_notes(
+                *
             )
         `)
         .order("created_at", { ascending: false }) as unknown as SupabaseMemberListResponse;
@@ -53,10 +56,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             experienceLevel: memberData.profiles.experience_level,
             isAdmin: memberData.is_admin,
             isMinor: memberData.is_minor,
+            status: memberData.status,
+            consent: memberData.consent,
+            last_login_at: memberData.last_login_at,
             created_at: memberData.created_at,
             updated_at: memberData.updated_at,
+            deleted_at: memberData.deleted_at,
+            updated_by: memberData.updated_by,
+            deleted_by: memberData.deleted_by,
             bio: memberData.profiles.bio ?? '',
-            avatar: memberData.profiles.avatar ?? '',        
+            avatar: memberData.profiles.avatar ?? '',
+            admin_notes: memberData.admin_notes,
             roles: memberData.member_roles.map(role => role.roles)
         }
     }) || [];

@@ -7,6 +7,7 @@ export async function fetcher<T>(
 ): Promise<T> {
     const fullUrl = params ? `${url}?${params.toString()}` : url;
 
+    logger.info(`API Request: ${fullUrl}`);
     const response = await fetch(fullUrl, {
       ...options,
       headers: {

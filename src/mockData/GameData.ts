@@ -1,4 +1,4 @@
-import { GMGameData, Player } from "@/lib/types/custom";
+import { GMGameData, Player } from "../lib/types/custom";
 
 export const mockScheduledGames: GMGameData[] = [
     {
@@ -46,7 +46,14 @@ export const mockScheduledGames: GMGameData[] = [
                 avatar: null,
                 experience_level: "forever-gm"
             },
-            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+            member_roles: [{ roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } }],
+            consent: false,
+            status: "pending",
+            last_login_at: null,
+            updated_by: "",
+            deleted_at: new Date(),
+            deleted_by: "",
+            admin_notes: null
         }
     },
     {
@@ -94,7 +101,14 @@ export const mockScheduledGames: GMGameData[] = [
                 avatar: null,
                 experience_level: "forever-gm"
             },
-            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+            member_roles: [{ roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } }],
+            consent: false,
+            status: "pending",
+            last_login_at: null,
+            updated_by: "",
+            deleted_at: new Date(),
+            deleted_by: "",
+            admin_notes: null
         }
     },
     {
@@ -142,7 +156,14 @@ export const mockScheduledGames: GMGameData[] = [
                 avatar: null,
                 experience_level: "forever-gm"
             },
-            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+            member_roles: [{ roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } }],
+            consent: false,
+            status: "pending",
+            last_login_at: null,
+            updated_by: "",
+            deleted_at: new Date(),
+            deleted_by: "",
+            admin_notes: null
         }
     },
     {
@@ -190,7 +211,14 @@ export const mockScheduledGames: GMGameData[] = [
                 avatar: null,
                 experience_level: "forever-gm"
             },
-            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+            member_roles: [{ roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } }],
+            consent: false,
+            status: "pending",
+            last_login_at: null,
+            updated_by: "",
+            deleted_at: new Date(),
+            deleted_by: "",
+            admin_notes: null
         }
     },
     {
@@ -238,7 +266,14 @@ export const mockScheduledGames: GMGameData[] = [
                 avatar: null,
                 experience_level: "forever-gm"
             },
-            member_roles: [ { roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } } ],
+            member_roles: [{ roles: { id: '', name: 'member' } }, { roles: { id: '', name: 'gamemaster' } }],
+            consent: false,
+            status: "pending",
+            last_login_at: null,
+            updated_by: "",
+            deleted_at: new Date(),
+            deleted_by: "",
+            admin_notes: null
         }
     }
 ];

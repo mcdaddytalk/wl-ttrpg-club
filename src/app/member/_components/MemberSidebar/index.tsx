@@ -9,6 +9,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 
 const navItems = [
     { href: "/member/my-games", label: "My Games", icon: '🎲' },
+    { href: "/member/resources", label: "Resources", icon: '📚' },
     { href: "/member/profile", label: "Profile", icon: '👤' },
     { href: "/member/messages", label: "Messages", icon: '📫' },
     { href: "/member/change-password", label: "Change Password", icon: '🔑' }

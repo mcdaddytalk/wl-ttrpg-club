@@ -1,12 +1,12 @@
-import { Suspense } from "react";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { getQueryClient } from "@/server/getQueryClient";
 import AdminTaskPageShell from "./AdminTaskShell";
 
-export default function AdminTasksPage() {
+export default async function AdminTasksPage() {
+  const queryClient = getQueryClient();
   return (
-    <main className="container max-w-5xl py-8 space-y-6">
-      <Suspense fallback={<div>Loading...</div>}>
-        <AdminTaskPageShell />
-      </Suspense>
-    </main>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <AdminTaskPageShell />
+    </HydrationBoundary>
   );
 }

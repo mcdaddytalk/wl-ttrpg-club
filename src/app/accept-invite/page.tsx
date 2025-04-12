@@ -1,11 +1,17 @@
 import { Suspense } from "react"
-import AcceptInvite from "./AcceptInvite"
+import AcceptInvite from "./_components/AcceptInvite"
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
+import { getQueryClient } from "@/server/getQueryClient"
 
-const AcceptInvitePage = (): React.ReactElement => {
+const AcceptInvitePage = async (): Promise<React.ReactElement> => {
+  const queryClient = getQueryClient();
+  
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <AcceptInvite />
-    </Suspense>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <Suspense fallback={<div>Loading...</div>}>
+        <AcceptInvite />
+      </Suspense>
+    </HydrationBoundary>
   )
 }
 

@@ -61,8 +61,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         created_at: memberData.created_at,
         updated_at: memberData.updated_at,
         bio: memberData.profiles.bio ?? '',
-        avatar: memberData.profiles.avatar ?? '',        
-        roles: memberData.member_roles.map(role => role.roles)
+        avatar: memberData.profiles.avatar ?? '',
+        roles: memberData.member_roles.map(role => role.roles),
+        status: "pending",
+        last_login_at: memberData.last_login_at,
+        consent: memberData.consent,
+        updated_by: memberData.updated_by,
+        deleted_at: memberData.deleted_at,
+        deleted_by: memberData.deleted_by
     }
     
     return NextResponse.json(memberDO, { status: 200 })

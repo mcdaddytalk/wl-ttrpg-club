@@ -1,4 +1,4 @@
-import { DOW, GameInterval, GameStatus } from "@/lib/types/custom";
+import { DOW, GameInterval, GameSchedStatus } from "@/lib/types/custom";
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "./useQueryClient";
 import logger from '@/utils/logger';
@@ -25,7 +25,7 @@ export const useUpdateGame = () => {
             description?: string;
             system?: string;
             maxSeats?: number;
-            status?: GameStatus;
+            status?: GameSchedStatus;
             location_id?: string;
             nextGameDate?: Date;
             interval?: GameInterval;

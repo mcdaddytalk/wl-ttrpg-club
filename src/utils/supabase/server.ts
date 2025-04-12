@@ -15,6 +15,11 @@ export async function createSupabaseServerClient(component: boolean = false) {
     ENVS.NEXT_PUBLIC_SUPABASE_URL!,
     ENVS.SUPABASE_SERVICE_ROLE_KEY!,
     {
+      global: {
+        headers: {
+          Authorization: `Bearer ${ENVS.SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll()

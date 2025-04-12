@@ -45,12 +45,12 @@ export const fetchMembersFull = () => {
 }
 
 // export const fetchMembersWithParams = async (params: GetMembersSchema) => {
-//     const { page, perPage, sort, email, experienceLevel, isAdmin, isMinor } = params;
+//     const { page, pageSize, sort, email, experienceLevel, isAdmin, isMinor } = params;
 
 //     let query = supabase
 //         .from("members")
 //         .select("*, profiles(*), member_roles(*)")
-//         .range((page - 1) * perPage, page * perPage - 1);
+//         .range((page - 1) * pageSize, page * pageSize - 1);
 
 //     if (sort) {
 //         sort.forEach(({ id, desc }) => {
