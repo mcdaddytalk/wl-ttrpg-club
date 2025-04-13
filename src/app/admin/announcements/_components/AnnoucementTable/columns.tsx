@@ -1,3 +1,5 @@
+"use client"
+
 import { AnnouncementDO } from "@/lib/types/custom"
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge";

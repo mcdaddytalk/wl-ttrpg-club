@@ -2,6 +2,8 @@ import { getQueryClient } from "@/server/getQueryClient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import AnnouncementsDashboard from "./_components/AnnoucementTable/AnnouncementTable";
 import fetcher from "@/utils/fetcher";
+import { Suspense } from "react";
+import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 
 const AdminAnnouncementsPage = async (): Promise<React.ReactElement> => {
     const queryClient = getQueryClient();
@@ -18,7 +20,19 @@ const AdminAnnouncementsPage = async (): Promise<React.ReactElement> => {
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
+            <Suspense fallback={
+                <DataTableSkeleton 
+                                    columnCount={5}
+                                    rowCount={5}
+                                    searchableColumnCount={2}
+                                    filterableColumnCount={2}
+                                    withPagination={false}
+                                    cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+                                    shrinkZero
+                                />    
+            }>    
                 <AnnouncementsDashboard />
+            </Suspense>
         </HydrationBoundary>
     )
 }
