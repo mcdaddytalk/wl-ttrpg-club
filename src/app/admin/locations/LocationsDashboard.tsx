@@ -1,7 +1,7 @@
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { Shell } from "@/components/Shell";
 import React, { Suspense } from "react";
-import LocationsTable from "../_components/LocationsTable/LocationsTable";
+import LocationsTable from "./_components/LocationsTable/LocationsTable";
 
 
 

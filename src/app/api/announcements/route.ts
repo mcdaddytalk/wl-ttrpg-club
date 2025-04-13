@@ -1,5 +1,6 @@
 import { sendInternalAnnouncementMessage } from "@/lib/notifications/sendInternalAnnouncementMessage";
 import { AnnouncementDO, SupabaseAnnouncementListResponse, SupabaseAnnouncementResponse } from "@/lib/types/custom";
+import { AnnouncementQuerySchema } from "@/lib/validation/announcements";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,26 +11,77 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (request.method !== 'GET') {
             return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
     }
-    
-    const publishedParam = request.nextUrl.searchParams.get('published');
-  const published = publishedParam !== 'false'; // Default to true
 
+    logger.debug("Active schema source:");
+    logger.debug(AnnouncementQuerySchema.toString());
+    logger.debug('GET /api/announcements  pre-parse', request.nextUrl.searchParams.toString());
+    const result = AnnouncementQuerySchema.safeParse(
+        Object.fromEntries(request.nextUrl.searchParams.entries())
+      );
+    
+      if (!result.success) {
+        logger.error("Invalid query params:", result.error);
+        return NextResponse.json({ message: "Invalid query parameters", errors: result.error.format() }, { status: 400 });
+      }
+    
+    logger.debug('GET /api/announcements  post-parse', result.data);
+
+    // TESTING BEGIN
+      const testResult = AnnouncementQuerySchema.safeParse({
+          published: 'false'
+      })
+
+      logger.debug('GET /api/announcements  test-parse', testResult.data);
+
+      const test = z.object({
+        published: z.string().transform(value => {
+            if (value === "true") {
+              return true;
+            } else if (value === "false") {
+              return false;
+            } else {
+              throw new Error("The string must be 'true' or 'false'");
+            }
+          }),
+      });
+      
+      const raw = Object.fromEntries(request.nextUrl.searchParams.entries());
+      const parsed = test.safeParse(raw);
+      logger.debug("raw published string:", `"${raw.published}"`);
+      logger.debug("Manual parse result:", parsed);
+
+    // TESTING END
+
+    const { title, audience, pinned, published, page, limit } = result.data;
+    const offset = (page - 1) * limit;
+    
 
     const supabase = await createSupabaseServerClient();
 
     let query = supabase
         .from('announcements')
-        .select('*')
+        .select('*', { count: "exact" })
         .is('deleted_at', null)
 
-    if (published)
+    if (published) {
         query = query.lte('published_at', new Date().toISOString());
-
+    }
+    if (title) {
+        query = query.ilike("title", `%${title}%`);
+    }
+    if (audience) {
+        query = query.eq("audience", audience);
+    }
+    if (pinned !== undefined) {
+        query = query.eq("pinned", pinned);
+    }
+    
     query = query
         .order('pinned', { ascending: false })
         .order('published_at', { ascending: false })
+        .range(offset, offset + limit - 1);
 
-    const { data: announcementData, error: announcementError } = await query as unknown as SupabaseAnnouncementListResponse;
+    const { data: announcementData, count, error: announcementError } = await query as unknown as SupabaseAnnouncementListResponse;
     
     if (announcementError) {
         logger.error(announcementError);
@@ -38,7 +90,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     
     const announcements: AnnouncementDO[] = announcementData || [];
 
-    return NextResponse.json(announcements, { status: 200 });
+    return NextResponse.json({ data: announcements || [], total: count ?? 0 }, { status: 200 });
 }
 
 const CreateAnnouncementSchema = z.object({
@@ -71,6 +123,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const body = await request.json();
     const result = CreateAnnouncementSchema.safeParse(body);
     if (!result.success) {
+        logger.error(result.error);
+        logger.error(body);
         return NextResponse.json({ message: 'Validation failed', errors: result.error.format() }, { status: 400 });
       }
       

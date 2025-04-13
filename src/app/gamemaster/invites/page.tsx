@@ -1,6 +1,6 @@
 import { useQueryClient } from "@/hooks/useQueryClient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import GMInvitesDashboard from "./GMInvitesDashboard";
+import GMInvitesDashboard from "./_components/GMInvitesDashboard";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { Suspense } from "react";
 

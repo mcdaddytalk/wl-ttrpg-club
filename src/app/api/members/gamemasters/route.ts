@@ -54,8 +54,16 @@ export async function GET(request: NextRequest) {
         phone: gamemaster.phone || '',
         isMinor: gamemaster.is_minor,
         isAdmin: gamemaster.is_admin,
+        consent: gamemaster.consent,
+        status: gamemaster.status,
         avatar: gamemaster.profiles.avatar || 'default',
-        roles: gamemaster.member_roles.map((role) => role.roles),        
+        roles: gamemaster.member_roles.map((role) => role.roles),
+        created_at: gamemaster.created_at,
+        updated_at: gamemaster.updated_at,
+        last_login_at: gamemaster.last_login_at,
+        deleted_at: gamemaster.deleted_at,
+        updated_by: gamemaster.updated_by,
+        deleted_by: gamemaster.deleted_by
     }));
 
     gamemasterList.sort((a, b) => a.surname.localeCompare(b.surname));

@@ -12,39 +12,48 @@ export type Database = {
       admin_notes: {
         Row: {
           author_id: string
+          category: string | null
           created_at: string
+          deleted_at: string | null
           edited_at: string | null
           id: string
-          member_id: string
           note: string
+          target_id: string
+          target_type: Database["public"]["Enums"]["admin_note_target_type"]
         }
         Insert: {
           author_id: string
+          category?: string | null
           created_at?: string
+          deleted_at?: string | null
           edited_at?: string | null
           id?: string
-          member_id: string
           note: string
+          target_id: string
+          target_type: Database["public"]["Enums"]["admin_note_target_type"]
         }
         Update: {
           author_id?: string
+          category?: string | null
           created_at?: string
+          deleted_at?: string | null
           edited_at?: string | null
           id?: string
-          member_id?: string
           note?: string
+          target_id?: string
+          target_type?: Database["public"]["Enums"]["admin_note_target_type"]
         }
         Relationships: [
           {
-            foreignKeyName: "fk_admin_notes_member"
-            columns: ["member_id"]
+            foreignKeyName: "fk_admin_notes_author"
+            columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "is_admin"
             referencedColumns: ["member_id"]
           },
           {
-            foreignKeyName: "fk_admin_notes_member"
-            columns: ["member_id"]
+            foreignKeyName: "fk_admin_notes_author"
+            columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
@@ -278,6 +287,54 @@ export type Database = {
           },
         ]
       }
+      audit_trail: {
+        Row: {
+          action: Database["public"]["Enums"]["audit_action"]
+          actor_id: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          summary: string | null
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["audit_action"]
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          summary?: string | null
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["audit_action"]
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          summary?: string | null
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_audit_actor"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "fk_audit_actor"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       broadcast_messages: {
         Row: {
           created_at: string | null
@@ -449,6 +506,68 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback: {
+        Row: {
+          category: Database["public"]["Enums"]["feedback_category"]
+          handled: boolean | null
+          handled_at: string | null
+          handled_by: string | null
+          id: string
+          member_id: string | null
+          message: string
+          submitted_at: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["feedback_category"]
+          handled?: boolean | null
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          member_id?: string | null
+          message: string
+          submitted_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["feedback_category"]
+          handled?: boolean | null
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          member_id?: string | null
+          message?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "feedback_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "feedback_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_favorites: {
         Row: {
           created_at: string
@@ -492,6 +611,7 @@ export type Database = {
       game_invites: {
         Row: {
           accepted: boolean | null
+          accepted_at: string | null
           display_name: string | null
           expires_at: string | null
           external_email: string | null
@@ -502,9 +622,11 @@ export type Database = {
           invited_at: string | null
           invitee: string | null
           notified: boolean | null
+          viewed_at: string | null
         }
         Insert: {
           accepted?: boolean | null
+          accepted_at?: string | null
           display_name?: string | null
           expires_at?: string | null
           external_email?: string | null
@@ -515,9 +637,11 @@ export type Database = {
           invited_at?: string | null
           invitee?: string | null
           notified?: boolean | null
+          viewed_at?: string | null
         }
         Update: {
           accepted?: boolean | null
+          accepted_at?: string | null
           display_name?: string | null
           expires_at?: string | null
           external_email?: string | null
@@ -528,6 +652,7 @@ export type Database = {
           invited_at?: string | null
           invitee?: string | null
           notified?: boolean | null
+          viewed_at?: string | null
         }
         Relationships: [
           {
@@ -633,6 +758,83 @@ export type Database = {
           },
         ]
       }
+      game_resources: {
+        Row: {
+          author_id: string | null
+          body: string | null
+          category: Database["public"]["Enums"]["resource_category"]
+          created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          external_url: string | null
+          file_url: string | null
+          id: string
+          pinned: boolean | null
+          title: string
+          updated_at: string | null
+          visibility: Database["public"]["Enums"]["resource_visibility"]
+        }
+        Insert: {
+          author_id?: string | null
+          body?: string | null
+          category?: Database["public"]["Enums"]["resource_category"]
+          created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          external_url?: string | null
+          file_url?: string | null
+          id?: string
+          pinned?: boolean | null
+          title: string
+          updated_at?: string | null
+          visibility?: Database["public"]["Enums"]["resource_visibility"]
+        }
+        Update: {
+          author_id?: string | null
+          body?: string | null
+          category?: Database["public"]["Enums"]["resource_category"]
+          created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          external_url?: string | null
+          file_url?: string | null
+          id?: string
+          pinned?: boolean | null
+          title?: string
+          updated_at?: string | null
+          visibility?: Database["public"]["Enums"]["resource_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_resources_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "game_resources_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_resources_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "game_resources_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_schedule: {
         Row: {
           created_at: string | null
@@ -645,7 +847,7 @@ export type Database = {
           last_game_date: string | null
           location_id: string | null
           next_game_date: string | null
-          status: Database["public"]["Enums"]["game_status_enum"]
+          status: Database["public"]["Enums"]["game_sched_status"]
           updated_at: string | null
         }
         Insert: {
@@ -659,7 +861,7 @@ export type Database = {
           last_game_date?: string | null
           location_id?: string | null
           next_game_date?: string | null
-          status?: Database["public"]["Enums"]["game_status_enum"]
+          status?: Database["public"]["Enums"]["game_sched_status"]
           updated_at?: string | null
         }
         Update: {
@@ -673,7 +875,7 @@ export type Database = {
           last_game_date?: string | null
           location_id?: string | null
           next_game_date?: string | null
-          status?: Database["public"]["Enums"]["game_status_enum"]
+          status?: Database["public"]["Enums"]["game_sched_status"]
           updated_at?: string | null
         }
         Relationships: [
@@ -699,45 +901,51 @@ export type Database = {
           created_at: string | null
           deleted_at: string | null
           description: string | null
+          game_code: string | null
           gamemaster_id: string | null
           id: string
           max_seats: number | null
           starting_seats: number | null
+          status: Database["public"]["Enums"]["game_status"]
           system: string | null
           title: string
           updated_at: string
           updated_by: string | null
-          visibility: string | null
+          visibility: Database["public"]["Enums"]["game_visibility"]
         }
         Insert: {
           cover_image?: string
           created_at?: string | null
           deleted_at?: string | null
           description?: string | null
+          game_code?: string | null
           gamemaster_id?: string | null
           id?: string
           max_seats?: number | null
           starting_seats?: number | null
+          status?: Database["public"]["Enums"]["game_status"]
           system?: string | null
           title: string
           updated_at?: string
           updated_by?: string | null
-          visibility?: string | null
+          visibility?: Database["public"]["Enums"]["game_visibility"]
         }
         Update: {
           cover_image?: string
           created_at?: string | null
           deleted_at?: string | null
           description?: string | null
+          game_code?: string | null
           gamemaster_id?: string | null
           id?: string
           max_seats?: number | null
           starting_seats?: number | null
+          status?: Database["public"]["Enums"]["game_status"]
           system?: string | null
           title?: string
           updated_at?: string
           updated_by?: string | null
-          visibility?: string | null
+          visibility?: Database["public"]["Enums"]["game_visibility"]
         }
         Relationships: [
           {
@@ -1110,6 +1318,77 @@ export type Database = {
         }
         Relationships: []
       }
+      session_notes: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string | null
+          deleted_at: string | null
+          game_id: string
+          id: string
+          is_visible_to_players: boolean | null
+          schedule_id: string | null
+          session_date: string
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string | null
+          deleted_at?: string | null
+          game_id: string
+          id?: string
+          is_visible_to_players?: boolean | null
+          schedule_id?: string | null
+          session_date: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          game_id?: string
+          id?: string
+          is_visible_to_players?: boolean | null
+          schedule_id?: string | null
+          session_date?: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "session_notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "game_schedule"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tags: {
         Row: {
           created_at: string | null
@@ -1152,15 +1431,11 @@ export type Database = {
         Returns: undefined
       }
       custom_access_token_hook: {
-        Args: {
-          event: Json
-        }
+        Args: { event: Json }
         Returns: Json
       }
       get_announcement_recipients: {
-        Args: {
-          audience: string
-        }
+        Args: { audience: string }
         Returns: {
           id: string
           consent: boolean
@@ -1175,15 +1450,21 @@ export type Database = {
         Returns: undefined
       }
       verify_user_password: {
-        Args: {
-          password: string
-        }
+        Args: { password: string }
         Returns: boolean
       }
     }
     Enums: {
+      admin_note_target_type: "member" | "game" | "announcement" | "invite"
       app_function: "games" | "members" | "schedules" | "messages"
       app_permission: "create" | "read" | "update" | "delete"
+      audit_action:
+        | "create"
+        | "update"
+        | "delete"
+        | "login"
+        | "system"
+        | "accept"
       day_of_week_enum:
         | "sunday"
         | "monday"
@@ -1200,13 +1481,14 @@ export type Database = {
         | "seasoned"
         | "player-gm"
         | "forever-gm"
+      feedback_category: "bug" | "feature" | "praise" | "other"
       game_interval_enum:
         | "weekly"
         | "biweekly"
         | "monthly"
         | "yearly"
         | "custom"
-      game_status_enum:
+      game_sched_status:
         | "draft"
         | "active"
         | "scheduled"
@@ -1214,11 +1496,22 @@ export type Database = {
         | "full"
         | "completed"
         | "canceled"
+        | "paused"
+      game_status: "planning" | "active" | "paused" | "completed" | "canceled"
+      game_visibility: "public" | "private"
       gamemaster_interest_enum: "yes" | "no" | "maybe"
       location_type: "vtt" | "discord" | "physical"
       LocationScope: "admin" | "gm" | "disabled"
       member_status: "active" | "inactive" | "pending" | "banned"
       registrant_status_enum: "banned" | "approved" | "rejected" | "pending"
+      resource_category:
+        | "rules"
+        | "lore"
+        | "characters"
+        | "map"
+        | "external"
+        | "misc"
+      resource_visibility: "public" | "members" | "gamemasters" | "admins"
       task_priority: "low" | "medium" | "high" | "critical"
       task_status: "pending" | "in_progress" | "complete" | "archived"
     }
@@ -1228,27 +1521,29 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1256,20 +1551,22 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1277,20 +1574,22 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1298,21 +1597,23 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema["CompositeTypes"]
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database
@@ -1321,6 +1622,65 @@ export type CompositeTypes<
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      admin_note_target_type: ["member", "game", "announcement", "invite"],
+      app_function: ["games", "members", "schedules", "messages"],
+      app_permission: ["create", "read", "update", "delete"],
+      audit_action: ["create", "update", "delete", "login", "system", "accept"],
+      day_of_week_enum: [
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+      ],
+      delivery_mode: ["email", "sms", "both"],
+      delivery_status: ["pending", "sent", "failed"],
+      experience_level_enum: [
+        "new",
+        "novice",
+        "seasoned",
+        "player-gm",
+        "forever-gm",
+      ],
+      feedback_category: ["bug", "feature", "praise", "other"],
+      game_interval_enum: ["weekly", "biweekly", "monthly", "yearly", "custom"],
+      game_sched_status: [
+        "draft",
+        "active",
+        "scheduled",
+        "awaiting-players",
+        "full",
+        "completed",
+        "canceled",
+        "paused",
+      ],
+      game_status: ["planning", "active", "paused", "completed", "canceled"],
+      game_visibility: ["public", "private"],
+      gamemaster_interest_enum: ["yes", "no", "maybe"],
+      location_type: ["vtt", "discord", "physical"],
+      LocationScope: ["admin", "gm", "disabled"],
+      member_status: ["active", "inactive", "pending", "banned"],
+      registrant_status_enum: ["banned", "approved", "rejected", "pending"],
+      resource_category: [
+        "rules",
+        "lore",
+        "characters",
+        "map",
+        "external",
+        "misc",
+      ],
+      resource_visibility: ["public", "members", "gamemasters", "admins"],
+      task_priority: ["low", "medium", "high", "critical"],
+      task_status: ["pending", "in_progress", "complete", "archived"],
+    },
+  },
+} as const

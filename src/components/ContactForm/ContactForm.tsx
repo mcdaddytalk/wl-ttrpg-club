@@ -271,7 +271,7 @@ export const ContactForm = () => {
                             name="isMinor"
                             render={({ field }) => (
                                 <FormItem className="space-y-2">
-                                    <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Are You A Minor? *Parent Information will be required </FormLabel>
+                                    <FormLabel className="text-sm font-medium leading-none text-slate-700 dark:text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Are You A Minor? *Parent Information will be required </FormLabel>
                                     <Checkbox
                                         checked={minor || field.value}
                                         onCheckedChange={(value) => {
@@ -459,7 +459,7 @@ export const ContactForm = () => {
                                 name="agreeToRules"
                                 render={({ field }) => (
                                     <FormItem className="mt-6 space-y-2">
-                                        <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Do you agree to abide by the rules and responsibilities?</FormLabel>
+                                        <FormLabel className="text-sm font-medium leading-none dark:text-slate-200 text-slate-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Do you agree to abide by the rules and responsibilities?</FormLabel>
                                         <Checkbox
                                             checked={field.value}
                                             onCheckedChange={field.onChange}

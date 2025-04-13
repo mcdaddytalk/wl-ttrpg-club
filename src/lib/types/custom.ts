@@ -39,25 +39,67 @@ export type ExtendedSortingState<TData> = ExtendedColumnSort<TData>[]
 export type JoinOperator = DataTableConfig["joinOperators"][number]["value"]
 
 /* ENUM Types */
-export type DOW = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
-export type GameStatus = 'draft' |'active' | 'scheduled' | 'completed' | 'awaiting-players' | 'full' | 'canceled';
+export const DaysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+export type DOW = (typeof DaysOfWeek)[number];
+export const GAME_STATUS = ['active', 'planning', 'paused', 'canceled', 'completed'] as const;
+export type GameStatus = (typeof GAME_STATUS)[number];
+export const GAME_SCHED_STATUS = ['draft', 'active', 'paused', 'scheduled', 'completed', 'awaiting-players', 'full', 'canceled'] as const;
+export type GameSchedStatus = (typeof GAME_SCHED_STATUS)[number];
 export const experienceLevels = ['new', 'novice', 'seasoned', 'player-gm', 'forever-gm'] as const;
 export type ExperienceLevel = typeof experienceLevels[number];
-export type GameInterval = 'weekly' | 'biweekly' | 'monthly' | 'yearly' | 'custom';
-export type GMInterest = 'no' | 'maybe' | 'yes';
-export type GameRegStatus = 'approved' | 'rejected' | 'pending' | 'banned';
-export type LocationType = 'vtt' | 'discord' | 'physical';
-export type DeliveryStatus = 'pending' | 'sent' | 'failed';
-export type DeliveryMethod = 'email' | 'sms' | 'both';
-export type LocationScope = 'admin' | 'gm' | 'disabled';
-export type GameVisibility = 'public' | 'private';
-export type Audience = 'public' | 'members' | 'gamemasters' | 'admins';
-export type MessageCategory = 'admin' | 'announcement' |'general' | 'gm' | 'invite' | 'support';
+export const GAME_INTERVALS = ['weekly', 'biweekly', 'monthly', 'yearly', 'custom'] as const;
+export type GameInterval = (typeof GAME_INTERVALS)[number];
+export const GM_INTERESTS = ['no', 'maybe', 'yes'] as const;
+export type GMInterest = (typeof GM_INTERESTS)[number];
+export const GAME_REG_STATUSES = ['approved', 'rejected', 'pending', 'banned'] as const;
+export type GameRegStatus = (typeof GAME_REG_STATUSES)[number];
+export const LOCATION_TYPES = ['vtt', 'discord', 'physical'] as const;
+export type LocationType = (typeof LOCATION_TYPES)[number];
+export const DELIVERY_STATUSES = ['pending', 'sent', 'failed'] as const;
+export type DeliveryStatus = (typeof DELIVERY_STATUSES)[number];
+export const DELIVERY_METHODS = ['email', 'sms', 'both'] as const;
+export type DeliveryMethod = (typeof DELIVERY_METHODS)[number];
+export const LOCATION_SCOPES = ['admin', 'gm', 'disabled'] as const;
+export type LocationScope = (typeof LOCATION_SCOPES)[number];
+export const GAME_VISIBILITY= ['public', 'private'] as const;
+export type GameVisibility = (typeof GAME_VISIBILITY)[number];
+export const AUDIENCES = ['public', 'members', 'gamemasters', 'admins'] as const;
+export type Audience = (typeof AUDIENCES)[number];
+export const MESSAGE_CATEGORIES = ['admin', 'announcement', 'general', 'gm', 'invite', 'support'] as const;
+export type MessageCategory = (typeof MESSAGE_CATEGORIES)[number];
 export const TASK_STATUSES = ['pending', 'in_progress', 'complete', 'archived'] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 export const TASK_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
 export type TaskPriority = (typeof TASK_PRIORITIES)[number];
+export const MEMBER_STATUSES = ['active', 'inactive', 'pending', 'banned'] as const;
+export type MemberStatus = (typeof MEMBER_STATUSES)[number];
+export const INVITE_STATUSES = ['pending', 'accepted', 'expired', 'declined'] as const;
+export type InviteStatus = (typeof INVITE_STATUSES)[number];
+export const NOTE_TARGET_TYPE = ['member', 'game'] as const;
+export type NoteTargetType = (typeof NOTE_TARGET_TYPE)[number];
+export const AUDIT_ACTION = ["create", "update", "delete", "accept", "login", "system"] as const;
+export type AuditAction = (typeof AUDIT_ACTION)[number];
+export const FEEDBACK_CATEGORIES = ['bug', 'feature', 'praise', 'other'] as const;
+export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
+export const RESOURCE_CATEGORIES = ['rules', 'lore', 'characters', 'map', 'external', 'misc'] as const;
+export type ResourceCategory = (typeof RESOURCE_CATEGORIES)[number];
+export const RESOURCE_VISIBILITY = ['admins', 'gamemasters', 'members', 'public'] as const;
+export type ResourceVisibility = (typeof RESOURCE_VISIBILITY)[number];
+
 /* DO Types */
+export type AdminNoteDO = Omit<AdminNote, | 'updated_at' | 'deleted_at' | 'author'> & {
+  edited_at: Date | null;
+  author_email: string;
+  author: {
+    id: string,
+    email: string,
+    displayName: string;
+  };
+  onView?: (note: AdminNoteDO) => void;
+}
+
+export type AuditTrailDO = AuditTrailData;
+
 export type ContactListDO = {
   id: string;
   given_name: string;
@@ -85,8 +127,54 @@ export type AnnouncementDO = {
   approved_by: string | null;
 }
 
+export type GMGamePlayerDO = {
+  member_id: string;
+  game_id: string;
+  registered_at: string;
+  status: string;
+  status_note: string | null;
+  email: string | null;
+  profiles: {
+    given_name: string | null;
+    surname: string | null;
+  } | null;
+};
+
+export type GMGameDataDO = {
+  id: string;
+  title: string;
+  system: string;
+  status: string;
+  gm_id: string | null;
+  gm_name: string;
+  player_count: number;
+  next_session_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  search?: string;
+  archived?: boolean;
+}
+
 export type GMLocationDO = Location & {
   authorized_gamemasters: ContactListDO[];
+}
+export type SupabaseGMLocationPermResponse = SupabaseDataResponseSingle<GMLocationDO>
+export type SupabaseGMLocationPermListResponse = SupabaseDataResponse<GMLocationDO>
+
+
+export type InviteDO = {
+    id: string;
+    display_name: string;
+    email: string | null;
+    invited_at: string;
+    expires_at: string;
+    accepted_at: string | null;
+    accepted: boolean;
+    notified: boolean;
+    game_title: string;
+    gm_name: string;  
+    search?: string;
+    status?: string;
 }
 
 export type InvitedPlayer = {
@@ -97,9 +185,13 @@ export type InvitedPlayer = {
   displayName: string;
   email?: string;
   phone?: string;
+  expires_in_days?: number;
+  expires_at?: string;
 }
 
 export type MemberDO = {
+  status: MemberStatus;
+  last_login_at: Date | null;
   id: string;
   provider?: string;
   given_name: string;
@@ -110,12 +202,20 @@ export type MemberDO = {
   birthday?: Date | null;
   isMinor: boolean;
   isAdmin: boolean;
+  consent: boolean;
   experienceLevel?: ExperienceLevel;
   bio?: string;
   avatar: string;
   roles: RoleDO[];
-  created_at?: Date;
-  updated_at?: Date;
+  created_at: Date;
+  updated_at: Date;
+  updated_by: string;
+  deleted_at: Date | null;
+  deleted_by: string;
+  admin_notes?: AdminNote[] | null;
+  search?: string;
+  last_login_before?: Date;
+  last_login_after?: Date;
   onManageRoles?: (member: MemberDO) => void; // Optional callback to manage roles
   onRemoveMember?: (id: string, displayName: string) => void; // Optional callback to remove a member
   onResetPassword?: (email: string) => void; // Optional callback to reset the member's password
@@ -185,6 +285,18 @@ export interface AnnouncementRead {
 export type SupabaseAnnouncementListResponse = SupabaseDataResponse<Announcement>
 export type SupabaseAnnouncementResponse = SupabaseDataResponseSingle<Announcement>
 
+export type AuditTrailData = {
+  id: string;
+  action: AuditAction;
+  actor_id: string | null;
+  target_type: string;
+  target_id: string;
+  summary: string | null;
+  metadata: Record<string, any> | null;
+  created_at: string;
+  actor?: MemberData;
+}
+
 export type ContactListData = {
   id: string;
   member_roles?: RoleData[];
@@ -216,6 +328,20 @@ export type GameRegistration = {
 }
 export type SupabaseGameRegistrationListResponse = SupabaseDataResponse<GameRegistration>
 
+export type AdminNote = {
+  id: string;
+  author_id: string;
+  author: MemberData;
+  target_id: string;
+  target_type: NoteTargetType;
+  note: string;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
+}
+export type SupabaseAdminNoteListResponse = SupabaseDataResponse<AdminNote>
+export type SupabaseAdminNoteResponse = SupabaseDataResponseSingle<AdminNote>
+
 export type MemberData = {
   id: string;
   email: string;
@@ -223,8 +349,15 @@ export type MemberData = {
   provider?: string;
   is_admin: boolean;
   is_minor: boolean;
+  consent: boolean;
+  status: MemberStatus;
+  last_login_at: Date | null;
   created_at: Date;
   updated_at: Date;
+  updated_by: string;
+  deleted_at: Date;
+  deleted_by: string;
+  admin_notes: AdminNote[] | null;
   profiles: ProfileData;
   member_roles: RoleData[];
 }
@@ -257,6 +390,33 @@ export type MessageData = {
 export type SupabaseMessageListResponse = SupabaseDataResponse<MessageData>
 export type SupabaseMessageResponse = SupabaseDataResponseSingle<MessageData>
 
+export type GMGameSummary = {
+  id: string;
+  title: string;
+  status: GameStatus;
+  system: string;
+  starting_seats: number;
+  visibility: GameVisibility;
+  max_seats: number;
+  gamemaster_id: string;
+  gamemaster: MemberData;
+  game_registrations: { count: number }
+  game_schedules: GameSchedule;
+}
+export type SupabaseGMGameSummaryListResponse = SupabaseDataResponse<GMGameSummary>
+export type SupabaseGMGameSummaryResponse = SupabaseDataResponseSingle<GMGameSummary>
+
+export type GMGameSummaryDO = Omit<GMGameSummary, "starting_seats" | "max_seats" | "game_registrations" | "game_schedules" | "starting_seats" | "gamemaster" | "gamemaster_id"> & {
+  startingSeats: number;
+  playerCount: number;
+  playerLimit: number;
+  gamemaster: {
+    id: string;
+    email: string;
+    displayName: string
+  }
+  schedules: GameSchedule;
+}
 
 export type ProfileData = {
   id?: string;
@@ -324,7 +484,7 @@ export type RegisteredGameDO = {
   coverImage: string;
   scheduled_for: Date | null;
   location: Location;
-  status: GameStatus;
+  status: GameSchedStatus;
   interval: GameInterval;
   dayOfWeek: DOW;
   gamemasterId: string;
@@ -366,6 +526,63 @@ export type AdminTaskTagData = {
   tag_id: string;
   count?: number  
 }
+
+export type FeedbackDO = Omit<FeedbackData, "member" | "handler"> & {
+  member: {
+    id: string;
+    given_name: string | null;
+    surname: string | null;
+    displayName: string | null;
+  }
+  handler: {
+    id: string;
+    given_name: string | null;
+    surname: string | null;
+    displayName: string | null;
+  }
+}
+
+export type FeedbackData = {
+  id: string;
+  message: string;
+  category: FeedbackCategory;
+  submitted_at: string;
+  handled: boolean;
+  handled_at: string | null;
+  handled_by: string | null;
+  handler: MemberData;
+  member_id: string;
+  member: MemberData;
+}
+export type SupabaseFeedbackListResponse = SupabaseDataResponse<FeedbackData>
+export type SupabaseFeedbackResponse = SupabaseDataResponseSingle<FeedbackData>
+
+export type GameResourceDO = GameResourceData;
+export type GameResourceData = {
+  id: string;
+  title: string;
+  body: string;
+  category: ResourceCategory;
+  visibility: ResourceVisibility;
+  external_url?: string;
+  file_url?: string;
+  author_id: string;
+  pinned: boolean;
+  created_at: string;
+  updated_at: string | null;
+  deleted_at: string | null;
+  deleted_by: string | null;
+}
+
+export type GMGameScheduleDO = {
+  interval: GameInterval;
+  status: GameSchedStatus;
+  first_game_date: string;
+  next_game_date: string;
+  last_game_date: string | null;
+  day_of_week: DOW;
+}
+
 
 export type TaskDO = Omit<TaskData, "assigned_to" | "assigned_to_user" | "created_at" | "updated_at" | "deleted_at"> & {
   assigned_to: {
@@ -410,7 +627,7 @@ export type RegisteredCharacter = {
 export type GameData = {
   id: string;
   game_id: string;
-  status: GameStatus;
+  status: GameSchedStatus;
   interval: GameInterval;
   firstGameDate: Date; // or Date if you convert the date
   nextGameDate: Date;
@@ -443,7 +660,7 @@ export type SupaGameScheduleData = {
   first_game_date: Date; // or Date if you convert the date
   next_game_date: Date; // or Date if you convert the date
   last_game_date: Date; // or Date if you convert the date
-  status: GameStatus;
+  status: GameSchedStatus;
   location_id: string;
   location: Location;
   games: SupaGameData;
@@ -467,17 +684,26 @@ export type SupabaseGameDataResponse = SupabaseDataResponseSingle<SupaGameSchedu
 export type SupabaseGameDataListResponse = SupabaseDataResponse<SupaGameScheduleData>
 export type SupabaseUpcomingGamesListResponse = SupabaseDataResponse<GameData>
 
+export type GMGameDO = SupaGMGameData
+export type GMGameDataResponse = SupabaseDataResponseSingle<GMGameDO>
+export type GMGameDataListResponse = SupabaseDataResponse<GMGameDO>
+
 export type SupaGMGameData = {
   id: string;
   title: string;
   description: string;
   system: string;
+  status: GameStatus;
+  game_code: string;
   cover_image: string;
   max_seats: number;
   starting_seats: number;
   visibility: GameVisibility;
   game_schedule: SupaGameScheduleData[];
   gamemaster: MemberData;
+  created_at: Date;
+  deleted_at: Date | null;
+  game_registrations: GameRegistration[];
 }
 export type SupabaseGMGameDataResponse = SupabaseDataResponseSingle<SupaGMGameData>
 export type SupabaseGMGameDataListResponse = SupabaseDataResponse<SupaGMGameData>
@@ -492,7 +718,7 @@ export type GMGameData = {
   interval: GameInterval;
   dow: DOW;
   maxSeats: number;
-  status: GameStatus;
+  status: GameSchedStatus;
   location_id: string;
   location: Location;
   visibility: GameVisibility;
@@ -519,7 +745,7 @@ export type Location = {
   scope: LocationScope;
 }
 
-export type AdminLocationData = 
+export type LocationData = 
   Location & {
     location_perms: LocationPermData[];
   }
@@ -534,8 +760,8 @@ export type LocationPermData = LocationPerm & {
   members: MemberData
 }
 
-export type SupabaseAdminLocationPermResponse = SupabaseDataResponseSingle<AdminLocationData>
-export type SupabaseAdminLocationPermListResponse = SupabaseDataResponse<AdminLocationData>
+export type SupabaseAdminLocationPermResponse = SupabaseDataResponseSingle<LocationData>
+export type SupabaseAdminLocationPermListResponse = SupabaseDataResponse<LocationData>
 
 export type SupabaseLocationPermResponse = SupabaseDataResponseSingle<LocationPermData>
 export type SupabaseLocationPermListResponse = SupabaseDataResponse<LocationPermData>
@@ -544,15 +770,18 @@ export type InviteData = {
   id: string;
   game_id: string;
   invitee: string;
+  invited_at: Date;
+  accepted: boolean;
+  accepted_at: Date | null;
+  expires_at: Date | null;
+  viewed_at: Date | null;
+  notified: boolean;
+  gamemaster_id: string;
   display_name: string;
   external_email?: string;
   external_phone?: string;
-  invited_at: Date;
-  expires_at: Date;
-  accepted: boolean;
-  notified: boolean;
-  gamemaster_id: string;
-  game?: GameData;
+  game: GameData;
+  gamemaster: MemberData;
 }
 
 export type SupabaseGameInviteResponse = SupabaseDataResponseSingle<InviteData>
@@ -642,5 +871,49 @@ export type SupaGameSchedule = {
   first_game_date: Date;
   next_game_date: Date;
   last_game_date?: Date;
-  status: GameStatus;
+  status: GameSchedStatus;
 }
+
+export type GMAnalytics = {
+  totalGames: number;
+  activeGames: number;
+  upcomingSessions: number;
+  totalPlayers: number;
+  inviteStats: InviteStat[];
+  registrationStatus: RegistrationStatus;
+}
+
+export type RegistrationStatus = {
+  approved: number;
+  pending: number;
+  rejected: number;
+  banned: number;
+}
+
+export type InviteStat = {
+  gameId: string;
+  gameTitle: string;
+  accepted: number;
+  total: number;
+}
+
+export type GMSessionNoteDO = {
+  id: string;
+  game_id: string;
+  schedule_id: string;
+  author_id: string;
+  session_date: string;
+  title: string;
+  body: string;
+  is_visible_to_players: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+export type GMLocationResponse = {
+  data: GMLocationDO[];
+  total: number;
+  page: number;
+  pageSize: number;
+};

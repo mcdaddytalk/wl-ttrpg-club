@@ -10,4 +10,14 @@ export const useAdminMembers = () =>
         return await res.json();
       }
     });
+
+  export const useAdminMember = (id: string) =>
+    useQuery<MemberDO>({
+      queryKey: ['admin-member', id],
+      queryFn: async () => {
+        const res = await fetch(`/api/admin/members/${id}`);
+        if (!res.ok) throw new Error('Failed to load member');
+        return await res.json();
+      }
+    });
   

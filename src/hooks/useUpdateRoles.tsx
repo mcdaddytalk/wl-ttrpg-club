@@ -1,6 +1,7 @@
 import createSupabaseBrowserClient from '@/utils/supabase/client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import logger from '@/utils/logger';
+import { useQueryClient } from './useQueryClient';
 
 export const useUpdateRoles = () => {
   const queryClient = useQueryClient();

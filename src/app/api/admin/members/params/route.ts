@@ -1,4 +1,4 @@
-import { GetMembersSchema } from "@/app/admin/_lib/validations";
+import { GetMembersSchema } from "@/app/admin/_lib/adminMembers";
 import { MemberData, MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
@@ -30,6 +30,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                     id,
                     name
                 )
+            ),
+            admin_notes(
+                *
             )
         `)
         .order("created_at", { ascending: false }) as unknown as SupabaseMemberListResponse;
@@ -53,10 +56,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             experienceLevel: memberData.profiles.experience_level,
             isAdmin: memberData.is_admin,
             isMinor: memberData.is_minor,
+            consent: memberData.consent,
+            status: memberData.status,
+            last_login_at: memberData.last_login_at,
             created_at: memberData.created_at,
             updated_at: memberData.updated_at,
+            deleted_at: memberData.deleted_at,
+            updated_by: memberData.updated_by,
+            deleted_by: memberData.deleted_by,
             bio: memberData.profiles.bio ?? '',
-            avatar: memberData.profiles.avatar ?? '',        
+            avatar: memberData.profiles.avatar ?? '',
+            admin_notes: memberData.admin_notes,
             roles: memberData.member_roles.map(role => role.roles)
         }
     }) || [];
@@ -70,7 +80,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json() as GetMembersSchema;
-    const { search, page, perPage, sort, email, experienceLevel, isAdmin, isMinor }  = body;
+    const { 
+        search, 
+        page, 
+        pageSize, 
+        sort, 
+        email, 
+        experienceLevel, 
+        isAdmin, 
+        isMinor, 
+        status, 
+        last_login_after, 
+        last_login_before 
+    }  = body;
 
     const supabase = await createSupabaseServerClient();
     let query = supabase
@@ -91,9 +113,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                     id,
                     name
                 )
-            )
+            ),
+            admin_notes(id, author_id, note, created_at)
         `, { count: "exact" })
-        .range((page - 1) * perPage, page * perPage - 1);
+        .range((page - 1) * pageSize, page * pageSize - 1);
 
     if (sort) {
         sort.forEach(({ id, desc }) => {
@@ -102,11 +125,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // Apply filters
-    if (search) query = query.or(`profiles.given_name.ilike.%${search}%,profiles.surname.ilike.%${search}%`);
+    if (search) query = query.or(`email.ilike.%${search}%,profiles.given_name.ilike.%${search}%,profiles.surname.ilike.%${search}%`);
     if (email) query = query.ilike("email", `%${email}%`);
     if (experienceLevel && experienceLevel.length) query = query.in("profiles.experience_level", experienceLevel);
     if (isAdmin) query = query.eq("is_admin", isAdmin);
     if (isMinor) query = query.eq("is_minor", isMinor);
+    if (status) {
+        query = query.eq("status", status);
+    }
+    if (last_login_after) {
+        query = query.gte("last_login_at", last_login_after);
+    }
+    if (last_login_before) {
+        query = query.lte("last_login_at", last_login_before);
+    }
 
     const { data: membersData, error, count } = await query;
     
@@ -134,10 +166,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                 experienceLevel: memberData.profiles.experience_level,
                 isAdmin: memberData.is_admin,
                 isMinor: memberData.is_minor,
+                consent: memberData.consent,
+                status: memberData.status,
+                last_login_at: memberData.last_login_at,
                 created_at: memberData.created_at,
                 updated_at: memberData.updated_at,
+                deleted_at: memberData.deleted_at,
+                updated_by: memberData.updated_by,
+                deleted_by: memberData.deleted_by,
                 bio: memberData.profiles.bio ?? '',
-                avatar: memberData.profiles.avatar ?? '',        
+                avatar: memberData.profiles.avatar ?? '',
+                admin_notes: memberData.admin_notes,
                 roles: memberData.member_roles.map(role => role.roles)
             }
         });

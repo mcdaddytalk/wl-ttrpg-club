@@ -47,6 +47,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
     return NextResponse.json({ error: "No invitees provided." }, { status: 400 });
   }
 
+  const today = new Date();
+
+  const allInviteesWithExpiry = invitees.map((invitee) => {
+    const expiresIn = invitee.expires_in_days ?? 7;
+    const expiresAt = new Date(today);
+    expiresAt.setDate(today.getDate() + expiresIn);
+    return { ...invitee, expires_at: expiresAt.toISOString() };
+  });
+
   const supabase = await createSupabaseServerClient();
 
   const { data: gameData, error: gameError } = await supabase
@@ -60,11 +69,17 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
     return NextResponse.json({ message: 'Error fetching game' }, { status: 500 });
   }
 
-  if (gameData && gameData.gamemaster_id !== gamemasterId) {
-    return NextResponse.json({ message: 'Not the gamemaster of this game' }, { status: 403 });
+  const { data: requester, error: requesterError } = await supabase
+    .from("members")
+    .select("is_admin")
+    .eq("id", gamemasterId)
+    .single();
+
+  if (requesterError || (!requester?.is_admin && gameData.gamemaster_id !== gamemasterId)) {
+    return NextResponse.json({ message: 'Not authorized to invite for this game' }, { status: 403 });
   }
   
-  logger.log('GM Games', gamemasterId, game_id, gameData);
+  logger.debug('GM Games', gamemasterId, game_id, gameData);
 
   const { data: existingReg } = await supabase
     .from('game_registrations')
@@ -75,9 +90,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
   
   if (existingReg)
     return NextResponse.json({ message: 'Player already registered' }, { status: 200 });
-
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7);
 
   const { data: existingMembers } = await supabase
     .from('members')
@@ -91,16 +103,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
           surname
         )    
     `)
-    .or(`email.in(${invitees.map((invitee) => invitee.email)}), phone.in(${invitees.map((invitee) => invitee.phone)}))`);
+    .or(`email.in(${allInviteesWithExpiry.map((invitee) => invitee.email)}), phone.in(${allInviteesWithExpiry.map((invitee) => invitee.phone)}))`);
 
     // Create invite records
     const inviteRecords: InternalInvite[] = [];
     const externalInvites: ExternalInvite[] = [];
 
     if (existingMembers) logger.log('Existing Members', existingMembers);
-    logger.log('Invites', invitees);
+    logger.log('Invites', allInviteesWithExpiry);
 
-    for (const invitee of invitees) {
+    for (const invitee of allInviteesWithExpiry) {
         const invite_id = uuidv4(); // Generate a unique invite ID
         const existingMember = existingMembers?.find(m => m.email === invitee.email || m.phone === invitee.phone);
         if (existingMember) {
@@ -120,16 +132,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
                     gamemaster_id: gamemasterId,
                     invitee: existingMember.id,
                     display_name: invitee.displayName,
-                    expires_at: expiresAt.toISOString(),
+                    expires_at: invitee.expires_at,
                     notified: true
                 })
-                // If consent is TRUE, send invite via email/SMS
-                // const { data: inviteData } = await supabase.from("game_invites").insert([{ game_id: game_id, member_id: existingMember.id }]);
                 // Send email and SMS notifications
                 const { email, phone, profiles } = existingMember;
                 const given_name = profiles ? `${profiles.given_name}` : 'Unknown';
-                if (email) await sendEmailInvite(given_name, email, game_id);
-                if (phone) await sendSMSInvite(phone, game_id);
+                if (email) await sendEmailInvite(given_name, email, game_id, false,  invitee.expires_in_days);
+                if (phone) await sendSMSInvite(phone, game_id, invitee.expires_in_days);
             }
         } else {
             externalInvites.push({
@@ -139,14 +149,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
                 external_email: invitee.email,
                 external_phone: invitee.phone,
                 display_name: invitee.displayName,
-                expires_at: expiresAt.toISOString(),
+                expires_at: invitee.expires_at,
                 notified: true
             })
             if (invitee.email) {
-                await sendEmailInvite(invitee.given_name, invitee.email, invite_id);
+                await sendEmailInvite(invitee.given_name, invitee.email, invite_id, false, invitee.expires_in_days);
             }
             if (invitee.phone) {
-                await sendSMSInvite(invitee.phone, invite_id);
+                await sendSMSInvite(invitee.phone, invite_id, invitee.expires_in_days);
             }
         }        
     }
@@ -162,22 +172,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
       const { error } = await supabase.from("game_invites").insert(externalInvites);
       if (error) throw new Error(error.message)
     }
-  // const { data: inviteData } = await supabase
-  //   .from('game_invites')
-  //   .insert([{
-  //     game_id: game_id,
-  //     external_email: body.external_email,
-  //     external_phone: body.external_phone,
-  //     expires_at: expiresAt.toISOString(),
-  //     notified: true
-  //   }])
-  //   .select('*')
-  //   .single();
     
   return NextResponse.json({ message: 'Players invited successfully', inviteRecords, externalInvites }, { status: 200 });
 }
 
-async function sendEmailInvite(given_name: string, email: string, invite_id: string, requireSignup = false) {
+async function sendEmailInvite(given_name: string, email: string, invite_id: string, requireSignup = false, expires_in_days = 7) {
   // Send email invite
   const inviteUrl = requireSignup
   ? getURL(`/signup?invite=${invite_id}&email=${encodeURIComponent(email)}`)
@@ -188,8 +187,8 @@ async function sendEmailInvite(given_name: string, email: string, invite_id: str
   : '[WL-TTRPG] You have been invited to a game';
 
   const body = requireSignup
-  ? `${given_name},\n\n<p>You have been invited to a private game.\nTo accept, please sign up first: <a href="${inviteUrl}" style="color:blue" >Click here to sign up and accept</a></p><p>This invite will expire in 7 days.</p><p>Happy Gaming!<br/>WL-TTRPG Gamemasters</p>`
-  : `${given_name},\n\n<p>You have been invited to a private game.\nTo accept, please click the link below:\n<a href="${inviteUrl}" style="color:blue">Accept Invite</a></p><p>This invite will expire in 7 days.</p><p>Happy Gaming!<br/>WL-TTRPG Gamemasters</p>`;
+  ? `${given_name},\n\n<p>You have been invited to a private game.\nTo accept, please sign up first: <a href="${inviteUrl}" style="color:blue" >Click here to sign up and accept</a></p><p>This invite will expire in ${expires_in_days} days.</p><p>Happy Gaming!<br/>WL-TTRPG Gamemasters</p>`
+  : `${given_name},\n\n<p>You have been invited to a private game.\nTo accept, please click the link below:\n<a href="${inviteUrl}" style="color:blue">Accept Invite</a></p><p>This invite will expire in ${expires_in_days} days.</p><p>Happy Gaming!<br/>WL-TTRPG Gamemasters</p>`;
 
   await sendEmail({
     to: email,
@@ -198,10 +197,10 @@ async function sendEmailInvite(given_name: string, email: string, invite_id: str
   })
 }
 
-async function sendSMSInvite(phone: string, invite_id: string) {
+async function sendSMSInvite(phone: string, invite_id: string, expires_in_days = 7) {
   // Send SMS invite
   const inviteUrl = getURL(`/accept-invite?invite=${invite_id}`);
-  const body = 'You have been invited to a private game. Click here to accept: ' + inviteUrl + '. This invite will expire in 7 days. Happy Gaming! WL-TTRPG Gamemasters';
+  const body = `You have been invited to a private game. Click here to accept: ${inviteUrl} - This invite will expire in ${expires_in_days} days. Happy Gaming! WL-TTRPG Gamemasters`;
 
   await sendSMS({
     to: phone,

@@ -1,4 +1,4 @@
-import { GameStatus, GameVisibility, Location, RegisteredGameDO } from "@/lib/types/custom";
+import { GameSchedStatus, GameVisibility, Location, RegisteredGameDO } from "@/lib/types/custom";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         scheduled_for: gr.games.game_schedule[0].next_game_date 
             ? new Date(gr.games.game_schedule[0].next_game_date)
             : new Date(),
-        status: (gr.games.game_schedule[0].status ?? '') as GameStatus,
+        status: (gr.games.game_schedule[0].status ?? '') as GameSchedStatus,
         location: (gr.games.game_schedule[0].locations ?? { id: '', name: '', address: '', url: '', type: ''}) as unknown as Location,
         gamemasterId: gr.games.gamemaster_id ?? '',
         interval: gr.games.game_schedule[0].interval,

@@ -8,7 +8,9 @@ import { useGMSidebarStore } from "@/store/gmSidebarStore"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 const navItems = [
+    { href: "/gamemaster", label: "Dashboard", icon: '📊' },
     { href: "/gamemaster/games", label: "My Games", icon: '👤' },
+    { href: "/gamemaster/resources", label: "My Resources", icon: '📚' },
     { href: "/gamemaster/locations", label: "My Locations", icon: '📍' },
     { href: "/gamemaster/invites", label: "My Invites", icon: '📫' }
 ]

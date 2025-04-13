@@ -41,7 +41,6 @@ import { useDebouncedCallback } from "./use-debounce-cb"
     | "pageCount"
     | "getCoreRowModel"
     | "manualFiltering"
-    | "manualPagination"
     | "manualSorting"
   >,
   Required<Pick<TableOptions<TData>, "pageCount">> {
@@ -135,6 +134,8 @@ initialState?: Omit<Partial<TableState>, "sorting"> & {
   // Extend to make the sorting id typesafe
   sorting?: ExtendedSortingState<TData>
 }
+
+manualPagination?: boolean
 }
 
 export function useDataTable<TData>({
@@ -149,6 +150,7 @@ export function useDataTable<TData>({
     clearOnDefault = false,
     startTransition,
     initialState,
+    manualPagination = false,
     ...props
 }: UseDataTableProps<TData>) {
     const queryStateOptions = React.useMemo<
@@ -162,6 +164,7 @@ export function useDataTable<TData>({
             debounceMs,
             clearOnDefault,
             startTransition,
+            manualPagination,
         }
     }, [
         history,
@@ -171,6 +174,7 @@ export function useDataTable<TData>({
         debounceMs,
         clearOnDefault,
         startTransition,
+        manualPagination,
     ])
 
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>(
@@ -183,8 +187,8 @@ export function useDataTable<TData>({
     "page",
     parseAsInteger.withOptions(queryStateOptions).withDefault(1)
     )
-    const [perPage, setPerPage] = useQueryState(
-    "perPage",
+    const [pageSize, setPerPage] = useQueryState(
+    "pageSize",
     parseAsInteger
         .withOptions(queryStateOptions)
         .withDefault(initialState?.pagination?.pageSize ?? 10)
@@ -224,7 +228,7 @@ export function useDataTable<TData>({
     // Paginate
     const pagination: PaginationState = {
         pageIndex: page - 1, // zero-based index -> one-based index
-        pageSize: perPage,
+        pageSize,
     }
 
     function onPaginationChange(updaterOrValue: Updater<PaginationState>) {
@@ -355,7 +359,7 @@ export function useDataTable<TData>({
         getFacetedUniqueValues: enableAdvancedFilter
             ? undefined
             : getFacetedUniqueValues(),
-        manualPagination: true,
+        manualPagination,
         manualSorting: true,
         manualFiltering: true,
     })
