@@ -10,7 +10,6 @@ import { getClientIp, RATE_LIMIT } from "./utils/helpers"
 const protectedApiRoutes = [
   '/api/admin',
   '/api/broadcasts',
-  '/api/contacts',
   '/api/gamemaster',
   '/api/games',
   '/api/locations',

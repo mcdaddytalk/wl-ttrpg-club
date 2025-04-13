@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { calculateNextGameDate, daysOfWeek, intervals, gameStatuses } from '@/utils/helpers';
 import { toast } from "sonner";
 import { useUpdateGame } from "@/hooks/useUpdateGame";
-import { DOW, GameInterval, GameStatus, GMGameData, Location } from "@/lib/types/custom";
+import { DOW, GameInterval, GameSchedStatus, GMGameData, Location } from "@/lib/types/custom";
 
 interface EditGameModalProps {
     isOpen: boolean,
@@ -36,7 +36,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
     const [gameDate, setGameDate] = useState(game.scheduled_next);
     const [gameInterval, setGameInterval] = useState(game.interval);
     const [gameDay, setGameDay] = useState(game.dow);
-    const [gameStatus, setGameStatus] = useState(game.status);
+    const [gameStatus, setGameSchedStatus] = useState(game.status);
     const [gameLocationId, setGameLocationId] = useState(game.location.id);
     const [error, setError] = useState<string | null>(null);
 
@@ -146,7 +146,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
                         <Label htmlFor="status" className="text-right">Status</Label>
                         <Select 
                             value={gameStatus} 
-                            onValueChange={(e) => setGameStatus(e as GameStatus)}
+                            onValueChange={(e) => setGameSchedStatus(e as GameSchedStatus)}
                         >
                             <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Select a status" />

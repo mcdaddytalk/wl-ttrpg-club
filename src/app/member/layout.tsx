@@ -1,10 +1,11 @@
 import React from "react";
-import Sidebar from "@/components/Sidebar";
+import MemberSidebar from "./_components/MemberSidebar";
+
 
 export default function MemberLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex min-h-screen">
-            <Sidebar />
+            <MemberSidebar />
             <div className="flex-grow p-6 overflow-auto">
                 {children}
             </div>

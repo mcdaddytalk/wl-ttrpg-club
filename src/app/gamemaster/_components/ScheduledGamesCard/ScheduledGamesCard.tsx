@@ -110,7 +110,7 @@ const ScheduledGamesCard= ({ scheduledGames, onShowDetails, onGameAdded, onGameE
     }));
 
     const pageSize = 5;
-    const pageCount = Math.ceil(scheduledGames.length / pageSize);
+    const pageCount = Math.ceil((scheduledGames?.length || 0) / pageSize);
     const filterFields: DataTableFilterField<GMGameData>[] = [];
 
     const { table } = useDataTable({

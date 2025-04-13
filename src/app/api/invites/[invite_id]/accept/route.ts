@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/utils/supabase/server";
 import logger from "@/utils/logger";
 import { SupabaseGameInviteResponse } from "@/lib/types/custom";
 import { getInitialSession } from "@/server/authActions";
+import { logAuditEvent } from "@/server/auditTrail";
 
 type InviteParams = {
   invite_id: string;
@@ -44,8 +45,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
   }
   
   // Check if expired
-  if (new Date(inviteData.expires_at) < new Date()) {
-    return NextResponse.json({ message: 'Invite has expired' }, { status: 400 });
+  const expiresAt = inviteData.expires_at;
+
+  if (expiresAt !== null) {
+    const expires = new Date(expiresAt);
+
+    if (!isNaN(expires.getTime()) && expires < new Date()) {
+      return NextResponse.json({ message: "Invite has expired" }, { status: 400 });
+    }
   }
 
   logger.log('Invite accepted:', inviteData);
@@ -73,7 +80,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
   // Mark invite as accepted
   const { data: acceptData, error: acceptError } = await supabase
     .from("game_invites")
-    .update({ accepted: true })
+    .update({ 
+      accepted: true,
+      accepted_at: new Date().toISOString() 
+    })
     .eq("id", invite_id)
     .select("*").single();
 
@@ -92,9 +102,21 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
     .eq('member_id', user.id)
     .single();
 
-  if (existingReg) {
-    return NextResponse.json({ message: 'You are already registered for this game' }, { status: 400 });
-  }
+    if (existingReg) {
+      // Still update the invite to reflect acceptance
+      await supabase
+        .from("game_invites")
+        .update({
+          accepted: true,
+          accepted_at: new Date().toISOString()
+        })
+        .eq("id", invite_id);
+    
+      return NextResponse.json({
+        message: "You were already registered — invite marked as accepted.",
+        game_id: inviteData.game_id
+      });
+    }
 
 
   // Register user for the game
@@ -111,6 +133,21 @@ export async function POST(request: NextRequest, { params }: { params: Promise<I
 
   // Remove invite
   // await supabase.from("game_invites").delete().eq("id", invite_id);
+
+  await logAuditEvent({
+    action: "accept",
+    actor_id: user.id,
+    target_type: "game_invite",
+    target_id: invite_id,
+    summary: `Joined game ${inviteData.game_id}`,
+    metadata: {
+      game_id: inviteData.game_id,
+      gamemaster_id: inviteData.gamemaster_id,
+      invitee_id: user.id,
+      invitee_email: user.email,
+      invitee_name: inviteData.display_name
+    }
+  })
 
   return NextResponse.json({ message: "Successfully joined game!", game_id: inviteData.game_id }, { status: 200 });
 }

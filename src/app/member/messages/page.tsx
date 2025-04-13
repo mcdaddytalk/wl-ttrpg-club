@@ -3,7 +3,7 @@
 import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
 import React from "react"
-import MemberMessageTable from "@/components/MemberMessageTable/MemberMessageTable";
+import MemberMessageTable from "./_components/MemberMessageTable/MemberMessageTable";
 
 const MessagesPage = (): React.ReactElement => {
     const session = useSession();

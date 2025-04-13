@@ -1,4 +1,4 @@
-import { DOW, GameInterval, GameStatus } from "@/lib/types/custom";
+import { DOW, GameInterval, GameSchedStatus } from "@/lib/types/custom";
 import { ENVS } from "@/utils/constants/envs"
 import { NextRequest } from "next/server";
 
@@ -33,7 +33,7 @@ export const formatDate = (isoString: string): string => {
 
 export const daysOfWeek: DOW[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 export const intervals: GameInterval[] = ['weekly', 'biweekly', 'monthly', 'yearly', 'custom'];
-export const gameStatuses: GameStatus[] = ['draft', 'active', 'awaiting-players', 'full', 'scheduled', 'canceled', 'completed'];
+export const gameStatuses: GameSchedStatus[] = ['draft', 'active', 'awaiting-players', 'full', 'scheduled', 'canceled', 'completed'];
 
 export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, date?: Date) => {
     const today = new Date();
@@ -101,3 +101,13 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
     // Fallback for environments without a proxy
     return req.headers.get("cf-connecting-ip") || "127.0.0.1"; // Default to localhost for safety
   };
+
+  export function toSearchParams(obj: Record<string, unknown>): URLSearchParams {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined && value !== null) {
+        params.set(key, String(value));
+      }
+    }
+    return params;
+  }

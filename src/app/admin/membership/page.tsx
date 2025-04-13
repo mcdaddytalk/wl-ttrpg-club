@@ -1,18 +1,13 @@
-import AdminMembersDashboarClient from "./AdminMembersDashboardClient";
+//import { fetchMembersFull } from "@/queries/fetchMembers";
+import AdminMembersDashboardClient from "./AdminMembersDashboardClient";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-// import { fetchMembersFull, fetchRoles } from "@/queries/fetchMembers";
 
 export default async function AdminMembersDashboard() {
     const queryClient = new QueryClient();
-    
-    // try {
-    //     await queryClient.prefetchQuery(fetchMembersFull());
-    //     await queryClient.prefetchQuery(fetchRoles());
-    // } catch (error) {
-    //     logger.error('Error prefetching queries:', error);
-    // }
-    
+
+    //await queryClient.prefetchQuery({ queryKey: ["admin", "members"], queryFn: fetchMembersFull });
+        
     return (<HydrationBoundary state={dehydrate(queryClient)}>
-        <AdminMembersDashboarClient />
+        <AdminMembersDashboardClient />
     </HydrationBoundary>);
 }
