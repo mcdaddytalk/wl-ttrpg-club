@@ -23,6 +23,7 @@ import useToastStore from "@/store/toastStore";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import logger from '@/utils/logger';
 import { ENVS } from "@/utils/constants/envs"
+import { getURL } from "@/utils/helpers";
 
 type JwtPayloadWithRoles = JwtPayload & { roles: string[] };
 export const getInitialSession = async (): Promise<{ session: Session | null; user: User | null; error: AuthError | null }> => {
@@ -113,11 +114,11 @@ export async function signOut(): Promise<{ error: AuthError | null }> {
 
 export async function signInWithProvider(provider: Provider, redirectUrl = '/member'): Promise<void> {
     const supabase = await createSupabaseServerClient();
-    const origin = ENVS.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+    const redirectTo = getURL('/auth/callback');
     const credentials: SignInWithOAuthCredentials = {
         provider,
         options: {
-            redirectTo: `${origin}/auth/callback`
+            redirectTo
         }
     }
     const { data, error } = await supabase.auth.signInWithOAuth(credentials);
