@@ -1,4 +1,4 @@
-import { SupabaseTagListResponse, TagDO } from '@/lib/types/custom';
+import { TagDO } from '@/lib/types/custom';
 import logger from '@/utils/logger';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
