@@ -23,10 +23,6 @@ export async function POST(request: Request): Promise<NextResponse> {
         logger.warn('Spam submission detected', contactUsData);
         return NextResponse.json({ error: 'Spam detected' }, { status: 400 });
     }
-    if (contactUsData && contactUsData.website) {
-        logger.warn('Spam submission detected', contactUsData);
-        return NextResponse.json({ error: 'Spam detected' }, { status: 400 });
-    }
     try {
         const { error } = await resend.emails.send({
             from: 'WL-TTRPG <onboarding@kaje.org>',
