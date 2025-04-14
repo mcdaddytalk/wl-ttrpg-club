@@ -79,6 +79,7 @@ const serverSchema = z.object({
     TWILIO_MESSAGING_SERVICE_SID: z.string(),
     NEXT_PUBLIC_SENTRY_DSN: z.string(),
     SENTRY_AUTH_TOKEN: z.string(),
+    DISCORD_CONTACT_WEBHOOK: z.string().url(),
 }).merge(clientSchema)
 
 type ServerEnvs = z.infer<typeof serverSchema>
@@ -119,7 +120,8 @@ const processEnv: PROCESS_ENV = {
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     DEBUG: process.env.DEBUG,
-    NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG
+    NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG,
+    DISCORD_CONTACT_WEBHOOK: process.env.DISCORD_CONTACT_WEBHOOK
 }
 
 const ENVS = createEnvs(parseEnvs(processEnv, clientSchema, serverSchema))
