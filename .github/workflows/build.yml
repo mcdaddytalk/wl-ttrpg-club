@@ -33,6 +33,7 @@ jobs:
             TWILIO_MESSAGING_SERVICE_SID: MG_not_a_real_sid
             NEXT_PUBLIC_SENTRY_DSN: "https://NOTREAL.ingest.us.sentry.io/4508502494019584"
             SENTRY_AUTH_TOKEN: sample_auth_token
+            DISCORD_CONTACT_WEBHOOK: https://sample.discord.com/webhook/
 
         steps:
             - name: Checkout codebase. 

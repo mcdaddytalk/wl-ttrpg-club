@@ -446,6 +446,33 @@ export type Database = {
           },
         ]
       }
+      contact_submissions: {
+        Row: {
+          category: Database["public"]["Enums"]["category_enum"]
+          created_at: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["category_enum"]
+          created_at?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["category_enum"]
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+        }
+        Relationships: []
+      }
       contacts: {
         Row: {
           agree_to_rules: boolean
@@ -1465,6 +1492,14 @@ export type Database = {
         | "login"
         | "system"
         | "accept"
+      category_enum:
+        | "support"
+        | "feedback"
+        | "question"
+        | "other"
+        | "general"
+        | "bug report"
+        | "feature request"
       day_of_week_enum:
         | "sunday"
         | "monday"
@@ -1633,6 +1668,15 @@ export const Constants = {
       app_function: ["games", "members", "schedules", "messages"],
       app_permission: ["create", "read", "update", "delete"],
       audit_action: ["create", "update", "delete", "login", "system", "accept"],
+      category_enum: [
+        "support",
+        "feedback",
+        "question",
+        "other",
+        "general",
+        "bug report",
+        "feature request",
+      ],
       day_of_week_enum: [
         "sunday",
         "monday",

@@ -917,3 +917,13 @@ export type GMLocationResponse = {
   page: number;
   pageSize: number;
 };
+
+export const CONTACT_CATEGORIES = ['general', 'bug report', 'feature request', 'support', 'question', 'feedback', 'other'] as const;
+export type ContactCategory = typeof CONTACT_CATEGORIES[number];
+export type ContactData = {
+    name: string;
+    email: string;
+    category: ContactCategory;
+    message: string;
+    website?: string;
+}

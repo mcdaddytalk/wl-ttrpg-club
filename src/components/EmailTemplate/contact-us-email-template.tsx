@@ -6,13 +6,14 @@ interface ContactUsEmailTemplateProps {
     message: string;
 }
 
-export const ContactUsEmail = ({ name, email, message }: ContactUsEmailTemplateProps) => {
-    return (
-        <div>
-            <h1>Contact Us</h1>
-            <p>Name: {name}</p>
-            <p>Email: {email}</p>
-            <p>Message: {message}</p>
-        </div>
-    );
-};
+export const ContactUsEmail = ({ name, email, message }: ContactUsEmailTemplateProps) => (
+    <div style={{ fontFamily: 'sans-serif', lineHeight: 1.6 }}>
+      <h2>New Contact Us Submission</h2>
+      <p><strong>Name:</strong> {name}</p>
+      <p><strong>Email:</strong> {email}</p>
+      <p><strong>Message:</strong></p>
+      <blockquote style={{ background: '#f9f9f9', padding: '1em', borderLeft: '4px solid #ccc' }}>
+        {message}
+      </blockquote>
+    </div>
+  );
