@@ -2,6 +2,9 @@ import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
+    if (req.method !== 'GET') {
+        return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
+    }
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
