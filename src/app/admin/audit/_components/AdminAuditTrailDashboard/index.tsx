@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/DataTable/data-table";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
@@ -9,7 +10,11 @@ import { AuditTrailDO } from "@/lib/types/custom";
 import { useAuditTrail } from "@/hooks/admin/useAuditTrail";
 import { getColumns } from "./columns";
 import { useState } from "react";
-import { AuditTrailDetailsModal } from "../AdminAuditDetailModal";
+// lazy-load the modal with SSR disabled
+const AuditTrailDetailsModal = dynamic(() => import("../AdminAuditDetailModal").then(mod => mod.AuditTrailDetailsModal), {
+    ssr: false,
+  });
+
 
 export default function AdminAuditTrailDashboard() {
   const { data = [], isLoading } = useAuditTrail();
