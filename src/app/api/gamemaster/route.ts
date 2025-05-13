@@ -1,4 +1,5 @@
-import { GMGameSummaryDO, SupabaseGMGameSummaryListResponse } from "@/lib/types/custom";
+import { SupabaseGMGameSummaryListResponse } from "@/lib/types/custom";
+import { GMGameSummaryDO } from "@/lib/types/data-objects";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 

@@ -10,9 +10,9 @@ type InviteParams = {
   invite_id: string;
 };
 
-export async function POST(request: NextRequest, { params }: { params: Promise<InviteParams> } ): Promise<NextResponse> {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<InviteParams> } ): Promise<NextResponse> {
 
-  if (request.method !== 'POST') {
+  if (request.method !== 'PATCH') {
     return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
   }
 

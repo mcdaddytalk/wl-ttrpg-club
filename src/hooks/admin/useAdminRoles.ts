@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "../useQueryClient";
-import { RoleDO } from "@/lib/types/custom";
+import { RoleDO } from "@/lib/types/data-objects";
 
 
 

@@ -6,25 +6,12 @@ import { siteConfig } from "@/config/site";
 
 // import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import Header from "@/components/Header";
-import ThemeProvider from "@/components/ThemeProvider";
 import { Toaster } from "sonner";
 import Footer from "@/components/Footer";
 import ToastHandler from "@/components/ToastHandler";
 import { Suspense } from "react";
-// import { Analytics } from "@vercel/analytics/react";
-import QueryProviderWrapper from "@/providers/QueryProvider";
 import { cn } from "@/lib/utils";
-
-// const geistSans = localFont({
-//   src: "./fonts/GeistVF.woff",
-//   variable: "--font-geist-sans",
-//   weight: "100 900",
-// });
-// const geistMono = localFont({
-//   src: "./fonts/GeistMonoVF.woff",
-//   variable: "--font-geist-mono",
-//   weight: "100 900",
-// });
+import UnifiedClientProvider from "@/providers/UnifiedClientProvider";
 
 const defaultUrl = siteConfig.url;
 const { title, description, icons, keywords, manifest } = siteConfig;
@@ -93,29 +80,22 @@ export default async function RootLayout({
           fontMono.variable
         )}
       >
-          <ThemeProvider 
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <QueryProviderWrapper>
-              <div className="flex flex-col min-h-screen">
-                <Header />
-                <Toaster position="top-right" />
-                <Suspense fallback="<div>Loading...</div>">
-                  <ToastHandler />
-                </Suspense>
-                  <div className="flex-grow dark:bg-black-overlay bg-white-overlay">
-                    <main className="container w-full max-w-screen-2xl mx-auto overflow-auto">
-                      {children}
-                    </main>
-                  </div>
-                <Footer />
+        <UnifiedClientProvider>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <Toaster position="top-right" />
+            <Suspense fallback="<div>Loading...</div>">
+              <ToastHandler />
+            </Suspense>
+              <div className="flex-grow dark:bg-black-overlay bg-white-overlay">
+                <main className="container w-full max-w-screen-2xl mx-auto overflow-auto">
+                  {children}
+                </main>
               </div>
-            </QueryProviderWrapper>
-          </ThemeProvider>
+            <Footer />
+          </div>
+        </UnifiedClientProvider>
       </body>
-    </html> 
+    </html>
   );
 }

@@ -8,11 +8,13 @@ import { useSidebarStore } from "@/store/sidebarStore"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 const navItems = [
-    { href: "/member/my-games", label: "My Games", icon: '🎲' },
-    { href: "/member/resources", label: "Resources", icon: '📚' },
+    { href: "/member", label: "Dashboard", icon: '🏠' },
     { href: "/member/profile", label: "Profile", icon: '👤' },
+    { href: "/member/change-password", label: "Change Password", icon: '🔑' },
+    { href: "/member/my-games", label: "My Games", icon: '🎲' },
+    { href: "/member/resources", label: "Resources", icon: '📚' },    
     { href: "/member/messages", label: "Messages", icon: '📫' },
-    { href: "/member/change-password", label: "Change Password", icon: '🔑' }
+    { href: "/member/my-invites", label: "Invites", icon: '🎉' },
 ]
 
 export default function Sidebar(): React.ReactElement {

@@ -5,9 +5,13 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { useGamemasterInvites } from "@/hooks/gamemaster/useGamemasterInvites";
+import useSession from "@/utils/supabase/use-session";
 
 export function PendingInvitesCard() {
-  const { data: invites = [], isLoading } = useGamemasterInvites();
+  const session = useSession();
+  const user = session?.user;
+  const gamemasterId = user?.id;
+  const { data: invites = [], isLoading } = useGamemasterInvites(gamemasterId);
 
   const pending = invites.filter((invite) => !invite.accepted);
 

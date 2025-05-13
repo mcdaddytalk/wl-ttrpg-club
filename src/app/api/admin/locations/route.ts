@@ -1,4 +1,5 @@
-import { AdminLocationDO, SupabaseAdminLocationPermListResponse } from "@/lib/types/custom";
+import { SupabaseAdminLocationPermListResponse } from "@/lib/types/custom";
+import { AdminLocationDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";

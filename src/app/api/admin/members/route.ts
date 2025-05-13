@@ -1,4 +1,5 @@
-import { MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
+import { SupabaseMemberListResponse } from "@/lib/types/custom";
+import { MemberDO } from "@/lib/types/data-objects";
 import { ENVS } from "@/utils/constants/envs";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { useGamePlayers, useRemovePlayer } from "@/hooks/gamemaster/useGamemasterPlayers";
-import { GMGamePlayerDO } from "@/lib/types/custom";
+import { GMGamePlayerDO } from "@/lib/types/data-objects";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";

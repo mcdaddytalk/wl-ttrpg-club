@@ -30,7 +30,7 @@ export default function AcceptInvite(): React.ReactElement {
         return;
       }
       try {
-        const res = await fetch(`/api/invites/${inviteId}/accept`, { method: "POST" });
+        const res = await fetch(`/api/invites/${inviteId}/accept`, { method: "PATCH" });
         const data = await res.json();
 
         setLoading(false);

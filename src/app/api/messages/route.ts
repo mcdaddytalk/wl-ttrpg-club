@@ -1,4 +1,5 @@
-import { MessageDO, SupabaseMessageListResponse } from "@/lib/types/custom";
+import { SupabaseMessageListResponse } from "@/lib/types/custom";
+import { MessageDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -41,6 +42,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             )
         ),
         content,
+        preview,
         subject,
         category,
         link_url,
@@ -66,6 +68,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                     surname: message.recipient.profiles.surname ?? ''
                 },
                 content: message.content,
+                preview: message.preview ?? '',
                 subject: message.subject ?? '',
                 category: message.category ?? '',
                 link_url: message.link_url ?? '',

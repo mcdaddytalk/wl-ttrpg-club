@@ -1,211 +1,63 @@
 "use client"
 
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import ScheduledGamesCard from "@/app/gamemaster/_components/ScheduledGamesCard/ScheduledGamesCard";
-import { ContactListDO, GMGameData, Player, Location, MemberDO } from "@/lib/types/custom";
+import { ContactListDO, GMGameDO, MemberDO } from "@/lib/types/data-objects";
 import useSession from "@/utils/supabase/use-session";
 import GameRegistrantsCard from "@/app/gamemaster/_components/GameRegistrantsCard/GameRegistrantsCard";
 import SelectedGameCard from "@/app/gamemaster/_components/SelectedGameCard/page";
 import { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
-import logger from "@/utils/logger";
-
-async function fetchGames(gamemasterId: string): Promise<GMGameData[]> {
-  const response = await fetch(`/api/gamemaster/${gamemasterId}/games`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-
-  switch (response.status) {
-    case 500:
-      toast.error("Error fetching games");
-      return [];   
-    case 404:
-      toast.error("Games not found");
-      return [];
-    case 200:
-      const games = await response.json();
-      return games;
-    default:
-      toast.error("Error fetching games");
-      return [];
-  }
-};
-
-const fetchMembers = async (): Promise<MemberDO[]> => {
-  const response = await fetch(`/api/members`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-  if (!response.ok) throw new Error('Failed to fetch members');
-  const data = await response.json();
-  return data as MemberDO[]
-}
-
-const fetchPlayers = async (gameId: string): Promise<Player[]> => {
-  const response = await fetch(`/api/games/${gameId}/registrants`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-
-  switch (response.status) {
-    case 500:
-      toast.error("Error fetching players");
-      return [];   
-    case 404:
-      toast.error("Players not found");
-      return [];
-    case 200:
-      const players = await response.json();
-      return players as Player[] || [];
-    default:
-      toast.error("Error fetching players");
-      return [];
-  }
-}
-
-const fetchGamemasters = async (): Promise<MemberDO[]> => {
-  const response = await fetch(`/api/members/gamemasters`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-  if (!response.ok) throw new Error('Failed to fetch gamemasters');
-  const data = await response.json();
-  return data as MemberDO[]
-}
-
-const fetchLocations = async (): Promise<Location[]> => {
-  const response = await fetch(`/api/locations`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-
-  switch (response.status) {
-    case 500:
-      toast.error("Error fetching locations");
-      return [];   
-    case 404:
-      toast.error("Locations not found");
-      return [];
-    case 200:
-      const locations = await response.json();
-      return locations as Location[] || [];
-    default:
-      toast.error("Error fetching locations");
-      return [];
-  }
-}
+import { useDeleteGame, useGamemasterGamesFull, useRefreshGames } from "@/hooks/gamemaster/useGamemasterGames";
+import { useGameMembers, useGameRegistrants, useRefreshRegistrants } from "@/hooks/gamemaster/useGamemasterPlayers";
+import { useGamemasterLocations } from "@/hooks/gamemaster/useGamemasterLocations";
 
 export default function GamemasterDashboard(): React.ReactElement {
   const queryClient = useQueryClient();
   const session = useSession();
   const user: User = (session?.user as User) ?? null;
 
-  const [selectedGame, setSelectedGame] = useState<GMGameData | null>(null);
+  const [selectedGame, setSelectedGame] = useState<GMGameDO | null>(null);
   const gamemasterId = user?.id;
 
   const contactList = queryClient.getQueryData<ContactListDO[]>(['members', 'full']) || [];
+
+  const { members } = useGameMembers();
+  const { games, isLoading: isGamesLoading } = useGamemasterGamesFull();
+  const { data: players } = useGameRegistrants(selectedGame?.id ?? "");
+  const { locations } = useGamemasterLocations();
+  const gamemasters = queryClient.getQueryData<MemberDO[]>(['gamemasters', 'full']) || [];
+
+  const { mutate: refreshGames } = useRefreshGames();
+  const { mutate: refreshRegistrants } = useRefreshRegistrants();
+  const { mutate: deleteGame } = useDeleteGame(gamemasterId);
+ 
   
-  const { data: members }  = useQuery<MemberDO[], Error>({
-    queryKey: ['members', 'full'],
-    queryFn: () => fetchMembers(),
-    enabled: !!gamemasterId,
-  });
-
-  const { data: games, isLoading } = useQuery<GMGameData[], Error>({
-    queryKey: ['games', gamemasterId, 'gm', 'full'],
-    queryFn: () => fetchGames(gamemasterId),
-    enabled: !!gamemasterId,
-  });
-
-  const { data: players } = useQuery<Player[], Error>({
-    queryKey: ['players', user?.id as string, selectedGame?.id],
-    queryFn: () => fetchPlayers(selectedGame?.id as string),
-    enabled: !!selectedGame?.id,
-  });
-
-  const { data: gamemasters } = useQuery<MemberDO[], Error>({
-    queryKey: ['gamemasters', 'full'],
-    queryFn: () => fetchGamemasters(),
-    enabled: true,
-  });
-
-  const { data: locations } = useQuery<Location[], Error>({
-    queryKey: ['locations', 'full'],
-    queryFn: () => fetchLocations(),
-    enabled: true,
-  });
-  
-  const gameMutation = useMutation({
-    mutationFn: () => fetchGames(gamemasterId),
-    onSuccess: (updatedData) => {
-      logger.debug('Games updated', updatedData);
-      // Invalidate the `games` query to refresh the data
-      queryClient.invalidateQueries({ queryKey: ['games', gamemasterId, 'gm', 'full'] });      
-    }
-  })
-
-  const playersMutation = useMutation({
-    mutationFn: () => fetchPlayers(selectedGame?.id as string),
-    onSuccess: () => {
-    // logger.log('Players updated');
-      // Invalidate the `players` query to refresh the data
-      queryClient.invalidateQueries({ queryKey: ['players', user?.id, selectedGame?.id] });
-    }
-  })
-  
-  const onShowDetails = (game: GMGameData) => {
+  const onShowDetails = (game: GMGameDO) => {
     setSelectedGame(game);
-    playersMutation.mutate();
+    refreshRegistrants(game.id); // ✅ Now passes the correct id at runtime
   };
 
   const onGameEdit = () => {
-    gameMutation.mutate();
+    refreshGames();
   };
 
   const onGameDelete = (id: string) => {
-    const response = fetch(`/api/gamemaster/${gamemasterId}/games`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id }),
-    });
-
-    response.then((res) => {
-      if (res.status === 200) {
+    deleteGame(id, {
+      onSuccess: () => {
         toast.success("Game deleted successfully");
-        gameMutation.mutate();
-      } else {
+        refreshGames();
+      },
+      onError: () => {
         toast.error("Failed to delete game");
-      }
-    });
+      },
+    })
   }
 
   const handleGameAdded = () => {
-    gameMutation.mutate();
+    refreshGames();
   };
 
   // logger.info(gamemasters)
@@ -215,7 +67,7 @@ export default function GamemasterDashboard(): React.ReactElement {
   return (
     <section className="items-center justify-center">
       <div className="space-y-2 p-2">
-        {isLoading ? (
+        {isGamesLoading ? (
           <DataTableSkeleton 
                       columnCount={5}
                       searchableColumnCount={3}

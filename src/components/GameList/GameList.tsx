@@ -1,9 +1,9 @@
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'; // Shadcn Card
-import { GMGameData } from '@/lib/types/custom';
+import { GMGameDO } from '@/lib/types/data-objects';
 import { format } from 'date-fns';
 
 type GameListProps = {
-  games: GMGameData[] | null;}
+  games: GMGameDO[] | null;}
 
 const GameList = ({ games }: GameListProps): React.ReactElement => {
   if (!games || games.length === 0) {

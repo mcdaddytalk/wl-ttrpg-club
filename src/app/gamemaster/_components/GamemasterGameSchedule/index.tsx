@@ -15,7 +15,7 @@ import { DaysOfWeek, DOW, GAME_INTERVALS, GAME_SCHED_STATUS, GameInterval, GameS
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { useGamemasterLocations } from "@/hooks/gamemaster/useGamemasterLocations";
-import { AddLocationModal } from "@/components/Modal/AddLocationModal";
+import { AddLocationModal } from "@/components/modals/AddLocationModal";
 import useSession from "@/utils/supabase/use-session";
 
 type FormValues = z.infer<typeof GMGameScheduleSchema>;

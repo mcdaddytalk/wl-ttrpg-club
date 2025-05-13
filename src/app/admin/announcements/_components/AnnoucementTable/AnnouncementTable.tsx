@@ -24,15 +24,16 @@ import {
 } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { AnnouncementDO, DataTableFilterField } from '@/lib/types/custom';
 import { useDataTable } from '@/hooks/use-data-table';
 import { getColumns } from './columns';
 import { DataTable } from '@/components/DataTable/data-table';
 import { DataTableToolbar } from '@/components/DataTable/data-table-toolbar';
 import { DataTableSkeleton } from '@/components/DataTable/data-table-skeleton';
 import { useAuth } from '@/hooks/useAuth';
-import { toSentenceCase } from '@/lib/utils';
-import { AnnouncementPreviewModal } from '@/components/Modal/AnnouncementPreviewModal';
+import { AnnouncementPreviewModal } from '@/components/modals/AnnouncementPreviewModal';
+import { AnnouncementDO } from '@/lib/types/data-objects';
+import { DataTableFilterField } from '@/lib/types/data-table';
+import { toSentenceCase } from '@/utils/helpers';
 
 const formSchema = z.object({
   id: z.string().optional(),
@@ -307,9 +308,7 @@ export default function AnnouncementsDashboard() {
                         <DataTable
                             table={table}
                         >
-                            <DataTableToolbar table={table} filterFields={filterFields}>
-                                
-                            </DataTableToolbar>
+                            <DataTableToolbar table={table} filterFields={filterFields} />
                         </DataTable>
                     )}
                     <AnnouncementPreviewModal

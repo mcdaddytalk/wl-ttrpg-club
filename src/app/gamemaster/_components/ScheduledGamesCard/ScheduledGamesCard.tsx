@@ -1,23 +1,25 @@
 // import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/DataTable/data-table";
 import { getColumns } from "./columns";
-import { Location, GMGameData, DataTableFilterField, MemberDO } from "@/lib/types/custom";
-import NewGameModal from "@/components/Modal/NewGameModal";
+import { Location } from "@/lib/types/custom";
+import { MemberDO, GMGameDO } from "@/lib/types/data-objects";
+import { DataTableFilterField } from "@/lib/types/data-table";
+import NewGameModal from "@/components/modals/NewGameModal";
 import { useState } from "react";
-import { EditGameModal } from "@/components/Modal/EditGameModal";
+import { EditGameModal } from "@/components/modals/EditGameModal";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
-import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
-import { SetGameTimeModal } from "@/components/Modal/SetGameTimeModal";
-import { TransferGameModal } from "@/components/Modal/TransferGameModal";
-import { GameInviteModal } from "@/components/Modal/GameInviteModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import { SetGameTimeModal } from "@/components/modals/SetGameTimeModal";
+import { TransferGameModal } from "@/components/modals/TransferGameModal";
+import { GameInviteModal } from "@/components/modals/GameInviteModal";
 
 type ScheduledGamesCardProps = {
-    scheduledGames: GMGameData[];
+    scheduledGames: GMGameDO[];
     locations: Location[];
     members: MemberDO[];
     gamemasters: MemberDO[];
-    onShowDetails: (game: GMGameData) => void;
+    onShowDetails: (game: GMGameDO) => void;
     onGameAdded: () => void;
     onGameEdit: () => void;
     onGameDelete: (id: string) => void;
@@ -32,9 +34,9 @@ const ScheduledGamesCard= ({ scheduledGames, onShowDetails, onGameAdded, onGameE
     const [isTimeGameModalOpen, setTimeGameModalOpen] = useState(false);
     const [isTransferGameModalOpen, setTransferGameModalOpen] = useState(false);
     const [isDeleteGameModalOpen, setDeleteGameModalOpen] = useState(false);
-    const [selectedGame, setSelectedGame] = useState<GMGameData | null>(null);
+    const [selectedGame, setSelectedGame] = useState<GMGameDO | null>(null);
     
-    const openModal = (modal: string, game?: GMGameData) => {
+    const openModal = (modal: string, game?: GMGameDO) => {
       if (game) setSelectedGame(game);
       switch(modal) {
         case 'addNew':
@@ -111,7 +113,7 @@ const ScheduledGamesCard= ({ scheduledGames, onShowDetails, onGameAdded, onGameE
 
     const pageSize = 5;
     const pageCount = Math.ceil((scheduledGames?.length || 0) / pageSize);
-    const filterFields: DataTableFilterField<GMGameData>[] = [];
+    const filterFields: DataTableFilterField<GMGameDO>[] = [];
 
     const { table } = useDataTable({
       data: enhancedScheduledGames,

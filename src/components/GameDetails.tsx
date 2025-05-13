@@ -1,6 +1,6 @@
 // components/GameDetails.tsx
 import { Button } from "@/components/ui/button";
-import { GameData, MessageUserDO } from "@/lib/types/custom";
+import {  MessageUserDO } from "@/lib/types/data-objects";
 import { toast } from "sonner";
 import { MdOutlineEventRepeat } from "react-icons/md";
 import { LuCalendar, LuUsers } from "react-icons/lu";
@@ -9,17 +9,18 @@ import { Badge } from "@/components/ui/badge";
 import { useToggleFavorite } from "@/hooks/useToggleFavorite";
 import { User } from "@supabase/supabase-js";
 import { StarOff } from "lucide-react";
-import MessageModal from "@/components/Modal/MessageModal";
+import MessageModal from "@/components/modals/MessageModal";
 import { useState } from "react";
 import { useToggleRegistration } from "@/hooks/useToggleRegistration";
 import EmailShareButton from "@/components/EmailShareButton";
 import { usePathname } from "next/navigation";
 import { EmailOptions } from "@/lib/types/social-share";
 import EmailShareIcon from "@/components/EmailShareIcon";
-import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import GameLocation from "@/components/GameLocation";
 import GameImage from "@/components/GameImage";
-import { toSentenceCase } from "@/lib/utils";
+import { toSentenceCase } from "@/utils/helpers";
+import { GameData } from "@/lib/types/custom";
 
 const enhanceStatus = (game: GameData) => {
     const { status, currentSeats, startingSeats } = game;

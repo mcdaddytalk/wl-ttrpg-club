@@ -1,4 +1,4 @@
-import type { Option } from "@/lib/types/custom"
+import type { Option } from "@/lib/types/data-table"
 import type { Column } from "@tanstack/react-table"
 import { Check, PlusCircle } from "lucide-react"
 

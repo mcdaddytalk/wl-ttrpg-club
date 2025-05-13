@@ -1,3 +1,9 @@
+/**
+ * @see https://usehooks-ts.com/react-hook/use-debounce
+ * 
+ * Good for debouncing inputs
+ */
+
 import { useEffect, useState } from "react";
 
 export function useDebounce<T>(

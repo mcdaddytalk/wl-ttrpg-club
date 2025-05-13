@@ -1,4 +1,4 @@
-import type { ExtendedSortingState, Filter } from "@/lib/types/custom"
+import type { ExtendedSortingState, Filter } from "@/lib/types/data-table"
 import { type Row } from "@tanstack/react-table"
 import { createParser } from "nuqs/server"
 import { dataTableConfig } from "@/config/data-table"

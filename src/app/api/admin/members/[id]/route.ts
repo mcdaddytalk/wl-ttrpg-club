@@ -1,4 +1,5 @@
-import { MemberDO, SupabaseMemberResponse } from "@/lib/types/custom";
+import { SupabaseMemberResponse } from "@/lib/types/custom";
+import { MemberDO } from "@/lib/types/data-objects";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 

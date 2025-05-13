@@ -1,5 +1,6 @@
 import { GetMembersSchema } from "@/app/admin/_lib/adminMembers";
-import { MemberData, MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
+import { MemberData, SupabaseMemberListResponse } from "@/lib/types/custom";
+import { MemberDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";

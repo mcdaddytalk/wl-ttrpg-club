@@ -8,10 +8,11 @@ import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { getColumns } from "./columns";
 import { useState } from "react";
-import { DataTableFilterField, InviteDO } from "@/lib/types/custom";
+import { InviteDO } from "@/lib/types/data-objects";
+import { DataTableFilterField } from "@/lib/types/data-table";
 import { useResendInvite, useCancelInvite } from "@/hooks/admin/useAdminInvites";
 import { toast } from "sonner";
-import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 
 export const AdminInvitationsTable = () => {
   const { data, isLoading, isError } = usePaginatedInvites();

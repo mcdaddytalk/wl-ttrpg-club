@@ -1,6 +1,6 @@
 "use client"
 
-import { useMyGames } from "@/hooks/useMyGames";
+import { useMyGames } from "@/hooks/member/useMyGames";
 import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
 import { SkeletonArray } from "@/components/ui/skeleton-array";

@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { useDebounce } from "@/hooks/use-debounce";
 import { GameResourceFilterParams } from "@/lib/validation/gameResources";
-import { toSentenceCase } from "@/lib/utils";
+import { toSentenceCase } from "@/utils/helpers";
 
 interface GameResourceFiltersProps {
     filters: GameResourceFilterParams;

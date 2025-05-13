@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from '@/utils/supabase/server';
-import { AnnouncementDO, CreateMessage } from '@/lib/types/custom';
+import { CreateMessage } from '@/lib/types/custom';
+import { AnnouncementDO } from '../types/data-objects';
 
 export async function sendInternalAnnouncementMessage(announcement: AnnouncementDO) {
   const supabase = await createSupabaseServerClient();

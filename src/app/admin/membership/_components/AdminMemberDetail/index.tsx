@@ -2,8 +2,7 @@
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MemberDO } from "@/lib/types/custom"
-import { formatDate, toSentenceCase } from "@/lib/utils";
+import { MemberDO } from "@/lib/types/data-objects"
 import { useEffect, useState } from "react";
 
 import { useToggleConsent } from "@/hooks/admin/useToggleConsent";
@@ -22,6 +21,7 @@ import { getMemberByIdQueryOptions } from "@/queries/admin";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAddUpdateAdminNote } from "@/hooks/admin/useAdminNotes";
 import useSession from "@/utils/supabase/use-session";
+import { formatDate, toSentenceCase } from "@/utils/helpers";
 
 
 const AdminMemberDetail = ({memberId}: AdminMemberDetailProps) => {

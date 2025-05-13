@@ -4,8 +4,8 @@ import { createSupabaseServerClient } from "@/utils/supabase/server";
 import logger from "@/utils/logger";
 import { sendEmail, sendSMS } from "@/utils/messaging";
 import { getURL } from "@/utils/helpers";
-import { InvitedPlayer } from "@/lib/types/custom";
 import { v4 as uuidv4 } from "uuid"; // For generating unique invite IDs
+import { InvitedPlayer } from "@/lib/types/data-objects";
 
 type InviteParams = {
   game_id: string;
