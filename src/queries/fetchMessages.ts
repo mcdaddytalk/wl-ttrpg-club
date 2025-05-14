@@ -1,10 +1,7 @@
+import { MessageDO } from "@/lib/types/data-objects";
+import fetcher from "@/utils/fetcher";
+
 export const fetchMessages = async (userId: string, method = 'unread') => {
-    const response = await fetch(`/api/messages?user_id=${userId}&method=${method}`);
-  
-    if (!response.ok) {
-      throw new Error('Failed to fetch messages');
-    }
-    const data = await response.json();
-    return data;
+    return fetcher<MessageDO[]>(`/api/messages?user_id=${userId}&method=${method}`);
   };
   

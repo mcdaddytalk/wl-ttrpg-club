@@ -1,7 +1,8 @@
 "use client";
 
 import { useDataTable } from "@/hooks/use-data-table";
-import { AdminNoteDO, DataTableFilterField } from "@/lib/types/custom";
+import { AdminNoteDO } from "@/lib/types/data-objects";
+import { DataTableFilterField } from "@/lib/types/data-table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/DataTable/data-table";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
@@ -9,7 +10,7 @@ import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { useAdminNotes, useDeleteAdminNote } from "@/hooks/admin/useAdminNotes";
 import { getColumns } from "./columns";
 import { useState } from "react";
-import { AdminNotePreviewModal } from "@/components/Modal/AdminNotePreviewModal";
+import { AdminNotePreviewModal } from "@/components/modals/AdminNotePreviewModal";
 import { toast } from "sonner";
 import { AdminNoteForm } from "../AdminNoteForm";
 

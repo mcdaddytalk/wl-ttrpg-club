@@ -1,5 +1,5 @@
 
-import { AuditTrailDO } from "@/lib/types/custom";
+import { AuditTrailDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 

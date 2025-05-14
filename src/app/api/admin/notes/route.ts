@@ -3,8 +3,9 @@ import { createSupabaseServerClient } from '@/utils/supabase/server';
 import logger from '@/utils/logger';
 
 import { getInitialSession } from '@/server/authActions';
-import { AdminNoteDO, SupabaseAdminNoteListResponse } from '@/lib/types/custom';
+import { SupabaseAdminNoteListResponse } from '@/lib/types/custom';
 import { logAuditEvent } from '@/server/auditTrail';
+import { AdminNoteDO } from '@/lib/types/data-objects';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
     if (request.method !== 'GET') {

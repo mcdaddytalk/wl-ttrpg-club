@@ -5,16 +5,17 @@ import { toast } from "sonner";
 import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
 import { useState } from "react";
-import { DataTableFilterField, MemberDO } from "@/lib/types/custom";
-import { ManageRolesModal } from "@/components/Modal/ManageRolesModal";
+import { DataTableFilterField } from "@/lib/types/data-table";
+import { MemberDO } from "@/lib/types/data-objects";
+import { ManageRolesModal } from "@/components/modals/ManageRolesModal";
 import { getColumns } from "./columns";
 import { 
     useQuery,
     // useSuspenseQuery,
 } from "@tanstack/react-query";
 import { redirect, useRouter } from "next/navigation";
-import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
-import { AddMemberModal } from "@/components/Modal/AddMemberModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import { AddMemberModal } from "@/components/modals/AddMemberModal";
 import { 
     fetchRoles 
 } from "@/queries/fetchMembers";

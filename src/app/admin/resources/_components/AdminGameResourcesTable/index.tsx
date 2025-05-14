@@ -6,11 +6,11 @@ import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { GameResourceDO, RESOURCE_CATEGORIES } from "@/lib/types/custom";
 import { getColumns } from "./columns";
-import { DataTableFilterField } from "@/lib/types/custom";
-import { toSentenceCase } from "@/lib/utils";
+import { DataTableFilterField } from "@/lib/types/data-table";
+import { toSentenceCase } from "@/utils/helpers";
 import { useDeleteGameResource } from "@/hooks/admin/useAdminGameResources";
-import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
-import { GameResourcePreviewModal } from "@/components/Modal/GameResourceModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import { GameResourcePreviewModal } from "@/components/modals/GameResourceModal";
 import { useState } from "react";
 
 interface Props {

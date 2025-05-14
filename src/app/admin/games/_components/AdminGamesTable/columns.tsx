@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { GMGameDataDO } from "@/lib/types/custom";
+import { GMGameDataDO } from "@/lib/types/data-objects";
 
 interface ColumnOptions {
   onOpenModal: (modalName: string, game: GMGameDataDO) => void;
@@ -25,6 +25,7 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameData
     },
     enableSorting: true,
   },
+
   {
     accessorKey: "status",
     header: "Status",
@@ -81,6 +82,18 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameData
     enableSorting: true,
   },
   {
+    accessorKey: "archived",
+    header: "Archived?",
+    cell: ({ row }) => {
+      return row.original.deleted_at ? (
+        <Badge variant="destructive">Archived</Badge>
+      ) : (
+        <Badge variant="default">Active</Badge>
+      );
+    },
+    enableSorting: true,
+  },
+  {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
@@ -98,10 +111,10 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameData
             <DropdownMenuItem onClick={() => onOpenModal("assignGM", game)}>
               Assign GM
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onOpenModal("archive", game)}>
+            <DropdownMenuItem onClick={() => onOpenModal("archiveGame", game)}>
               {game.deleted_at ? "Unarchive" : "Archive"}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onOpenModal("viewDetails", game)}>
+            <DropdownMenuItem onClick={() => onOpenModal("viewGame", game)}>
               View Details
             </DropdownMenuItem>
           </DropdownMenuContent>

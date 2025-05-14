@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { InviteData } from "@/lib/types/custom"
+import { InviteDO } from "@/lib/types/data-objects"
 import { 
     DropdownMenu, 
     DropdownMenuContent,
@@ -19,10 +19,10 @@ import { InviteStatusBadge } from "@/components/InviteStatusBadge"
 
 type ActiveModal = 'addNew' | 'purge' | 'edit' | 'delete' | null;
 interface ColumnOptions {
-    onOpenModal: (modalName: ActiveModal, data: InviteData) => void
+    onOpenModal: (modalName: ActiveModal, data: InviteDO) => void
 }
 
-export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<InviteData>[] => [
+export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<InviteDO>[] => [
     {
         id: "select",
         header: ({ table }) => (
@@ -68,19 +68,19 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<InviteData
         enableHiding: false
     },
     {
-        accessorKey: "external_email",
-        header: "Email (external)",
+        accessorKey: "email",
+        header: "Email",
         cell: ({ row }) => {
-            return (<span className="text-sm font-medium ">{row.original.external_email}</span>)
+            return (<span className="text-sm font-medium ">{row.original.email}</span>)
         },
         enableSorting: true,
         enableHiding: false
     },
     {
-        accessorKey: "external_phone",
-        header: "Phone (external)",
+        accessorKey: "phone",
+        header: "Phone",
         cell: ({ row }) => {
-            return (<span className="text-sm font-medium ">{row.original.external_phone}</span>)
+            return (<span className="text-sm font-medium ">{row.original.phone}</span>)
         },
         enableSorting: true,
         enableHiding: false
@@ -154,7 +154,7 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<InviteData
           const viewedAt = row.original.viewed_at ?? null;
       
           return (
-            <InviteStatusBadge accepted={isAccepted} viewedAt={viewedAt?.toISOString()} />
+            <InviteStatusBadge accepted={isAccepted} viewedAt={viewedAt} />
           );
         },
         enableSorting: false,

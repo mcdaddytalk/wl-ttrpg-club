@@ -6,8 +6,8 @@ import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { FEEDBACK_CATEGORIES, FeedbackDO } from "@/lib/types/custom";
 import { getColumns } from "./columns";
-import { DataTableFilterField } from "@/lib/types/custom";
-import { toSentenceCase } from "@/lib/utils";
+import { DataTableFilterField } from "@/lib/types/data-table";
+import { toSentenceCase } from "@/utils/helpers";
 import FeedbackPreviewModal from "./FeedbackPreviewModal";
 import { useHandleFeedback } from "@/hooks/admin/useAdminFeedback";
 import { useState } from "react";
@@ -24,8 +24,8 @@ export default function AdminFeedbackTable({ data, isLoading }: AdminFeedbackTab
     const { mutate: handleFeedback } = useHandleFeedback();
 
     const onPreview = (feedback: FeedbackDO) => {
-    setSelectedFeedback(feedback);
-    setModalOpen(true);
+      setSelectedFeedback(feedback);
+      setModalOpen(true);
     };
 
     const onHandle = () => {
@@ -65,7 +65,7 @@ export default function AdminFeedbackTable({ data, isLoading }: AdminFeedbackTab
     initialState: {
       pagination: {
         pageIndex: 0,
-        pageSize: 10
+        pageSize: 5
       },
       sorting: [
         { id: "submitted_at", desc: true }

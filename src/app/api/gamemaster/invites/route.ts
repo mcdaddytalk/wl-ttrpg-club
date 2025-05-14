@@ -1,4 +1,5 @@
 import { SupabaseGameInviteListResponse } from "@/lib/types/custom";
+import { InviteDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -20,7 +21,26 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     .from('game_invites')
     .select(`
         *,
+        invitee_member:members!game_invites_invitee_fkey(
+            id,
+            email,
+            phone,
+            profiles (
+                given_name,
+                surname
+            )
+        ),
+        gamemaster:members!game_invites_gamemaster_id_fkey(
+          id,
+          email,
+          phone,
+          profiles (
+            given_name,
+            surname
+          )
+        ),
         games!inner (
+            id,
             title
         )
     `)
@@ -39,7 +59,22 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   // logger.log('Invites fetched:', inviteData);
 
-  return NextResponse.json(inviteData);
+  const transformedInvites: InviteDO[] = inviteData.map((invite) => {
+    return {
+      ...invite,
+      expires_at: invite.expires_at ? new Date(invite.expires_at).toISOString() : null,
+      display_name: invite.display_name ?? `${invite.invitee_member?.profiles?.given_name} ${invite.invitee_member?.profiles?.surname}`,
+      email: invite.external_email ?? invite.invitee_member?.email ?? '',
+      phone: invite.external_phone ?? invite.invitee_member?.phone ?? '',
+      invitee: invite.invitee_member?.id ?? 'external',
+      game_title: invite.games?.title,
+      gm_id: invite.gamemaster.id,
+      gm_name: `${invite.gamemaster?.profiles?.given_name} ${invite.gamemaster?.profiles?.surname}`,
+      game: invite.games,
+      status: invite.status
+    }
+  })
+  return NextResponse.json(transformedInvites);
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {

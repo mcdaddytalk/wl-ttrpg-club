@@ -1,5 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "../useQueryClient";
+import fetcher from "@/utils/fetcher";
+import { Player } from "@/lib/types/custom";
+import { InviteDO } from "@/lib/types/data-objects";
 
 
 export const useCreateInvite = () => {
@@ -58,3 +61,26 @@ export const useCancelInvite = () => {
     },
   });
 };
+
+export function useAdminGameDetails(gameId?: string) {
+  const { data, isLoading, isError } = useQuery({
+      queryKey: ["admin", "gameDetails", gameId],
+    queryFn:  async () => {
+      if (!gameId) throw new Error("No game ID");
+      const [invites, players] = await Promise.all([
+        fetcher<InviteDO[]>(`/api/admin/games/${gameId}/invites`),
+        fetcher<Player[]>(`/api/admin/games/${gameId}/registrations`)
+      ]);
+      return { invites, players };
+    },
+    enabled: !!gameId,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  return {
+    invites: data?.invites || [],
+    players: data?.players || [],
+    isLoading,
+    isError,
+  };
+}

@@ -4,7 +4,7 @@ import React from "react"
 import type { 
     DataTableFilterField, 
     ExtendedSortingState 
-} from "@/lib/types/custom"
+} from "@/lib/types/data-table"
 import {
   getCoreRowModel,
   getFacetedRowModel,
@@ -219,6 +219,8 @@ export function useDataTable<TData>({
     }, [filterFields, queryStateOptions])
 
     const [filterValues, setFilterValues] = useQueryStates(filterParsers)
+    const [globalFilter, setGlobalFilter] = React.useState("")
+    const debouncedSetGlobalFilter = useDebouncedCallback(setGlobalFilter, debounceMs);
 
     const debouncedSetFilterValues = useDebouncedCallback(
         setFilterValues,
@@ -336,6 +338,7 @@ export function useDataTable<TData>({
             columnVisibility,
             rowSelection,
             columnFilters: enableAdvancedFilter ? [] : columnFilters,
+            globalFilter,
         },
         defaultColumn: {
             size: 200,
@@ -364,5 +367,9 @@ export function useDataTable<TData>({
         manualFiltering: true,
     })
 
-    return { table }
+    return {
+        table,
+        globalFilter,
+        setGlobalFilter: debouncedSetGlobalFilter,
+      };
 }

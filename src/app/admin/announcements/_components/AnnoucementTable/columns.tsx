@@ -1,6 +1,6 @@
 "use client"
 
-import { AnnouncementDO } from "@/lib/types/custom"
+import { AnnouncementDO } from "@/lib/types/data-objects"
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"

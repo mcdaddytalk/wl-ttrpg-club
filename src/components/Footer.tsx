@@ -22,14 +22,14 @@ export default function Footer() {
         <span className="flex items-center gap-1">
           Powered by{" "}
           <Link href="https://nextjs.org" target="_blank" rel="noopener noreferrer">
-            <Icon type="nextjs" size={24} />
+            <Icon type="nextjs" className='w-8 md:w-12' />
           </Link>
         </span>
         <span>&nbsp;|&nbsp;</span>
         <span className="flex items-center gap-1">
           Hosting by{" "}
           <Link href="https://vercel.com" target="_blank" rel="noopener noreferrer">
-            <Icon type="vercel" size={24} />
+            <Icon type="vercel" className='w-8 md:w-12' />
           </Link>
         </span>
       </div>

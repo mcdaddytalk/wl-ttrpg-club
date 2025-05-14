@@ -20,13 +20,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ error: tagError.message }, { status: 500 });
     }
 
-    const { data: counts, error: countError } = await (
-      supabase
-        .from('admin_task_tags')
-        .select('tag_id, count:count(*)')
-        // @ts-expect-error: group is valid PostgREST param but not in supabase-js types
-        .group('tag_id')
-    );
+    type TagCountRow = { tag_id: string; count: number };
+
+    const { data: counts, error: countError } = await supabase
+      .rpc('get_tag_counts') as unknown as { data: TagCountRow[]; error: any };
 
     if (countError) {
         logger.error(countError);

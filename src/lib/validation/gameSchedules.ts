@@ -6,11 +6,19 @@ const GameStatusEnum = z.enum([...GAME_SCHED_STATUS])
 const DayOfWeekEnum = z.enum([...DaysOfWeek])
 
 export const GMGameScheduleSchema = z.object({
-    interval: GameIntervalEnum,
-    status: GameStatusEnum,
+    interval: GameIntervalEnum.optional(),
+    status: GameStatusEnum.optional(),
     location_id: z.string().uuid().optional(),
-    first_game_date: z.string().datetime(),
-    next_game_date: z.string().datetime().optional(),
-    last_game_date: z.string().datetime().nullable().optional(),
+    first_game_date: z.string().refine(val => !isNaN(Date.parse(val)), {
+      message: "Invalid date",
+    }).optional(),
+    next_game_date: z.string().refine(val => !isNaN(Date.parse(val)), {
+      message: "Invalid date",
+    }).nullable().optional(),
+    last_game_date: z.string().refine(val => !isNaN(Date.parse(val)), {
+      message: "Invalid date",
+    }).nullable().optional(),
     day_of_week: DayOfWeekEnum.optional(),
-  });
+});
+
+export type ScheduleUpdateInput = z.infer<typeof GMGameScheduleSchema>

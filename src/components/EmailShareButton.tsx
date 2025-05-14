@@ -1,4 +1,5 @@
-import transformObjectToParams, { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { transformObjectToParams } from "@/utils/helpers";
 import { Button } from "@/components/ui/button";
 import { EmailOptions } from "@/lib/types/social-share";
 import { Tooltip } from "@radix-ui/react-tooltip";

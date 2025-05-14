@@ -35,26 +35,39 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     .eq("gamemaster_id", gm_id);
 
   if (permError) {
+    logger.error("Error fetching location permissions");
     logger.error(permError);
     return NextResponse.json({ message: "Error fetching permissions" }, { status: 500 });
   }
 
   const locationIds = permData.map((p) => p.location_id);
 
+  if (!locationIds?.length) {
+    logger.warn("No locationIds provided");
+    return NextResponse.json({ message: "Missing location IDs" }, { status: 400 });
+  }
+
+  logger.debug("locationIds", locationIds);
+
   let countQuery = supabase
     .from("locations")
-    .select("*", { count: "exact", head: true })
+    .select("id", { count: "exact", head: true })
     .in("id", locationIds);
   
   if (onlyActive) {
-      countQuery = countQuery.eq("scope", "gm").is("deleted_at", null);
+      countQuery = countQuery    
+        .is("deleted_at", null);
   }
    
-  const { count, error: countError } = await countQuery;
+  const { data, count, error: countError } = await countQuery;
+  
+  logger.debug("location data", data);
+  logger.debug("location count", count);
   
   if (countError) {
-    logger.error(countError);
-    return NextResponse.json({ message: "Error fetching count" }, { status: 500 });
+    logger.error("Error fetching location count");
+    logger.error(JSON.stringify(countError, null, 2)); // Reveal internal error
+    return NextResponse.json({ message: "Error fetching count", details: countError }, { status: 500 });
   }
 
   let query = supabase
@@ -75,6 +88,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const { data: locationsData, error: locationsError } = await query as unknown as SupabaseGMLocationPermListResponse;
 
   if (locationsError) {
+    logger.error("Error fetching locations");
     logger.error(locationsError);
     return NextResponse.json({ message: 'Error fetching locations' }, { status: 500 });
   }

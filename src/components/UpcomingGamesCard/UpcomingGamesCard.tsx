@@ -2,25 +2,13 @@ import {
     Card,
     CardHeader,
     CardTitle,
-    // CardDescription,
-    CardContent,
-    // CardFooter
+    CardContent
 } from "@/components/ui/card"
-//import { Button } from "@/components/ui/button"
-//import { DataTable } from "./DataTable"
-//import { columns } from "./columns"
 import { UpcomingGame } from "@/lib/types/custom"
-import { format } from "date-fns"
+import { formatDate } from "@/utils/helpers"
 
 type UpcomingGamesCardProps = {
     upcomingGames: UpcomingGame[] | null
-}
-
-const formatDate = (date: Date | null) => {
-    if (date) {
-      return format(date, 'MMM dd, yyyy at h:mm a');
-    }
-    return 'No date available';
 }
 
 const UpcomingGamesCard = ({ upcomingGames }: UpcomingGamesCardProps): React.ReactElement => {

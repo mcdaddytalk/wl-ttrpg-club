@@ -1,7 +1,7 @@
 "use client"
 
 import { toast } from "sonner";
-import { GMLocationDO, DataTableFilterField } from "@/lib/types/custom";
+import { GMLocationDO } from "@/lib/types/data-objects";
 import { useDataTable } from "@/hooks/use-data-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,12 +9,13 @@ import { useState } from "react";
 import { getColumns } from "./columns";
 import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { DataTable } from "@/components/DataTable/data-table";
-import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { useRemoveLocation } from "@/hooks/useRemoveLocation";
-import { AddLocationModal } from "@/components/Modal/AddLocationModal";
-import { EditLocationModal } from "@/components/Modal/EditLocationModal";
+import { AddLocationModal } from "@/components/modals/AddLocationModal";
+import { EditLocationModal } from "@/components/modals/EditLocationModal";
 import { User } from "@supabase/supabase-js";
 import { usePaginationQueryParams } from "@/hooks/usePaginationQueryParams";
+import { DataTableFilterField } from "@/lib/types/data-table";
 
 interface LocationsTableProps {
     className?: string;
@@ -128,7 +129,7 @@ const LocationsTable = ({ className, locations, total, gamemaster }: LocationsTa
                         <div className="text-center p-4">
                             <span className="text-gray-500">No locations found.</span>
                             <br />
-                            <span className="text-gray-500">Click the &ldquo;Add New Invite&rdquo; button to create a new location.</span>
+                            <span className="text-gray-500">Click the &ldquo;Add Location&rdquo; button to create a new location.</span>
                         </div>
                     )}
                 </CardContent>

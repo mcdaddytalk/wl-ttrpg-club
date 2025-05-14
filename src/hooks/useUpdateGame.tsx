@@ -27,7 +27,7 @@ export const useUpdateGame = () => {
             maxSeats?: number;
             status?: GameSchedStatus;
             location_id?: string;
-            nextGameDate?: Date;
+            nextGameDate?: string | null;
             interval?: GameInterval;
             dayOfWeek?: DOW;
             gm_id: string

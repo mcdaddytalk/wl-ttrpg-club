@@ -7,6 +7,7 @@ export const GameResourceVisibility = z.enum([...RESOURCE_VISIBILITY]);
 
 export const CreateGameResourceSchema = z.object({
     title: z.string().min(1),
+    summary: z.string().min(1),
     body: z.string().min(1),
     category: GameResourceCategories,
     visibility: GameResourceVisibility,

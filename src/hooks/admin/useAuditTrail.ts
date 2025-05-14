@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { AuditTrailDO } from "@/lib/types/custom";
+import { AuditTrailDO } from "@/lib/types/data-objects";
 
 export const useAuditTrail = () => {
   return useQuery<AuditTrailDO[]>({

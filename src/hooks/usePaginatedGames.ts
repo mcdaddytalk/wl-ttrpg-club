@@ -1,5 +1,5 @@
 import { searchGamesParamsCache } from "@/app/admin/_lib/adminGames";
-import { GMGameDataDO } from "@/lib/types/custom";
+import { GMGameDataDO } from "@/lib/types/data-objects";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 

@@ -1,10 +1,9 @@
 // import { GetMembersSchema } from "@/app/admin/_lib/validations";
 import { 
     // MemberData, 
-    MemberDO, 
-    RoleDO, 
     TypedSupabaseClient 
 } from "@/lib/types/custom";
+import { MemberDO, RoleDO } from "@/lib/types/data-objects";
 import { queryOptions } from "@tanstack/react-query";
 export function getMembers(supabase: TypedSupabaseClient) {
     return supabase

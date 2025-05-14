@@ -1,0 +1,8 @@
+{
+    "mocha.env": {
+        "mochaExplorer.nodePath": "${workspaceFolder}/.nvmrc"
+    },
+    "mocha.node_options": [
+        
+    ]
+}

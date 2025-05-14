@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator, 
     DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
-import { GMLocationDO } from "@/lib/types/custom"
+import { GMLocationDO } from "@/lib/types/data-objects"
 import { MapPin, Monitor, MessageCircle } from "lucide-react"; // Adjust icon set if needed
 
 
