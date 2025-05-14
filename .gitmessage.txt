@@ -1,0 +1,20 @@
+# Commit Message Template
+# -----------------------
+# Use Conventional Commit format: <type>(optional scope): <description>
+#
+# Types:
+#   feat     - A new feature
+#   fix      - A bug fix
+#   docs     - Documentation only changes
+#   style    - Changes that do not affect meaning (white-space, formatting)
+#   refactor - Code change that neither fixes a bug nor adds a feature
+#   perf     - A code change that improves performance
+#   test     - Adding missing tests or correcting existing tests
+#   chore    - Changes to the build process or auxiliary tools
+#
+# Example:
+#   feat(schedule): add support for recurring game events
+#
+# Footer for breaking changes or issues:
+#   BREAKING CHANGE: <explanation>
+#   Closes #123
