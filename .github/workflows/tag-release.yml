@@ -8,9 +8,19 @@ on:
 jobs:
   tag:
     runs-on: ubuntu-latest
+
+    outputs:
+      skip_release: ${{ steps.check_tag.outputs.skip_release }}
+      new_tag: ${{ env.NEW_TAG }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history and tags
+
+      - name: Fetch all tags
+        run: git fetch --tags
 
       - name: Get latest tag
         id: get_tag
@@ -22,7 +32,6 @@ jobs:
           OLD_TAG=${{ env.TAG }}
           echo "Previous tag: $OLD_TAG"
 
-          # Determine change type based on commit messages
           if git log --format=%B -n 1 | grep -iqE "BREAKING CHANGE|major"; then
             TYPE="major"
           elif git log --format=%B -n 1 | grep -iqE "feat:"; then
@@ -33,39 +42,4 @@ jobs:
 
           MAJOR=$(echo $OLD_TAG | cut -d. -f1 | tr -d 'v')
           MINOR=$(echo $OLD_TAG | cut -d. -f2)
-          PATCH=$(echo $OLD_TAG | cut -d. -f3)
-
-          if [ "$TYPE" == "major" ]; then
-            NEW_TAG="v$((MAJOR + 1)).0.0"
-          elif [ "$TYPE" == "minor" ]; then
-            NEW_TAG="v$MAJOR.$((MINOR + 1)).0"
-          else
-            NEW_TAG="v$MAJOR.$MINOR.$((PATCH + 1))"
-          fi
-
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-          echo "Versioning: $TYPE update to $NEW_TAG"
-
-      - name: Create new tag
-        run: |
-          git tag ${{ env.NEW_TAG }}
-          git push origin ${{ env.NEW_TAG }}
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.NEW_TAG }}
-          name: Release ${{ env.NEW_TAG }}
-          body: "🚀 Automated release of ${{ env.NEW_TAG }}"
-          draft: false
-          prerelease: false
-
-      - name: Notify Discord
-        if: success()
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d '{"content": "📢 **New Release:** `${{ env.NEW_TAG }}` is now live! 🚀"}' \
-               $DISCORD_WEBHOOK
+          PATCH=$(echo $OLD_TAG | cut_
