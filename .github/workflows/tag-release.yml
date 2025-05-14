@@ -11,6 +11,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed to fetch all tags and history
+
+      - name: Fetch all tags
+        run: git fetch --tags
 
       - name: Get latest tag
         id: get_tag
@@ -22,7 +27,6 @@ jobs:
           OLD_TAG=${{ env.TAG }}
           echo "Previous tag: $OLD_TAG"
 
-          # Determine change type based on commit messages
           if git log --format=%B -n 1 | grep -iqE "BREAKING CHANGE|major"; then
             TYPE="major"
           elif git log --format=%B -n 1 | grep -iqE "feat:"; then
@@ -46,12 +50,24 @@ jobs:
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
           echo "Versioning: $TYPE update to $NEW_TAG"
 
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/${{ env.NEW_TAG }}$"; then
+            echo "Tag already exists. Skipping release."
+            echo "skip_release=true" >> $GITHUB_ENV
+          else
+            echo "skip_release=false" >> $GITHUB_ENV
+        shell: bash
+
       - name: Create new tag
+        if: env.skip_release != 'true'
         run: |
           git tag ${{ env.NEW_TAG }}
           git push origin ${{ env.NEW_TAG }}
 
       - name: Create GitHub Release
+        if: env.skip_release != 'true'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NEW_TAG }}
@@ -61,7 +77,7 @@ jobs:
           prerelease: false
 
       - name: Notify Discord
-        if: success()
+        if: env.skip_release != 'true' && success()
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
