@@ -1,3 +1,18 @@
 #!/bin/sh
 
-pnpm dlx commitlint --edit $1
+# Load nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+# Load node from .nvmrc (optional)
+[ -f .nvmrc ] && nvm use >/dev/null
+
+# Run commitlint with pnpm or fallback to npx
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm dlx commitlint --edit "$1"
+elif command -v npx >/dev/null 2>&1; then
+  npx --no-install commitlint --edit "$1"
+else
+  echo "❌ Neither pnpm nor npx is available. Commit message cannot be linted."
+  exit 1
+fi
