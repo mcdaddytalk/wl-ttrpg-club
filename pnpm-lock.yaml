@@ -265,7 +265,7 @@ importers:
         specifier: ^8.5.2
         version: 8.5.3
       semantic-release:
-        specifier: ^24.2.3
+        specifier: 24.2.3
         version: 24.2.3(typescript@5.8.2)
       semantic-release-discord:
         specifier: ^1.2.0
