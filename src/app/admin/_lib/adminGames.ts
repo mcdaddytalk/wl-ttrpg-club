@@ -1,5 +1,5 @@
 import { getSortingStateParser } from "@/lib/parsers";
-import { GAME_SCHED_STATUS, SupaGMGameData } from "@/lib/types/custom";
+import { GAME_SCHED_STATUS, GMGameData } from "@/lib/types/custom";
 import { 
     parseAsArrayOf, 
     parseAsString, 
@@ -17,7 +17,7 @@ export const adminGameSearchParams = {
   search: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),
   pageSize: parseAsInteger.withDefault(10),
-  sort: getSortingStateParser<SupaGMGameData>().withDefault([
+  sort: getSortingStateParser<GMGameData>().withDefault([
     { id: "created_at", desc: true },
     { id: "title", desc: true },
   ]),

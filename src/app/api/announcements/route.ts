@@ -1,5 +1,6 @@
 import { sendInternalAnnouncementMessage } from "@/lib/notifications/sendInternalAnnouncementMessage";
-import { AnnouncementDO, SupabaseAnnouncementListResponse, SupabaseAnnouncementResponse } from "@/lib/types/custom";
+import { SupabaseAnnouncementListResponse, SupabaseAnnouncementResponse } from "@/lib/types/custom";
+import { AnnouncementDO } from "@/lib/types/data-objects";
 import { AnnouncementQuerySchema } from "@/lib/validation/announcements";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";

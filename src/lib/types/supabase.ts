@@ -797,6 +797,7 @@ export type Database = {
           file_url: string | null
           id: string
           pinned: boolean | null
+          summary: string | null
           title: string
           updated_at: string | null
           visibility: Database["public"]["Enums"]["resource_visibility"]
@@ -812,6 +813,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           pinned?: boolean | null
+          summary?: string | null
           title: string
           updated_at?: string | null
           visibility?: Database["public"]["Enums"]["resource_visibility"]
@@ -827,6 +829,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           pinned?: boolean | null
+          summary?: string | null
           title?: string
           updated_at?: string | null
           visibility?: Database["public"]["Enums"]["resource_visibility"]
@@ -1036,6 +1039,7 @@ export type Database = {
           address: string | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
           id: string
           name: string
           scope: Database["public"]["Enums"]["LocationScope"]
@@ -1047,6 +1051,7 @@ export type Database = {
           address?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           id?: string
           name: string
           scope?: Database["public"]["Enums"]["LocationScope"]
@@ -1058,6 +1063,7 @@ export type Database = {
           address?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           id?: string
           name?: string
           scope?: Database["public"]["Enums"]["LocationScope"]
@@ -1186,6 +1192,7 @@ export type Database = {
           is_archived: boolean
           is_read: boolean
           link_url: string | null
+          preview: string | null
           recipient_id: string
           sender_id: string
           subject: string | null
@@ -1199,6 +1206,7 @@ export type Database = {
           is_archived?: boolean
           is_read?: boolean
           link_url?: string | null
+          preview?: string | null
           recipient_id: string
           sender_id: string
           subject?: string | null
@@ -1212,6 +1220,7 @@ export type Database = {
           is_archived?: boolean
           is_read?: boolean
           link_url?: string | null
+          preview?: string | null
           recipient_id?: string
           sender_id?: string
           subject?: string | null
@@ -1466,6 +1475,13 @@ export type Database = {
         Returns: {
           id: string
           consent: boolean
+        }[]
+      }
+      get_tag_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          tag_id: string
+          count: number
         }[]
       }
       transfer_game_ownership: {

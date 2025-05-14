@@ -81,7 +81,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
                     description: game.games.description,
                     system: game.games.system,
                     coverImage: game.games.cover_image,
-                    scheduled_for: new Date(game.next_game_date) || null,
+                    scheduled_for: game.next_game_date ?? null,
                     status: game.status,
                     num_players: gameRegistrants.filter((gameRegistrant) => gameRegistrant.game_id === game.game_id).length,
                     max_seats: game.games.max_seats,

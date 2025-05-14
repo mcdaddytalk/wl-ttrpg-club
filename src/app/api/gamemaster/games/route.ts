@@ -1,4 +1,5 @@
-import { DOW, GMGameData, SupabaseGMGameDataListResponse } from "@/lib/types/custom";
+import { DOW, GMGameDataListResponse } from "@/lib/types/custom";
+import { GMGameDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         description,
         system,
         cover_image, 
+        status,
         max_seats,
         visibility,
         starting_seats, 
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                 )        
         )    
       `)
-    .eq('gamemaster_id', gm_id) as unknown as SupabaseGMGameDataListResponse;
+    .eq('gamemaster_id', gm_id) as unknown as GMGameDataListResponse;
 
     if (gamesError) {
       logger.error(gamesError);
@@ -127,20 +129,22 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         return acc;
       }, {} as Record<string, number>);
 
-    const combinedData: GMGameData[] = gamesData?.map(game => ({
+    const combinedData: GMGameDO[] = gamesData?.map(game => ({
       id: game.id,
       title: game.title,
       description: game.description ?? '',
       system: game.system ?? '',
       coverImage: game.cover_image ?? 'default',
+      gameCode: game.game_code ?? '',
       gamemaster: game.gamemaster,
-      scheduled_next: new Date(game.game_schedule[0]?.next_game_date),
+      scheduled_next: game.game_schedule[0]?.next_game_date,
       interval: game.game_schedule[0]?.interval,
       dow: game.game_schedule[0]?.day_of_week as DOW,
       maxSeats: game.max_seats as number,
       visibility: game.visibility,
       startingSeats: game.starting_seats as number,
-      status: game.game_schedule[0]?.status,
+      status: game.status,
+      schedStatus: game.game_schedule[0]?.status,
       location_id: game.game_schedule[0]?.location_id,
       location: game.game_schedule[0]?.location ?? '',
       invites: inviteCounts[game.id] ?? 0,

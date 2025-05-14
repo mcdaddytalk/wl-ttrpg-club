@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "../useQueryClient";
-import { SupaGMGameData } from "@/lib/types/custom";
+import { GMGameData } from "@/lib/types/custom";
 
 export const useAvailableGames = () => {
     return useQuery({
@@ -8,7 +8,7 @@ export const useAvailableGames = () => {
       queryFn: async () => {
         const res = await fetch("/api/admin/games/available");
         if (!res.ok) throw new Error("Failed to fetch games");
-        return res.json() as unknown as SupaGMGameData[]; // expected: [{ id, title, gm_id, gm_name }]
+        return res.json() as unknown as GMGameData[]; // expected: [{ id, title, gm_id, gm_name }]
       },
     });
 };

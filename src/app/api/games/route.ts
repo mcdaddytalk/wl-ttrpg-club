@@ -73,7 +73,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
       return {
           game_id: favorite.game_id,
           member_id: favorite.member_id,
-          created_at: new Date(favorite.created_at)
+          created_at: favorite.created_at
       }
     }) ?? [];
 

@@ -5,7 +5,7 @@ import { usePublishedGameResources } from "@/hooks/usePublishedGameResources";
 import { GameResourceList } from "@/components/GameResources/GameResourceList";
 import { useState } from "react";
 import { GameResourceFilterParams } from "@/lib/validation/gameResources";
-import { GameResourcePreviewModal } from "@/components/Modal/GameResourceModal";
+import { GameResourcePreviewModal } from "@/components/modals/GameResourceModal";
 import { GameResourceDO } from "@/lib/types/custom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 

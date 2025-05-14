@@ -8,7 +8,8 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { User } from '@supabase/supabase-js';
 import { useQuery } from '@tanstack/react-query';
-import { MessageData, MessageDO } from '@/lib/types/custom';
+import { MessageData } from '@/lib/types/custom';
+import { MessageDO } from '@/lib/types/data-objects'
 import { fetchMessages } from '@/queries/fetchMessages';
 import createSupabaseBrowserClient from '@/utils/supabase/client';
 import { Badge } from '@/components/ui/badge';

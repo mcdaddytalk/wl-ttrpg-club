@@ -2,7 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AdminLocationDO, ContactListDO, DataTableFilterField } from "@/lib/types/custom";
+import { AdminLocationDO, ContactListDO } from "@/lib/types/data-objects";
+import { DataTableFilterField } from "@/lib/types/data-table";
 import { useDataTable } from "@/hooks/use-data-table";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -12,11 +13,11 @@ import { getColumns } from "./columns";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { DataTable } from "@/components/DataTable/data-table";
-import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { useRemoveLocation } from "@/hooks/useRemoveLocation";
-import { AddLocationModal } from "@/components/Modal/AddLocationModal";
-import { EditLocationModal } from "@/components/Modal/EditLocationModal";
-import ManageLocationGMsModal from "@/components/Modal/ManageLocationGMsModal";
+import { AddLocationModal } from "@/components/modals/AddLocationModal";
+import { EditLocationModal } from "@/components/modals/EditLocationModal";
+import ManageLocationGMsModal from "@/components/modals/ManageLocationGMsModal";
 import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
 

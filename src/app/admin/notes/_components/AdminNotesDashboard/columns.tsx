@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminNoteDO } from "@/lib/types/custom";
+import { AdminNoteDO } from "@/lib/types/data-objects";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";

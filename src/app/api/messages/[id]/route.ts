@@ -1,4 +1,5 @@
-import { SupabaseMessageResponse, type MessageDO } from "@/lib/types/custom";
+import { SupabaseMessageResponse } from "@/lib/types/custom";
+import { MessageDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -36,6 +37,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
             ),
             subject,
             content,
+            preview,
             category,
             link_url,
             is_read,
@@ -69,6 +71,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         },
         subject: messageData.subject ?? "",
         content: messageData.content  ?? "",
+        preview: messageData.preview ?? "",
         category: messageData.category ?? "",
         link_url: messageData.link_url ?? "",
         is_read: messageData.is_read,
@@ -85,11 +88,17 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
     const { id } = await params;
     const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+    }
 
     const { error: messageError } = await supabase
         .from('messages')
         .update({ deleted_at: new Date().toISOString() })
-        .eq('id', id);
+        .eq('id', id)
+        .eq("recipient_id", user.id);
 
     if (messageError) {
         logger.error(messageError)

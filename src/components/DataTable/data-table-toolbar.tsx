@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import type { DataTableFilterField } from "@/lib/types/custom"
+import type { DataTableFilterField } from "@/lib/types/data-table"
 import type { Table } from "@tanstack/react-table"
-import { X } from "lucide-react"
+import { X, Search } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -36,18 +36,22 @@ interface DataTableToolbarProps<TData>
    *   }
    * ]
    */
-  filterFields?: DataTableFilterField<TData>[]
+  filterFields?: DataTableFilterField<TData>[],
+  globalFilter?: string;
+  setGlobalFilter?: (value: string) => void; 
 }
 
 export function DataTableToolbar<TData>({
   table,
   filterFields = [],
+  globalFilter,
+  setGlobalFilter,
   children,
   className,
   ...props
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
-
+  
   // Memoize computation of searchableColumns and filterableColumns
   const { searchableColumns, filterableColumns } = React.useMemo(() => {
     return {
@@ -65,6 +69,27 @@ export function DataTableToolbar<TData>({
       {...props}
     >
       <div className="flex flex-1 items-center gap-2">
+        {globalFilter !== undefined && setGlobalFilter && (
+          <div className="relative flex-1 max-w-sm">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+              <Search className="h-4 w-4" />
+            </span>
+            <Input
+              placeholder="Global Search..."
+              value={globalFilter}
+              onChange={(e) => {
+                const value = e.target.value;
+                setGlobalFilter(value);
+        
+                // If cleared (blank string), reset table filters
+                if (value.trim() === "") {
+                  table.resetGlobalFilter();
+                }
+              }}
+              className="pl-9 h-8"
+            />
+          </div>
+        )}
         {searchableColumns.length > 0 &&
           searchableColumns.map(
             (column) =>

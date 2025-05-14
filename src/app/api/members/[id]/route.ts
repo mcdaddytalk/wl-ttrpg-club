@@ -1,4 +1,5 @@
-import { MemberDO, SupabaseMemberResponse } from "@/lib/types/custom";
+import { SupabaseMemberResponse } from "@/lib/types/custom";
+import { MemberDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         displayName: `${memberData.profiles.given_name} ${memberData.profiles.surname}`,
         email: memberData.email,
         phone: memberData.phone || '',
-        birthday: memberData.profiles.birthday ? new Date(memberData.profiles.birthday) : null,
+        birthday: memberData.profiles.birthday ?? null,
         experienceLevel: memberData.profiles.experience_level,
         isAdmin: memberData.is_admin,
         isMinor: memberData.is_minor,

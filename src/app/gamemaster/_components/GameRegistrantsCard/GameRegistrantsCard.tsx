@@ -3,12 +3,13 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DataTable } from "@/components/DataTable/data-table"
 import { getColumns } from './columns';
-import { ContactListDO, Player } from "@/lib/types/custom";
+import { Player } from "@/lib/types/custom";
+import { ContactListDO } from "@/lib/types/data-objects";
 import { useDataTable } from "@/hooks/use-data-table";
-import MessageModal from "@/components/Modal/MessageModal";
+import MessageModal from "@/components/modals/MessageModal";
 import { User } from "@supabase/supabase-js";
-import { ApprovalModal } from "@/components/Modal/ApprovalModal";
-import PlayerViewModal from "@/components/Modal/PlayerViewModal";
+import { ApprovalModal } from "@/components/modals/ApprovalModal";
+import PlayerViewModal from "@/components/modals/PlayerViewModal";
 
 
 type GameRegistrantsCardProps = {

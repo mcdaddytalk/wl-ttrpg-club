@@ -15,7 +15,7 @@ import { DaysOfWeek, DOW, GAME_INTERVALS, GAME_SCHED_STATUS, GameInterval, GameS
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { useGamemasterLocations } from "@/hooks/gamemaster/useGamemasterLocations";
-import { AddLocationModal } from "@/components/Modal/AddLocationModal";
+import { AddLocationModal } from "@/components/modals/AddLocationModal";
 import useSession from "@/utils/supabase/use-session";
 
 type FormValues = z.infer<typeof GMGameScheduleSchema>;
@@ -25,7 +25,7 @@ const defaultSchedule: FormValues = {
   status: "draft",
   first_game_date: "",
   last_game_date: null,
-  next_game_date: "",
+  next_game_date: null,
   day_of_week: "monday",
   location_id: "",
 };
@@ -42,14 +42,20 @@ export default function GamemasterGameSchedule({ gameId }: { gameId: string }) {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(GMGameScheduleSchema),
-    defaultValues: schedule ?? defaultSchedule,
+    defaultValues: {
+      ...((schedule ?? defaultSchedule) as FormValues),
+      day_of_week: schedule?.day_of_week ?? undefined,
+    }
   });
 
   const { watch, register, formState: { errors }, setValue } = form;
 
   useEffect(() => {
     if (schedule) {
-      form.reset(schedule);
+      form.reset({
+        ...schedule,
+        day_of_week: schedule?.day_of_week ?? undefined,
+      });
     }
   }, [schedule, form]);
 

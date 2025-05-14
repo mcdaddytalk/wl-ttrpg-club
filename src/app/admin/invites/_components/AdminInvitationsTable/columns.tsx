@@ -11,7 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InviteDO } from "@/lib/types/custom";
+import { InviteDO } from "@/lib/types/data-objects";
+import { BooleanCellWithTooltip, DateCell } from "@/components/DataTable/data-table-cell-helpers";
 
 interface ColumnOptions {
   onOpenModal: (modal: string, invite: InviteDO) => void;
@@ -50,20 +51,11 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<InviteDO>[
     cell: ({ row }) => {
       const { accepted, expires_at } = row.original;
       const now = new Date();
-      const expired = !accepted && new Date(expires_at) < now;
+      const expiryDate = expires_at ? new Date(expires_at) : null;
+      const expired = !accepted && expiryDate && !isNaN(expiryDate.getTime()) && expiryDate < now;
 
-      const status = accepted
-        ? "Accepted"
-        : expired
-            ? "Expired"
-            : "Pending";
-
-      const variant = accepted
-        ? "default"
-        : expired
-            ? "destructive"
-            : "secondary";
-
+      const status = accepted ? "Accepted" : expired ? "Expired" : "Pending";
+      const variant = accepted ? "default" : expired ? "destructive" : "secondary";
       return <Badge variant={variant}>{status}</Badge>;
     },
   },
@@ -71,22 +63,25 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<InviteDO>[
     id: "notified",
     header: "Notified",
     cell: ({ row }) => (
-      <Badge variant={row.original.notified ? "default" : "outline"}>
-        {row.original.notified ? "Yes" : "No"}
-      </Badge>
+      <BooleanCellWithTooltip
+        value={row.original.notified}
+        label="Notified"
+        tooltipLabel={row.original.notified ? "Yes" : "No"}
+      />
     ),
   },
   {
     accessorKey: "invited_at",
     header: "Invited At",
     cell: ({ row }) =>
-      new Date(row.original.invited_at).toLocaleDateString(),
+      DateCell({ date: row.original.invited_at, label: "Invited At" }),
   },
   {
     accessorKey: "expires_at",
     header: "Expires",
-    cell: ({ row }) =>
-      new Date(row.original.expires_at).toLocaleDateString(),
+    cell: ({ row }) => {
+      return DateCell({ date: row.original.expires_at, label: "Expires" });
+    },
   },
   {
     id: "actions",

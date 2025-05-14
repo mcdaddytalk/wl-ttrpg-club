@@ -1,7 +1,8 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { GMGameData, Location } from "@/lib/types/custom"
+import { Location } from "@/lib/types/custom"
+import { GMGameDO } from "@/lib/types/data-objects"
 import { Button } from "@/components/ui/button"
 import { 
     DropdownMenu, 
@@ -13,10 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 interface ColumnOptions {
-    onOpenModal: (modalName: string, data: GMGameData) => void
+    onOpenModal: (modalName: string, data: GMGameDO) => void
 }
 
-export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameData>[] => [
+export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameDO>[] => [
     {
         accessorKey: "title",
         header: "Title",

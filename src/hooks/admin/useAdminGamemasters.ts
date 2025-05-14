@@ -1,6 +1,7 @@
-import { MemberDO } from "@/lib/types/custom";
+import { ContactListDO, MemberDO } from "@/lib/types/data-objects";
 import { useQueryClient } from "../useQueryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import fetcher from "@/utils/fetcher";
 
 
 
@@ -8,20 +9,7 @@ export const useAdminGamemasters = () => {
     return useQuery({
         queryKey: ['admin", "gamemasters'],
         queryFn: async () => {
-            const response = await fetch(`/api/admin/gamemasters`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
-            ).then((res) => {
-                if (!res.ok) {
-                    throw new Error('Error fetching game');
-                }
-                return res.json() as Promise<MemberDO[]>;
-            });
-            return response;
+            return await fetcher<ContactListDO[]>(`/api/admin/gamemasters`);
         },
     })
 }

@@ -1,5 +1,5 @@
 import { searchParamsCache } from "@/app/admin/_lib/adminMembers";
-import { MemberDO } from "@/lib/types/custom";
+import { MemberDO } from "@/lib/types/data-objects";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation"
 
