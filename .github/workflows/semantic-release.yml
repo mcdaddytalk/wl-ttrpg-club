@@ -18,7 +18,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -43,4 +42,29 @@ jobs:
         run: pnpm exec semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub-provided token
+          
+      - name: Notify Discord with changelog highlights
+        if: success()
+        env:
           DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+        run: |
+            LATEST_TAG=$(git describe --tags --abbrev=0)
+        
+            # Get recent changelog (adjust lines if needed)
+            CHANGELOG=$(awk '/## 📦 Changelog/ {found=1} found' CHANGELOG.md | head -n 20 | sed 's/"/\\"/g')
+        
+            curl -H "Content-Type: application/json" \
+              -X POST \
+              -d @- "$DISCORD_RELEASE_WEBHOOK" <<EOF
+            {
+              "username": "ReleaseBot",
+              "avatar_url": "https://i.imgur.com/bRMyEWh.png",
+              "embeds": [
+                {
+                  "title": "📢 New Release: $LATEST_TAG",
+                  "description": "$CHANGELOG",
+                  "color": 5814783
+                }
+              ]
+            }
+            EOF
