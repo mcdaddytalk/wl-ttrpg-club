@@ -14,14 +14,6 @@ module.exports = {
     '@semantic-release/github'
   ],
     verifyConditions: [
-      '@semantic-release/github',
-      [
-        'semantic-release-discord',
-        {
-          webhookUrl: process.env.DISCORD_RELEASE_WEBHOOK,
-          avatar_url: 'https://i.imgur.com/bRMyEWh.png',
-          username: 'ReleaseBot'
-        }
-      ]
+      '@semantic-release/github'
     ]
   };
