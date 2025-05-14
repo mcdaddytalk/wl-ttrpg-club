@@ -1,0 +1,21 @@
+types:
+  - feat
+  - fix
+  - docs
+  - style
+  - refactor
+  - perf
+  - test
+  - chore
+
+scopes:
+  - schedule
+  - game
+  - invite
+  - admin
+  - member
+
+requireScope: false
+requireSubject: true
+subjectPattern: ^(?![A-Z]).+$
+subjectPatternError: Subject must not start with an uppercase letter.
