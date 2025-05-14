@@ -135,7 +135,7 @@ export const getURL = (path: string = '') => {
 //     return new Intl.DateTimeFormat("en-US", options).format(date);
 // };
 
-export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, date?: Date) => {
+export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, date?: string | null) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 

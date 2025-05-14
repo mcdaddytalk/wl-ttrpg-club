@@ -53,7 +53,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             given_name: memberData.profiles.given_name ?? '',
             surname: memberData.profiles.surname ?? '',
             displayName: `${memberData.profiles.given_name} ${memberData.profiles.surname}`,
-            birthday: memberData.profiles.birthday ? new Date(memberData.profiles.birthday) : null,
+            birthday: memberData.profiles.birthday ?? null,
             experienceLevel: memberData.profiles.experience_level,
             isAdmin: memberData.is_admin,
             isMinor: memberData.is_minor,

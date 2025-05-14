@@ -137,7 +137,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       coverImage: game.cover_image ?? 'default',
       gameCode: game.game_code ?? '',
       gamemaster: game.gamemaster,
-      scheduled_next: new Date(game.game_schedule[0]?.next_game_date),
+      scheduled_next: game.game_schedule[0]?.next_game_date,
       interval: game.game_schedule[0]?.interval,
       dow: game.game_schedule[0]?.day_of_week as DOW,
       maxSeats: game.max_seats as number,

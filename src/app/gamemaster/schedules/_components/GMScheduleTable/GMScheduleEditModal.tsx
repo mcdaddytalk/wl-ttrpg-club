@@ -31,7 +31,6 @@ export function GMScheduleEditModal({ open, onClose, onUpdate, schedule, locatio
     handleSubmit,
     control,
     reset,
-    setValue,
     formState: { errors },
   } = useForm<ScheduleUpdateInput>({
     resolver: zodResolver(GMGameScheduleSchema),

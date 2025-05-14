@@ -14,7 +14,7 @@ export const GMGameScheduleSchema = z.object({
     }).optional(),
     next_game_date: z.string().refine(val => !isNaN(Date.parse(val)), {
       message: "Invalid date",
-    }).optional(),
+    }).nullable().optional(),
     last_game_date: z.string().refine(val => !isNaN(Date.parse(val)), {
       message: "Invalid date",
     }).nullable().optional(),

@@ -127,7 +127,7 @@ export type EmailInvite = {
 export type GameFavorite = {
   game_id: string;
   member_id: string;
-  created_at: Date;
+  created_at: string;
 }
 export type SupabaseGameFavoriteListResponse = SupabaseDataResponse<GameFavorite>
 
@@ -136,7 +136,7 @@ export type GameRegistration = {
   member_id: string;
   status: GameRegStatus;
   status_note: string;
-  registered_at: Date;
+  registered_at: string;
   members: MemberData;  
 }
 export type SupabaseGameRegistrationListResponse = SupabaseDataResponse<GameRegistration>
@@ -148,9 +148,9 @@ export type AdminNote = {
   target_id: string;
   target_type: NoteTargetType;
   note: string;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at: Date | null;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
 }
 export type SupabaseAdminNoteListResponse = SupabaseDataResponse<AdminNote>
 export type SupabaseAdminNoteResponse = SupabaseDataResponseSingle<AdminNote>
@@ -164,11 +164,11 @@ export type MemberData = {
   is_minor: boolean;
   consent: boolean;
   status: MemberStatus;
-  last_login_at: Date | null;
-  created_at: Date;
-  updated_at: Date;
+  last_login_at: string | null;
+  created_at: string;
+  updated_at: string;
   updated_by: string;
-  deleted_at: Date;
+  deleted_at: string | null;
   deleted_by: string;
   admin_notes: AdminNote[] | null;
   profiles: ProfileData;
@@ -244,8 +244,8 @@ export type BroadcastRecipient = {
   recipient_id: string;
   members: MemberData;
   error_message: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
   delivery_method: DeliveryMethod;
   delivery_status: DeliveryStatus;
 }
@@ -258,7 +258,7 @@ export type BroadcastMessage = {
   game_id: string;
   subject: string;
   message: string;
-  created_at: Date;
+  created_at: string;
   mode: DeliveryMethod;
 }
 export type SupabaseBroadcastMessageListResponse = SupabaseDataResponse<BroadcastMessage>;
@@ -269,9 +269,9 @@ export type RegisteredGame = {
   title: string;
   description: string;
   system: string;
-  scheduled_for: Date | null;
+  scheduled_for: string | null;
   status: string;
-  registration_date: Date | null;
+  registration_date: string | null;
   num_players: number;
   gm_name: string;
   gm_member_id: string;
@@ -284,7 +284,7 @@ export type RegisteredGameDO = {
   system: string;
   visibility: GameVisibility
   coverImage: string;
-  scheduled_for: Date | null;
+  scheduled_for: string | null;
   location: Location;
   status: GameSchedStatus;
   interval: GameInterval;
@@ -394,7 +394,7 @@ export type UpcomingGame = {
   description: string;
   system: string;
   coverImage: string;
-  scheduled_for: Date | null;
+  scheduled_for: string | null;
   status: string;
   num_players: number;
   max_seats: number;
@@ -402,7 +402,7 @@ export type UpcomingGame = {
   gm_member_id: string;
   registered: boolean;
   registration_status: GameRegStatus;
-  registration_date: Date | null;  
+  registration_date: string | null;  
 }
 
 export type RegisteredCharacter = {
@@ -410,7 +410,7 @@ export type RegisteredCharacter = {
   name: string;
   description: string;
   system: string;
-  registered_at: Date;
+  registered_at: string;
   member_id: string;
   game_id: string;
   gm_name: string;
@@ -422,8 +422,8 @@ export type GameData = {
   game_id: string;
   status: GameSchedStatus;
   interval: GameInterval;
-  firstGameDate: Date; // or Date if you convert the date
-  nextGameDate: Date;
+  firstGameDate: string; // or string if you convert the date
+  nextGameDate: string | null; // or string if you convert the date
   location_id: string;
   location: Location;
   dayOfWeek: DOW;
@@ -494,8 +494,8 @@ export type GMGameData = {
   game_schedule: SupaGameScheduleData[];
   gamemaster_id: string;
   gamemaster: MemberData;
-  created_at: Date;
-  deleted_at: Date | null;
+  created_at: string;
+  deleted_at: string | null;
   game_invites: InviteData[];
   game_registrations: GameRegistration[];
 }
@@ -512,8 +512,8 @@ export type Location = {
   url?: string;
   address?: string;
   type: LocationType;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
   created_by: string;
   scope: LocationScope;
 }
@@ -585,9 +585,9 @@ export type GameSchedule = {
   game_name: string;
   interval: string;
   day_of_week: string;
-  first_game_date: Date;
-  next_game_date: Date;
-  last_game_date: Date;
+  first_game_date: string;
+  next_game_date: string;
+  last_game_date: string;
   status: string;
   game_registrations: GameRegistrant[]
 }
@@ -620,7 +620,7 @@ export type Player = {
 
 export type GameRegistrationData = {
   member_id: string;
-  registered_at: Date;
+  registered_at: string;
   members: MemberData;
   profiles: ProfileData;
 }
@@ -630,9 +630,9 @@ export type GameScheduleWithRegistrantsData = {
   game_id: string;
   interval: string;
   day_of_week: string;
-  first_game_date: Date;
-  next_game_date: Date;
-  last_game_date: Date;
+  first_game_date: string;
+  next_game_date: string;
+  last_game_date: string;
   status: string;
   games: GameData;
   game_registrations: GameRegistrationData[];
@@ -643,9 +643,9 @@ export type SupaGameSchedule = {
   game_id: string;
   interval: GameInterval;
   day_of_week: DOW;
-  first_game_date: Date;
-  next_game_date: Date;
-  last_game_date?: Date;
+  first_game_date: string;
+  next_game_date: string;
+  last_game_date?: string;
   status: GameSchedStatus;
   location_id: string;
   location: Location;

@@ -22,7 +22,7 @@ interface GMScheduleTableProps {
 
 export const GMScheduleTable = ({ className }: GMScheduleTableProps): React.ReactElement => {
     const [editingSchedule, setEditingSchedule] = useState<GMGameScheduleDO | null>(null)
-    const { filters, setters } = useGMScheduleFilters()
+    const { filters } = useGMScheduleFilters()
     const { interval, status, dayOfWeek} = filters;
 
     const { data: schedules } = useFetchAllGameSchedules()
@@ -30,9 +30,9 @@ export const GMScheduleTable = ({ className }: GMScheduleTableProps): React.Reac
     const updateSchedule = useUpdateGameSchedule(editingSchedule?.game_id ?? "")
 
     const [activeModal, setActiveModal] = useState<string | null>(null);
-    const [isAddScheduleModalOpen, setAddScheduleModalOpen] = useState(false);
+    // const [isAddScheduleModalOpen, setAddScheduleModalOpen] = useState(false);
     const [isEditScheduleModalOpen, setEditLocationModalOpen] = useState(false);
-    const [isRemoveScheduleModalOpen, setRemoveLocationModalOpen] = useState(false);
+    // const [isRemoveScheduleModalOpen, setRemoveLocationModalOpen] = useState(false);
 
     const openModal = (modal: string, schedule?: GMGameScheduleDO) => {
         logger.info("Opening modal", modal)

@@ -19,7 +19,7 @@ import EmailShareIcon from "@/components/EmailShareIcon";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import GameLocation from "@/components/GameLocation";
 import GameImage from "@/components/GameImage";
-import { toSentenceCase } from "@/utils/helpers";
+import { formatDate, toSentenceCase } from "@/utils/helpers";
 import { GameData } from "@/lib/types/custom";
 
 const enhanceStatus = (game: GameData) => {
@@ -162,11 +162,7 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                         <div className="flex items-center gap-2">
                             {/* Icon and Text on the Same Line */}
                             <LuCalendar className="text-xl" />
-                            <span>{new Date(game.nextGameDate).toLocaleDateString()} @{' '}
-                            {new Date(game.nextGameDate).toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            })}</span>
+                            <span>{formatDate(game.nextGameDate)}</span>
                         </div>
                         <GameLocation location={game.location}/>
                         <div className="flex items-center gap-2">

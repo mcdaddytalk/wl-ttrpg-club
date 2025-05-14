@@ -1,4 +1,4 @@
-import { locationBadge, toSentenceCase } from "@/utils/helpers"
+import { toSentenceCase } from "@/utils/helpers"
 import clsx from "clsx"
 
 

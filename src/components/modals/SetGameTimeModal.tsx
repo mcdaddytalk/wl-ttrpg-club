@@ -35,11 +35,16 @@ export const SetGameTimeModal: React.FC<SetGameTimeModalProps> = ({
 }) => {
     const { mutate: setGameTime, isPending } = useUpdateGame();
 
-    const [nextGameDate, setNextGameDate] = useState(game.scheduled_next);
+    const [nextGameDate, setNextGameDate] = useState<string | undefined>(
+        game.scheduled_next ?? undefined
+      );
 
     const handleSubmit = async () => {
         setGameTime(
-            { id: game.id, nextGameDate, gm_id: gamemaster_id },
+            { 
+                id: game.id, 
+                nextGameDate,
+                gm_id: gamemaster_id },
             {
                 onSuccess: () => {
                     toast.success("Game Date Updated")
@@ -69,8 +74,8 @@ export const SetGameTimeModal: React.FC<SetGameTimeModalProps> = ({
                             Next Game Date
                         </label>
                         <DatetimePicker
-                            selected={nextGameDate}
-                            setDate={setNextGameDate}
+                            selected={typeof nextGameDate === 'string' ? new Date(nextGameDate) : undefined}
+                            setDate={(date) => setNextGameDate(date?.toISOString())}
                         />
                     </div>
                 </div>

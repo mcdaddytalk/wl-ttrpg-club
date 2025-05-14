@@ -47,7 +47,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
         setError(null)
         const nextGameDate = calculateNextGameDate(gameDay, gameInterval, gameDate);
         if (nextGameDate) {
-            setGameDate(new Date(nextGameDate));
+            setGameDate(nextGameDate);
             const editedGame = {
                 // ...game,
                 id: game.id,
@@ -57,7 +57,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
                 maxSeats: gameMaxSeats,
                 schedStatus: gameSchedStatus,
                 location_id: gameLocationId,
-                nextGameDate: gameDate,
+                nextGameDate: nextGameDate,
                 interval: gameInterval,
                 dayOfWeek: gameDay,
                 gm_id: gamemaster_id

@@ -2,7 +2,7 @@ import { AdminNote, Audience, AuditTrailData, ExperienceLevel, MemberStatus, Mes
 
 /* DO Types */
 export type AdminNoteDO = Omit<AdminNote, | 'updated_at' | 'deleted_at' | 'author'> & {
-  edited_at: Date | null;
+  edited_at: string | null;
   author_email: string;
   author: {
     id: string,
@@ -43,7 +43,7 @@ export type GMGameDO = {
   system: string;
   coverImage: string;
   gameCode: string;
-  scheduled_next: Date;
+  scheduled_next: string | null;
   interval: GameInterval;
   dow: DOW;
   maxSeats: number;
@@ -163,7 +163,7 @@ export type InvitedPlayer = {
 
 export type MemberDO = {
   status: MemberStatus;
-  last_login_at: Date | null;
+  last_login_at: string | null;
   id: string;
   provider?: string;
   given_name: string;
@@ -171,7 +171,7 @@ export type MemberDO = {
   displayName: string;
   email: string;
   phone: string;
-  birthday?: Date | null;
+  birthday?: string | null;
   isMinor: boolean;
   isAdmin: boolean;
   consent: boolean;
@@ -179,15 +179,15 @@ export type MemberDO = {
   bio?: string;
   avatar: string;
   roles: RoleDO[];
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
   updated_by: string;
-  deleted_at: Date | null;
+  deleted_at: string | null;
   deleted_by: string;
   admin_notes?: AdminNote[] | null;
   search?: string;
-  last_login_before?: Date;
-  last_login_after?: Date;
+  last_login_before?: string;
+  last_login_after?: string;
   onManageRoles?: (member: MemberDO) => void; // Optional callback to manage roles
   onRemoveMember?: (id: string, displayName: string) => void; // Optional callback to remove a member
   onResetPassword?: (email: string) => void; // Optional callback to reset the member's password
@@ -215,7 +215,7 @@ export type UpcomingGameDO = {
   id: string;
   title: string;
   status: GameSchedStatus
-  next_session_date: Date | string | null;
+  next_session_date: string | string | null;
   location: Location;
 }
 
@@ -226,5 +226,5 @@ export type ProfileSummaryDO = {
   id: string;
   experience_level: ExperienceLevel;
   bio: string;
-  created_at: Date;
+  created_at: string;
 }
