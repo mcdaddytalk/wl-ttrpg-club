@@ -39,16 +39,16 @@ export const GMScheduleTable = ({ className }: GMScheduleTableProps): React.Reac
         logger.info("Schedule", schedule)    
         if (schedule) setEditingSchedule(schedule);
         logger.info("Editing schedule", editingSchedule)
-        if (modal === 'addSchedule') setAddScheduleModalOpen(true);
+        // if (modal === 'addSchedule') setAddScheduleModalOpen(true);
         if (modal === 'editSchedule') setEditLocationModalOpen(true);
-        if (modal === 'removeSchedule') setRemoveLocationModalOpen(true);
+        // if (modal === 'removeSchedule') setRemoveLocationModalOpen(true);
         setActiveModal(modal);
     }
 
     const closeModal = () => {
-        if (activeModal === 'addSchedule') setAddScheduleModalOpen(false);
+        // if (activeModal === 'addSchedule') setAddScheduleModalOpen(false);
         if (activeModal === 'editSchedule') setEditLocationModalOpen(false);
-        if (activeModal === 'removeSchedule') setRemoveLocationModalOpen(false);
+        // if (activeModal === 'removeSchedule') setRemoveLocationModalOpen(false);
         setActiveModal(null);
     }
     
