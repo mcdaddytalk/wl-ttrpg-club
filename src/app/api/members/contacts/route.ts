@@ -1,5 +1,6 @@
 // import { ContactListDO } from "@/lib/types/custom";
-import { ContactListDO, SupabaseContactListResponse } from "@/lib/types/custom";
+import { SupabaseContactListResponse } from "@/lib/types/custom";
+import { ContactListDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";

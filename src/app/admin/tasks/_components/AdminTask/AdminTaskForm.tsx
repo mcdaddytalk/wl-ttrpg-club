@@ -15,7 +15,7 @@ import { useAdminMembers } from '@/hooks/admin/useAdminMembers';
 import { useEffect } from 'react';
 import { TASK_PRIORITIES, TASK_STATUSES } from '@/lib/types/custom';
 import { Select, SelectContent, SelectTrigger, SelectItem, SelectValue } from '@/components/ui/select';
-import { toSentenceCase } from '@/lib/utils';
+import { toSentenceCase } from "@/utils/helpers";
 import logger from '@/utils/logger';
 import { TagAutoSuggest } from '@/components/TagAutoSuggest';
 

@@ -1,180 +1,86 @@
 "use client"
 
-import { ContactListDO, MessageDO } from "@/lib/types/custom";
-// import useSession from "@/utils/supabase/use-session";
+import { MessageDO } from "@/lib/types/data-objects";
 import { User } from "@supabase/supabase-js";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useQueryClient } from "@/hooks/useQueryClient";
 import React, { useState } from "react"
-import { fetchMessages } from "@/queries/fetchMessages";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { columns } from "./columns";
-import { DataTable } from "./DataTable";
 import { Button } from "@/components/ui/button";
 import { ArchiveRestore, MailCheck, SendHorizonal } from "lucide-react";
-import MessageModal from "@/components/Modal/MessageModal";
+import MessageModal from "@/components/modals/MessageModal";
 import logger from "@/utils/logger";
-
-const fetchContactList = async (): Promise<ContactListDO[]> => {
-    const response = await fetch('/api/members/contacts',
-        {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        }
-    );
-    if (!response.ok) {
-        throw new Error('Failed to fetch contact list');
-    }
-    const contacts = await response.json();
-    return contacts;
-}
+import { useMyContacts } from "@/hooks/member/useMyContacts";
+import { useFetchMyMessages, useMarkAllMyMessagesAsArchived, useMarkAllMyMessagesAsRead, useMarkMyMessagesAsArchived, useMarkMyMessagesAsRead } from "@/hooks/member/useMyMessages";
+import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
+import { useDataTable } from "@/hooks/use-data-table";
+import { DataTableFilterField } from "@/lib/types/data-table";
+import { DataTable } from "@/components/DataTable/data-table";
+import { getColumns } from "./columns";
 
 type MemberMessageTableProps = {
     user: User;
 }
 
 const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactElement => {
-    const queryClient = useQueryClient();
-
     const [selectedMessage, setSelectedMessage] = useState<MessageDO | undefined>(undefined);
     const [selectedMessages] = useState<MessageDO[]>([]);
 
     const [isMessageModalOpen, setMessageModalOpen] = useState<boolean>(false); 
     const [messageMode, setMessageMode] = useState<'new' | 'reply' | 'forward'>("new");
     const [fixedRecipient, setRecipient] = useState<string>("");
-    
-    const { mutate: markMessageAsRead } = useMutation({
-        mutationFn: async (messageId: string) => {
-          // logger.log('Marking message as read:', messageId);
-          // logger.log('SelectedMessage:  ', selectedMessage);
-            const response = await fetch(`/api/messages/${messageId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    is_read: !selectedMessage?.is_read
-                }),
-            });
-            if (!response.ok) {
-                throw new Error('Failed to mark message as read');
-            }
-            return response.json();
-        },
-        onSuccess: (data) => {
-            logger.debug('Message marked as read:', data);
-            queryClient.invalidateQueries({ queryKey: ['messages', 'unread', user?.id] });
-            queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
-        },
-        onError: () => {
-            logger.error('Error marking message as read');
-        },
-    })
-    
-    const { mutate: archiveMessage } = useMutation({
-        mutationFn: async (messageId: string) => {
-            return await fetch(`/api/messages/${messageId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ is_archived: !selectedMessage?.is_archived, is_read: !selectedMessage?.is_read }),
-            });            
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
-        },
-        onError: () => {
-            logger.error('Error archiving message');
-        },
-    })
-    
-    const { mutate: archiveAllMessages } = useMutation({
-        mutationFn: async () => {
-            const response = await fetch(`/api/messages`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ user_id: user?.id, selectedMessages }),
-            });
-            if (!response.ok) {
-                throw new Error('Failed to delete all messages');
-            }
-            return response.json();
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
-        }
-    })    
-    
-    const { mutate: markAllMessagesAsRead } = useMutation({
-        mutationFn: async () => {
-            const response = await fetch(`/api/messages`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ user_id: user.id, is_read: true, selectedMessages }),
-            });
-            if (!response.ok) {
-                throw new Error('Failed to mark all messages as read');
-            }
-            return response.json();
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['messages', 'all', user?.id] });
-        },
-    })
 
-    const { data: membersData, isLoading: membersLoading, isError: membersError} = useQuery<ContactListDO[]>({
-        queryKey: ['members', 'contact_list', user?.id],
-        queryFn: () => fetchContactList(),
-        enabled: !!user?.id,
-    })
+    const { data: contacts, isLoading: contactsLoading, error: contactsError } = useMyContacts();
+    const { data: receivedMessages, isLoading: messagesLoading, isError: messagesError} = useFetchMyMessages(user?.id);
 
-    const { data: receivedMessages, isLoading: messagesLoading, isError: messagesError} = useQuery<MessageDO[]>({
-        queryKey: ['messages', 'all', user?.id],
-        queryFn: () => fetchMessages(user?.id, 'all'),
-        enabled: !!user?.id,
-    });
+    const { mutate: markMessageAsRead } = useMarkMyMessagesAsRead(user?.id);
+    const { mutate: archiveMessage } = useMarkMyMessagesAsArchived(user?.id);
+    const { mutate: archiveAllMessages } = useMarkAllMyMessagesAsArchived(user?.id);
+    const { mutate: markAllMessagesAsRead } = useMarkAllMyMessagesAsRead(user?.id);
 
-    const handleMessageSubmit = () => {
-        setMessageModalOpen(false);
-    };
+    const filterFields: DataTableFilterField<MessageDO>[] = [
+        {
+            id: "is_read",
+            label: "Read",
+            options: [
+                { value: "false", label: "Unread" },
+                { value: "true", label: "Read" },
+            ]
+        },
+        {
+            id: "category",
+            label: "Category",
+            options: [
+              { label: "All", value: "" },
+              { label: "General", value: "general" },
+              { label: "System", value: "system" },
+              { label: "Invite", value: "invite" },
+              { label: "Feedback", value: "feedback" },
+              { label: "Announcement", value: "announcement" },
+              { label: "Reminder", value: "reminder" },
+            ]
+          },
+          {
+            id: "sender_id",
+            label: "Sender",
+            options: [
+                { label: "All", value: "" },
+                ...(contacts ?? []).map((c) => ({
+                    label: `${c.given_name} ${c.surname}`,
+                    value: c.id,
+                })),
+            ],
+          }
+    ]
 
-    // const handleReplyMessage = (message: MessageDO) => {
-    //     setSelectedMessage(message);
-    //     setMessageModalOpen(true);
-    // };
-
-    // const handleForwardMessage = (message: MessageDO) => {
-    //     setSelectedMessage(message);
-    //     setMessageModalOpen(true);
-    // };
-    
-    if (messagesError || membersError) {
-        logger.error(messagesError);
-    }
-
-    if (messagesLoading || membersLoading) {
-        return (
-            <span className="ml-2">Loading...</span>
-        );
-    }
-        
     const enhancedMessages = receivedMessages?.map((message) => {
         return {
             ...message,
             onArchive: () => {
                 setSelectedMessage(message);
-                archiveMessage(message.id)
+                archiveMessage({ messageId: message.id, isArchived: message.is_archived, isRead: message.is_read });
             },
             onMarkRead: () => {
                 setSelectedMessage(message);
-                markMessageAsRead(message.id)
+                markMessageAsRead({ messageId: message.id, isRead: message.is_read });
             },
             onReply: () => {
                 setSelectedMessage(message);
@@ -191,6 +97,41 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
         };
     });
 
+    const pageSize = 10;
+    const pageCount = Math.ceil((receivedMessages?.length || 0) / pageSize);
+    
+    const { table, globalFilter, setGlobalFilter } = useDataTable<MessageDO>({
+        data: enhancedMessages || [],
+        columns: getColumns(),
+        pageCount: pageCount || -1,
+        filterFields,
+        initialState: {
+            columnFilters: [{ id: "is_read", value: "false" }],
+            sorting: [{ id: "created_at", desc: true }],
+            pagination: {
+                pageIndex: 0,
+                pageSize
+            }
+        },
+        getRowId: (row) => row.id,
+        shallow: false,
+        clearOnDefault: true
+    });
+    
+    const handleMessageSubmit = () => {
+        setMessageModalOpen(false);
+    };
+
+    if (messagesError || contactsError) {
+        logger.error(messagesError);
+    }
+
+    if (messagesLoading || contactsLoading) {
+        return (
+            <span className="ml-2">Loading...</span>
+        );
+    }
+
     logger.debug({
         isMessageModalOpen,
         messageMode,
@@ -198,8 +139,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
         fixedRecipient,
         useFixedRecipient: fixedRecipient !== "",
     });
-    
-    
+   
     return (
         <section>
             <Card className="w-full">
@@ -208,10 +148,10 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
                 </CardHeader>
                 <CardContent>
                     <div className="flex items-center justify-between">
-                        <Button onClick={() => archiveAllMessages()}>
+                        <Button onClick={() => archiveAllMessages(selectedMessages)}>
                             <ArchiveRestore className="mr-2 h-4 w-4" /><span>Archive Selected</span>
                         </Button>
-                        <Button onClick={() => markAllMessagesAsRead()}>
+                        <Button onClick={() => markAllMessagesAsRead(selectedMessages)}>
                             <MailCheck className="mr-2 h-4 w-4" /><span>Mark Read Selected</span>
                         </Button>
                         <Button 
@@ -223,7 +163,14 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
                             <SendHorizonal className="mr-2 h-4 w-4" /><span>New Message</span>
                         </Button>
                     </div>
-                    <DataTable<MessageDO, unknown> columns={columns} data={enhancedMessages || []} />
+                    <DataTable table={table}>
+                        <DataTableToolbar 
+                            table={table} 
+                            filterFields={filterFields} 
+                            globalFilter={globalFilter}
+                            setGlobalFilter={setGlobalFilter} 
+                        />
+                    </DataTable>
                 </CardContent>
             </Card>
             {/* MODALS GO HERE */}
@@ -231,7 +178,7 @@ const MemberMessageTable = ({ user }: MemberMessageTableProps): React.ReactEleme
                 isOpen={isMessageModalOpen} 
                 onConfirm={() => handleMessageSubmit()}
                 onCancel={() => setMessageModalOpen(false)}
-                members={membersData || []}
+                members={contacts || []}
                 user={user}
                 mode={messageMode}
                 message={selectedMessage}

@@ -1,4 +1,4 @@
-import { MemberDO } from "@/lib/types/custom";
+import { MemberDO } from "@/lib/types/data-objects";
 import { useQuery } from "@tanstack/react-query";
 
 export const useAdminMembers = () =>

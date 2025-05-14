@@ -1,5 +1,5 @@
 import { searchParamsCache } from "@/app/admin/_lib/adminInvites";
-import { InviteDO } from "@/lib/types/custom";
+import { InviteDO } from "@/lib/types/data-objects";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 

@@ -1,5 +1,6 @@
 import { GetMembersSchema } from "@/app/admin/_lib/adminMembers";
-import { MemberData, MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
+import { MemberData, SupabaseMemberListResponse } from "@/lib/types/custom";
+import { MemberDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             given_name: memberData.profiles.given_name ?? '',
             surname: memberData.profiles.surname ?? '',
             displayName: `${memberData.profiles.given_name} ${memberData.profiles.surname}`,
-            birthday: memberData.profiles.birthday ? new Date(memberData.profiles.birthday) : null,
+            birthday: memberData.profiles.birthday ?? null,
             experienceLevel: memberData.profiles.experience_level,
             isAdmin: memberData.is_admin,
             isMinor: memberData.is_minor,
@@ -162,7 +163,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                 given_name: memberData.profiles.given_name ?? '',
                 surname: memberData.profiles.surname ?? '',
                 displayName: `${memberData.profiles.given_name} ${memberData.profiles.surname}`,
-                birthday: memberData.profiles.birthday ? new Date(memberData.profiles.birthday) : null,
+                birthday: memberData.profiles.birthday ?? null,
                 experienceLevel: memberData.profiles.experience_level,
                 isAdmin: memberData.is_admin,
                 isMinor: memberData.is_minor,

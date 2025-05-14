@@ -1,31 +1,36 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MessageDO } from "@/lib/types/custom";
+import { MessageDO } from "@/lib/types/data-objects";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Archive, MailOpen, Mail, Reply, Forward  } from "lucide-react";
 import { DateCell, LinkCell, TextUppercaseCell } from "@/components/DataTable/data-table-cell-helpers";
+import { Checkbox } from "@radix-ui/react-checkbox";
 
-export const columns: ColumnDef<MessageDO>[] = [
+export const getColumns = (): ColumnDef<MessageDO>[] => [
     {
         id: 'select',
         header: ({ table }) => (
-            <input
-                type="checkbox"
-                checked={table.getIsAllPageRowsSelected()}
-                onChange={table.getToggleAllRowsSelectedHandler()}
-                className="cursor-pointer"
-            />
+            <Checkbox
+                checked={table.getIsAllPageRowsSelected() ||
+                (table.getIsSomePageRowsSelected() && "indeterminate")}
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+                className="translate-y-0.5"
+            />    
         ),
         cell: ({ row }) => (
-            <input
-                type="checkbox"
-                checked={row.getIsSelected()}
-                onChange={row.getToggleSelectedHandler()}
-                className="cursor-pointer"
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label="Select row"
+              className="translate-y-0.5"
             />
         ),
+        enableSorting: false,
+        enableHiding: false,
+        size: 80,
     },
     {
         accessorKey: "sender_id",
@@ -103,7 +108,7 @@ export const columns: ColumnDef<MessageDO>[] = [
             return (
                 <div className="flex items-center gap-x-2">
                         <Tooltip>
-                            <TooltipTrigger>
+                            <TooltipTrigger asChild>
                                 <Button variant="secondary" size="sm" onClick={() => message.onMarkRead?.(message.id)}>
                                     { message.is_read ? <MailOpen className="h-4 w-4" /> : <Mail className="h-4 w-4" /> }
                                 </Button>
@@ -113,7 +118,7 @@ export const columns: ColumnDef<MessageDO>[] = [
                             </TooltipContent>
                         </Tooltip>
                         <Tooltip>
-                            <TooltipTrigger>
+                            <TooltipTrigger asChild>
                                 <Button variant="secondary" size="sm" onClick={() => message.onReply?.(message)}>
                                     <Reply className="h-4 w-4" />
                                 </Button>
@@ -123,7 +128,7 @@ export const columns: ColumnDef<MessageDO>[] = [
                             </TooltipContent>
                         </Tooltip>
                         <Tooltip>
-                            <TooltipTrigger>
+                            <TooltipTrigger asChild>
                                 <Button variant="secondary" size="sm" onClick={() => message.onForward?.(message)}>
                                     <Forward className="h-4 w-4" />
                                 </Button>
@@ -133,7 +138,7 @@ export const columns: ColumnDef<MessageDO>[] = [
                             </TooltipContent>
                         </Tooltip>
                         <Tooltip>
-                            <TooltipTrigger>
+                            <TooltipTrigger asChild>
                                 <Button variant="destructive" size="sm" onClick={() => message.onArchive?.(message.id)}>
                                     <Archive className="h-4 w-4" />
                                 </Button>

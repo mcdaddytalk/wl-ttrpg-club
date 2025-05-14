@@ -1,4 +1,4 @@
-import { AdminLocationDO } from "@/lib/types/custom"
+import { AdminLocationDO } from "@/lib/types/data-objects"
 import { ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"

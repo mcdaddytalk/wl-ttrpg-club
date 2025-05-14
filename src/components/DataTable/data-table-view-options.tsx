@@ -4,7 +4,8 @@ import * as React from "react"
 import type { Table } from "@tanstack/react-table"
 import { Check, ChevronsUpDown, Settings2 } from "lucide-react"
 
-import { cn, toSentenceCase } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { toSentenceCase } from "@/utils/helpers"
 import { Button } from "@/components/ui/button"
 import {
   Command,

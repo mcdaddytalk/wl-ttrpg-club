@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
-import { MemberDO } from "@/lib/types/custom";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { useToggleConsent } from "@/hooks/admin/useToggleConsent";
+import { MemberDO } from "@/lib/types/data-objects";
 
 export const ConsentCell = ({ member }: { member: MemberDO }) => {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,17 +1,17 @@
 "use client"
 
-import { Dialog, DialogHeader, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogContent, DialogFooter, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAdminGamemasters, useAdminAssignGamemaster } from "@/hooks/admin/useAdminGamemasters";
+import { useAdminAssignGamemaster, useAdminGamemasters } from "@/hooks/admin/useAdminGamemasters";
 
 interface AssignGamemasterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  game: { id: string; title: string };
+  game: { id: string; title: string; gm_id: string };
 }
 
 export const AssignGamemasterModal = ({ isOpen, onClose, game }: AssignGamemasterModalProps) => {
@@ -34,7 +34,12 @@ export const AssignGamemasterModal = ({ isOpen, onClose, game }: AssignGamemaste
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
-        <DialogHeader>Assign Gamemaster</DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Assign Gamemaster</DialogTitle>
+          <DialogDescription>
+            Select a gamemaster to assign to <strong>{game.title}</strong>
+          </DialogDescription>
+        </DialogHeader>
         <div className="space-y-4">
           <Label htmlFor="gm">Select a Gamemaster for <strong>{game.title}</strong></Label>
           <Select onValueChange={setSelected}>
@@ -44,7 +49,7 @@ export const AssignGamemasterModal = ({ isOpen, onClose, game }: AssignGamemaste
             <SelectContent>
               {gamemasters.map((gm) => (
                 <SelectItem key={gm.id} value={gm.id}>
-                  {gm.displayName}
+                  {gm.id == game.gm_id ? "✅ " : ""} {gm.given_name} {gm.surname}
                 </SelectItem>
               ))}
             </SelectContent>

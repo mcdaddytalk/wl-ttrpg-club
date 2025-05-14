@@ -1,11 +1,11 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { GMGameData } from "@/lib/types/custom";
 import GameImage from "@/components/GameImage";
 import { format } from 'date-fns';
+import { GMGameDO } from "@/lib/types/data-objects";
 
 interface SelectedGameCardProps {
-    game: GMGameData | null;
+    game: GMGameDO | null;
     children?: React.ReactNode;
     onClick?: () => void
 }

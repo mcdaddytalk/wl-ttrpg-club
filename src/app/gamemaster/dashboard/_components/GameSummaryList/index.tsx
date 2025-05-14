@@ -1,4 +1,4 @@
-import { GMGameSummaryDO } from "@/lib/types/custom";
+import { GMGameSummaryDO } from "@/lib/types/data-objects";
 import Link from "next/link";
 
 export function GameSummaryList({ games }: { games: GMGameSummaryDO[] }) {

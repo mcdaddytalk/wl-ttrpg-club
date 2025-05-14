@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
 import logger from '@/utils/logger';
-import { SupabaseGMGameDataListResponse } from '@/lib/types/custom';
+import { GMGameDataListResponse } from '@/lib/types/custom';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
     if (request.method !== 'GET') {
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         `)
         .is('deleted_at', null)
 
-        .order('created_at', { ascending: false }) as unknown as SupabaseGMGameDataListResponse;
+        .order('created_at', { ascending: false }) as unknown as GMGameDataListResponse;
 
     if (gamesError) {
         logger.error(gamesError);

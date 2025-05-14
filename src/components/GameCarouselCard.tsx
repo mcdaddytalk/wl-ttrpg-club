@@ -8,6 +8,7 @@ import { MdOutlineEventRepeat } from "react-icons/md";
 
 import { redirect } from "next/navigation";
 import GameImage from "@/components/GameImage";
+import { formatDate } from "@/utils/helpers";
 
 
 
@@ -93,7 +94,7 @@ const GameCarouselCard = ({ game, onToggleFavorite, className }: GameCarouselCar
                                 <div className="flex items-center gap-2">
                                     {/* Icon and Text on the Same Line */}
                                     <LuCalendar />
-                                    <span>{new Date(game.nextGameDate).toLocaleDateString()}</span>
+                                    <span>{formatDate(game.nextGameDate)}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {/* Icon and Text on the Same Line */}

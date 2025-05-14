@@ -2,7 +2,7 @@
 
 import { GameResourceFilters } from "@/components/GameResources/GameResourceFilters";
 import { GameResourceList } from "@/components/GameResources/GameResourceList";
-import { GameResourcePreviewModal } from "@/components/Modal/GameResourceModal";
+import { GameResourcePreviewModal } from "@/components/modals/GameResourceModal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePublishedGameResources } from "@/hooks/usePublishedGameResources";
 import { GameResourceDO } from "@/lib/types/custom";

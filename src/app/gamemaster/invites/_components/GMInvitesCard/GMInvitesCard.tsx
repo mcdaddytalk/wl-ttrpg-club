@@ -1,18 +1,19 @@
-import { InviteData, DataTableFilterField } from "@/lib/types/custom";
+import { InviteDO } from "@/lib/types/data-objects";
+import {DataTableFilterField } from "@/lib/types/data-table";
 import { DataTable } from "@/components/DataTable/data-table";
 import { getColumns } from "./columns";
 import { useDataTable } from "@/hooks/use-data-table";
 import { useState } from "react";
 import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
-import { ConfirmationModal } from "@/components/Modal/ConfirmationModal";
-import { GMInviteModal } from "@/components/Modal/GMIniviteModal";
-import { TodoModal } from "@/components/Modal/TodoModal";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import { GMInviteModal } from "@/components/modals/GMIniviteModal";
+import { TodoModal } from "@/components/modals/TodoModal";
 import { Button } from "@/components/ui/button";
 import { useGameMembers } from "@/hooks/gamemaster/useGamemasterPlayers";
 import { useGamemasterGames } from "@/hooks/gamemaster/useGamemasterGames";
 
 type GMInvitesCardProps = {
-    invites: InviteData[];
+    invites: InviteDO[];
     gamemasterId: string;
     onInviteAdded: () => void;
     onInviteEdit: () => void;
@@ -23,16 +24,16 @@ type ActiveModal = 'addNew' | 'purge' | 'edit' | 'delete' | null;
 
 export default function GMInvitesCard({invites, gamemasterId, onInviteAdded, onInviteEdit, onInviteDelete}: GMInvitesCardProps): React.ReactElement {
     const [activeModal, setActiveModal] = useState<ActiveModal>(null);
-    const [selectedInvite, setSelectedInvite] = useState<InviteData | null>(null);
+    const [selectedInvite, setSelectedInvite] = useState<InviteDO | null>(null);
     const [isNewInviteModalOpen, setNewInviteModalOpen] = useState(false);
     const [isPurgeInviteModalOpen, setPurgeInviteModalOpen] = useState(false);
     const [isEditInviteModalOpen, setEditInviteModalOpen] = useState(false);
     const [isDeleteInviteModalOpen, setDeleteInviteModalOpen] = useState(false);
 
-    const { data: members = [] } = useGameMembers();
+    const { members = [] } = useGameMembers();
     const { games = [] } = useGamemasterGames();
 
-    const openModal = (modal: ActiveModal, invite?: InviteData) => {
+    const openModal = (modal: ActiveModal, invite?: InviteDO) => {
         if (invite) setSelectedInvite(invite);
         switch(modal) {
             case 'addNew':
@@ -83,7 +84,7 @@ export default function GMInvitesCard({invites, gamemasterId, onInviteAdded, onI
     
     const pageSize = 5;
     const pageCount = Math.ceil((invites?.length || 0) / pageSize);
-    const filterFields: DataTableFilterField<InviteData>[] = [];
+    const filterFields: DataTableFilterField<InviteDO>[] = [];
     
     const { table } = useDataTable({
         data: invites,

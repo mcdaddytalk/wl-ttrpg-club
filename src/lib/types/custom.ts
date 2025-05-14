@@ -1,44 +1,10 @@
 import { SupabaseClient, QueryError } from "@supabase/supabase-js";
 import type { Database } from "./supabase";
-import { type DataTableConfig } from "@/config/data-table";
-import { type z } from "zod";
-import { type filterSchema } from "@/lib/parsers";
-import { ColumnSort } from "@tanstack/react-table";
-
-/* DataTable Support Types */
-export type ColumnType = DataTableConfig["columnTypes"][number]
-export type FilterOperator = DataTableConfig["globalOperators"][number]
-export interface SearchParams {
-  [key: string]: string | string[] | undefined
-}
-export type Prettify<T> = {
-  [K in keyof T]: T[K]
-} & {}
-export type StringKeyOf<T> = Extract<keyof T, string>
-export interface Option {
-  label: string
-  value: string
-  icon?: React.ComponentType<{ className?: string }>
-  count?: number
-}
-export type Filter<TData> = Prettify<
-  Omit<z.infer<typeof filterSchema>, "id"> & {
-    id: StringKeyOf<TData>
-  }
->
-export interface DataTableFilterField<TData> {
-  id: StringKeyOf<TData>
-  label: string
-  placeholder?: string
-  options?: Option[]
-}
-export interface ExtendedColumnSort<TData> extends Omit<ColumnSort, "id"> {
-  id: StringKeyOf<TData>
-}
-export type ExtendedSortingState<TData> = ExtendedColumnSort<TData>[]
-export type JoinOperator = DataTableConfig["joinOperators"][number]["value"]
+import { GMLocationDO, RoleDO } from "./data-objects";
 
 /* ENUM Types */
+export const ROLES = ['admin', 'gamemaster', 'member'] as const;
+export type Role = (typeof ROLES)[number];
 export const DaysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
 export type DOW = (typeof DaysOfWeek)[number];
 export const GAME_STATUS = ['active', 'planning', 'paused', 'canceled', 'completed'] as const;
@@ -85,159 +51,6 @@ export const RESOURCE_CATEGORIES = ['rules', 'lore', 'characters', 'map', 'exter
 export type ResourceCategory = (typeof RESOURCE_CATEGORIES)[number];
 export const RESOURCE_VISIBILITY = ['admins', 'gamemasters', 'members', 'public'] as const;
 export type ResourceVisibility = (typeof RESOURCE_VISIBILITY)[number];
-
-/* DO Types */
-export type AdminNoteDO = Omit<AdminNote, | 'updated_at' | 'deleted_at' | 'author'> & {
-  edited_at: Date | null;
-  author_email: string;
-  author: {
-    id: string,
-    email: string,
-    displayName: string;
-  };
-  onView?: (note: AdminNoteDO) => void;
-}
-
-export type AuditTrailDO = AuditTrailData;
-
-export type ContactListDO = {
-  id: string;
-  given_name: string;
-  surname: string;
-}
-
-export type AdminLocationDO = Location & {
-  authorized_gamemasters: ContactListDO[];
-}
-
-export type AnnouncementDO = {
-  id: string;
-  title: string;
-  body: string;
-  audience: Audience;
-  pinned: boolean;
-  published: boolean;
-  notify_on_publish: boolean;
-  published_at: string | null;
-  expires_at: string | null;
-  deleted_at: string | null;
-  created_at: string;
-  updated_at: string;
-  author_id: string;
-  approved_by: string | null;
-}
-
-export type GMGamePlayerDO = {
-  member_id: string;
-  game_id: string;
-  registered_at: string;
-  status: string;
-  status_note: string | null;
-  email: string | null;
-  profiles: {
-    given_name: string | null;
-    surname: string | null;
-  } | null;
-};
-
-export type GMGameDataDO = {
-  id: string;
-  title: string;
-  system: string;
-  status: string;
-  gm_id: string | null;
-  gm_name: string;
-  player_count: number;
-  next_session_at: string | null;
-  deleted_at: string | null;
-  created_at: string;
-  search?: string;
-  archived?: boolean;
-}
-
-export type GMLocationDO = Location & {
-  authorized_gamemasters: ContactListDO[];
-}
-export type SupabaseGMLocationPermResponse = SupabaseDataResponseSingle<GMLocationDO>
-export type SupabaseGMLocationPermListResponse = SupabaseDataResponse<GMLocationDO>
-
-
-export type InviteDO = {
-    id: string;
-    display_name: string;
-    email: string | null;
-    invited_at: string;
-    expires_at: string;
-    accepted_at: string | null;
-    accepted: boolean;
-    notified: boolean;
-    game_title: string;
-    gm_name: string;  
-    search?: string;
-    status?: string;
-}
-
-export type InvitedPlayer = {
-  id?: string;
-  provider?: string;
-  given_name: string;
-  surname: string;
-  displayName: string;
-  email?: string;
-  phone?: string;
-  expires_in_days?: number;
-  expires_at?: string;
-}
-
-export type MemberDO = {
-  status: MemberStatus;
-  last_login_at: Date | null;
-  id: string;
-  provider?: string;
-  given_name: string;
-  surname: string;
-  displayName: string;
-  email: string;
-  phone: string;
-  birthday?: Date | null;
-  isMinor: boolean;
-  isAdmin: boolean;
-  consent: boolean;
-  experienceLevel?: ExperienceLevel;
-  bio?: string;
-  avatar: string;
-  roles: RoleDO[];
-  created_at: Date;
-  updated_at: Date;
-  updated_by: string;
-  deleted_at: Date | null;
-  deleted_by: string;
-  admin_notes?: AdminNote[] | null;
-  search?: string;
-  last_login_before?: Date;
-  last_login_after?: Date;
-  onManageRoles?: (member: MemberDO) => void; // Optional callback to manage roles
-  onRemoveMember?: (id: string, displayName: string) => void; // Optional callback to remove a member
-  onResetPassword?: (email: string) => void; // Optional callback to reset the member's password
-}
-export type MessageUserDO = {
-  id: string;
-  given_name: string;
-  surname: string;
-}
-export type MessageDO = Omit<MessageData, "sender" | "recipient"> & {
-  sender: MessageUserDO;
-  recipient: MessageUserDO;
-  onDelete?: (id: string) => void;
-  onArchive?: (id: string) => void;
-  onMarkRead?: (id: string) => void;
-  onReply?: (message: MessageDO) => void;
-  onForward?: (message: MessageDO) => void;  
-}
-export type RoleDO = {
-  id: string;
-  name: string;
-}
 
 /* Supabase Support Types */
 export type TypedSupabaseClient = SupabaseClient<Database>
@@ -314,7 +127,7 @@ export type EmailInvite = {
 export type GameFavorite = {
   game_id: string;
   member_id: string;
-  created_at: Date;
+  created_at: string;
 }
 export type SupabaseGameFavoriteListResponse = SupabaseDataResponse<GameFavorite>
 
@@ -323,7 +136,7 @@ export type GameRegistration = {
   member_id: string;
   status: GameRegStatus;
   status_note: string;
-  registered_at: Date;
+  registered_at: string;
   members: MemberData;  
 }
 export type SupabaseGameRegistrationListResponse = SupabaseDataResponse<GameRegistration>
@@ -335,9 +148,9 @@ export type AdminNote = {
   target_id: string;
   target_type: NoteTargetType;
   note: string;
-  created_at: Date;
-  updated_at: Date;
-  deleted_at: Date | null;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
 }
 export type SupabaseAdminNoteListResponse = SupabaseDataResponse<AdminNote>
 export type SupabaseAdminNoteResponse = SupabaseDataResponseSingle<AdminNote>
@@ -351,11 +164,11 @@ export type MemberData = {
   is_minor: boolean;
   consent: boolean;
   status: MemberStatus;
-  last_login_at: Date | null;
-  created_at: Date;
-  updated_at: Date;
+  last_login_at: string | null;
+  created_at: string;
+  updated_at: string;
   updated_by: string;
-  deleted_at: Date;
+  deleted_at: string | null;
   deleted_by: string;
   admin_notes: AdminNote[] | null;
   profiles: ProfileData;
@@ -380,6 +193,7 @@ export type MessageData = {
   recipient_id: string;
   recipient: MemberData;
   content: string;
+  preview: string;
   subject: string;
   category: MessageCategory;
   link_url: string;
@@ -406,18 +220,6 @@ export type GMGameSummary = {
 export type SupabaseGMGameSummaryListResponse = SupabaseDataResponse<GMGameSummary>
 export type SupabaseGMGameSummaryResponse = SupabaseDataResponseSingle<GMGameSummary>
 
-export type GMGameSummaryDO = Omit<GMGameSummary, "starting_seats" | "max_seats" | "game_registrations" | "game_schedules" | "starting_seats" | "gamemaster" | "gamemaster_id"> & {
-  startingSeats: number;
-  playerCount: number;
-  playerLimit: number;
-  gamemaster: {
-    id: string;
-    email: string;
-    displayName: string
-  }
-  schedules: GameSchedule;
-}
-
 export type ProfileData = {
   id?: string;
   given_name: string | null;
@@ -442,8 +244,8 @@ export type BroadcastRecipient = {
   recipient_id: string;
   members: MemberData;
   error_message: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
   delivery_method: DeliveryMethod;
   delivery_status: DeliveryStatus;
 }
@@ -456,7 +258,7 @@ export type BroadcastMessage = {
   game_id: string;
   subject: string;
   message: string;
-  created_at: Date;
+  created_at: string;
   mode: DeliveryMethod;
 }
 export type SupabaseBroadcastMessageListResponse = SupabaseDataResponse<BroadcastMessage>;
@@ -467,9 +269,9 @@ export type RegisteredGame = {
   title: string;
   description: string;
   system: string;
-  scheduled_for: Date | null;
+  scheduled_for: string | null;
   status: string;
-  registration_date: Date | null;
+  registration_date: string | null;
   num_players: number;
   gm_name: string;
   gm_member_id: string;
@@ -482,7 +284,7 @@ export type RegisteredGameDO = {
   system: string;
   visibility: GameVisibility
   coverImage: string;
-  scheduled_for: Date | null;
+  scheduled_for: string | null;
   location: Location;
   status: GameSchedStatus;
   interval: GameInterval;
@@ -561,6 +363,7 @@ export type GameResourceDO = GameResourceData;
 export type GameResourceData = {
   id: string;
   title: string;
+  summary: string;
   body: string;
   category: ResourceCategory;
   visibility: ResourceVisibility;
@@ -573,16 +376,6 @@ export type GameResourceData = {
   deleted_at: string | null;
   deleted_by: string | null;
 }
-
-export type GMGameScheduleDO = {
-  interval: GameInterval;
-  status: GameSchedStatus;
-  first_game_date: string;
-  next_game_date: string;
-  last_game_date: string | null;
-  day_of_week: DOW;
-}
-
 
 export type TaskDO = Omit<TaskData, "assigned_to" | "assigned_to_user" | "created_at" | "updated_at" | "deleted_at"> & {
   assigned_to: {
@@ -601,7 +394,7 @@ export type UpcomingGame = {
   description: string;
   system: string;
   coverImage: string;
-  scheduled_for: Date | null;
+  scheduled_for: string | null;
   status: string;
   num_players: number;
   max_seats: number;
@@ -609,7 +402,7 @@ export type UpcomingGame = {
   gm_member_id: string;
   registered: boolean;
   registration_status: GameRegStatus;
-  registration_date: Date | null;  
+  registration_date: string | null;  
 }
 
 export type RegisteredCharacter = {
@@ -617,7 +410,7 @@ export type RegisteredCharacter = {
   name: string;
   description: string;
   system: string;
-  registered_at: Date;
+  registered_at: string;
   member_id: string;
   game_id: string;
   gm_name: string;
@@ -629,8 +422,8 @@ export type GameData = {
   game_id: string;
   status: GameSchedStatus;
   interval: GameInterval;
-  firstGameDate: Date; // or Date if you convert the date
-  nextGameDate: Date;
+  firstGameDate: string; // or string if you convert the date
+  nextGameDate: string | null; // or string if you convert the date
   location_id: string;
   location: Location;
   dayOfWeek: DOW;
@@ -654,13 +447,13 @@ export type GameData = {
 
 export type SupaGameScheduleData = {
   id: string;
-  game_id: string;
+  status: GameSchedStatus;
   interval: GameInterval;
   day_of_week: DOW;
-  first_game_date: Date; // or Date if you convert the date
-  next_game_date: Date; // or Date if you convert the date
-  last_game_date: Date; // or Date if you convert the date
-  status: GameSchedStatus;
+  first_game_date: string; // or Date if you convert the date
+  next_game_date: string | null; // or Date if you convert the date
+  last_game_date: string | null; // or Date if you convert the date
+  game_id: string;  
   location_id: string;
   location: Location;
   games: SupaGameData;
@@ -684,11 +477,10 @@ export type SupabaseGameDataResponse = SupabaseDataResponseSingle<SupaGameSchedu
 export type SupabaseGameDataListResponse = SupabaseDataResponse<SupaGameScheduleData>
 export type SupabaseUpcomingGamesListResponse = SupabaseDataResponse<GameData>
 
-export type GMGameDO = SupaGMGameData
-export type GMGameDataResponse = SupabaseDataResponseSingle<GMGameDO>
-export type GMGameDataListResponse = SupabaseDataResponse<GMGameDO>
+export type GMGameDataResponse = SupabaseDataResponseSingle<GMGameData>
+export type GMGameDataListResponse = SupabaseDataResponse<GMGameData>
 
-export type SupaGMGameData = {
+export type GMGameData = {
   id: string;
   title: string;
   description: string;
@@ -700,35 +492,16 @@ export type SupaGMGameData = {
   starting_seats: number;
   visibility: GameVisibility;
   game_schedule: SupaGameScheduleData[];
+  gamemaster_id: string;
   gamemaster: MemberData;
-  created_at: Date;
-  deleted_at: Date | null;
+  created_at: string;
+  deleted_at: string | null;
+  game_invites: InviteData[];
   game_registrations: GameRegistration[];
 }
-export type SupabaseGMGameDataResponse = SupabaseDataResponseSingle<SupaGMGameData>
-export type SupabaseGMGameDataListResponse = SupabaseDataResponse<SupaGMGameData>
 
-export type GMGameData = {
-  id: string;
-  title: string;
-  description: string;
-  system: string;
-  coverImage: string;
-  scheduled_next: Date;
-  interval: GameInterval;
-  dow: DOW;
-  maxSeats: number;
-  status: GameSchedStatus;
-  location_id: string;
-  location: Location;
-  visibility: GameVisibility;
-  invites: number;
-  pending: number;
-  registered: number;
-  gamemaster: MemberData;
-  onShowDetails?: (game: GMGameData) => void;
-  onEditGame?: (game: GMGameData) => void;
-}
+export type SupabaseGMLocationPermResponse = SupabaseDataResponseSingle<GMLocationDO>
+export type SupabaseGMLocationPermListResponse = SupabaseDataResponse<GMLocationDO>
 
 export type SupabaseLocationResponse = SupabaseDataResponseSingle<Location>
 export type SupabaseLocationListResponse = SupabaseDataResponse<Location>
@@ -739,8 +512,8 @@ export type Location = {
   url?: string;
   address?: string;
   type: LocationType;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
   created_by: string;
   scope: LocationScope;
 }
@@ -770,17 +543,19 @@ export type InviteData = {
   id: string;
   game_id: string;
   invitee: string;
-  invited_at: Date;
+  invitee_member?: MemberData;
+  invited_at: string;
   accepted: boolean;
-  accepted_at: Date | null;
-  expires_at: Date | null;
-  viewed_at: Date | null;
+  status: InviteStatus;
+  accepted_at: string | null;
+  expires_at: string | null;
+  viewed_at: string | null;
   notified: boolean;
   gamemaster_id: string;
   display_name: string;
   external_email?: string;
   external_phone?: string;
-  game: GameData;
+  games: GameData;
   gamemaster: MemberData;
 }
 
@@ -810,9 +585,9 @@ export type GameSchedule = {
   game_name: string;
   interval: string;
   day_of_week: string;
-  first_game_date: Date;
-  next_game_date: Date;
-  last_game_date: Date;
+  first_game_date: string;
+  next_game_date: string;
+  last_game_date: string;
   status: string;
   game_registrations: GameRegistrant[]
 }
@@ -845,7 +620,7 @@ export type Player = {
 
 export type GameRegistrationData = {
   member_id: string;
-  registered_at: Date;
+  registered_at: string;
   members: MemberData;
   profiles: ProfileData;
 }
@@ -855,9 +630,9 @@ export type GameScheduleWithRegistrantsData = {
   game_id: string;
   interval: string;
   day_of_week: string;
-  first_game_date: Date;
-  next_game_date: Date;
-  last_game_date: Date;
+  first_game_date: string;
+  next_game_date: string;
+  last_game_date: string;
   status: string;
   games: GameData;
   game_registrations: GameRegistrationData[];
@@ -868,10 +643,12 @@ export type SupaGameSchedule = {
   game_id: string;
   interval: GameInterval;
   day_of_week: DOW;
-  first_game_date: Date;
-  next_game_date: Date;
-  last_game_date?: Date;
+  first_game_date: string;
+  next_game_date: string;
+  last_game_date?: string;
   status: GameSchedStatus;
+  location_id: string;
+  location: Location;
 }
 
 export type GMAnalytics = {
@@ -927,3 +704,14 @@ export type ContactData = {
     message: string;
     website?: string;
 }
+
+type UpcomingGameData = {
+  game_id: string;
+  games: {
+    id: string;
+    title: string;
+    game_schedule: SupaGameSchedule[];
+  };
+}
+
+export type UpcomingGamesResponse = SupabaseDataResponse<UpcomingGameData>

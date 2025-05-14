@@ -104,7 +104,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             expires_at: invite.expires_at,
             accepted: invite.accepted,
             notified: invite.notified,
-            game_title: invite.game?.title ?? "—",
+            game_title: invite.games.title ?? "—",
             gm_name: invite.gamemaster
               ? `${invite.gamemaster.profiles.given_name} ${invite.gamemaster.profiles.surname}`.trim()
               : "—",

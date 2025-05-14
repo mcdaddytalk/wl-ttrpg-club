@@ -8,8 +8,11 @@ import { usePaginatedGames } from "@/hooks/usePaginatedGames";
 import { useDataTable } from "@/hooks/use-data-table";
 import { getColumns } from "./columns";
 import { useState } from "react";
-import { DataTableFilterField, GMGameDataDO } from "@/lib/types/custom";
 import { ArchiveGameModal } from "../AdminArchiveGameModal";
+import { AssignGamemasterModal } from "../AssignGamemasterModal";
+import { AdminGameDetailsModal } from "../AdminGameDetailModal";
+import { GMGameDataDO } from "@/lib/types/data-objects";
+import { DataTableFilterField } from "@/lib/types/data-table";
 
 export const AdminGamesTable = () => {
   const { data, isLoading, isError } = usePaginatedGames();
@@ -31,17 +34,15 @@ export const AdminGamesTable = () => {
   };
 
   const filterFields: DataTableFilterField<GMGameDataDO>[] = [
-    { id: "search", label: "Search", placeholder: "Title or System" },
-    { id: "system", label: "System", options: [] }, // can populate dynamically
     { id: "status", label: "Status", options: [] },
-    { id: "gm_id", label: "Gamemaster", options: [] },
+    { id: "gm_name", label: "Gamemaster", options: [] },
     { id: "archived", label: "Show Archived?", options: [
       { value: "true", label: "Yes" },
       { value: "false", label: "No" },
     ]},
   ];
 
-  const { table } = useDataTable<GMGameDataDO>({
+  const { table, globalFilter, setGlobalFilter } = useDataTable<GMGameDataDO>({
     data: games,
     columns: getColumns({ onOpenModal: openModal }),
     pageCount,
@@ -81,7 +82,12 @@ export const AdminGamesTable = () => {
       </CardHeader>
       <CardContent>
         <DataTable table={table}>
-          <DataTableToolbar table={table} filterFields={filterFields} />
+          <DataTableToolbar 
+            table={table} 
+            filterFields={filterFields} 
+            globalFilter={globalFilter}
+            setGlobalFilter={setGlobalFilter}
+          />
         </DataTable>
         {activeModal === "archiveGame" && (
             <ArchiveGameModal
@@ -89,6 +95,20 @@ export const AdminGamesTable = () => {
                 onClose={closeModal}
                 game={selectedGame}
             />
+        )}
+        {activeModal === "assignGM" && (
+            <AssignGamemasterModal
+                isOpen={activeModal === "assignGM"}
+                onClose={closeModal}
+                game={selectedGame}
+            />
+        )}
+        {activeModal === "viewGame" && (
+          <AdminGameDetailsModal
+            isOpen={activeModal === "viewGame"}
+            onClose={closeModal}
+            game={selectedGame}
+          />
         )}
       </CardContent>
     </Card>

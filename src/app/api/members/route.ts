@@ -1,10 +1,11 @@
 // import { ContactListDO } from "@/lib/types/custom";
-import { MemberDO, SupabaseMemberListResponse } from "@/lib/types/custom";
+import { SupabaseMemberListResponse } from "@/lib/types/custom";
+import { MemberDO } from "@/lib/types/data-objects";
 import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
 
     if (request.method !== 'GET') {
         return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });

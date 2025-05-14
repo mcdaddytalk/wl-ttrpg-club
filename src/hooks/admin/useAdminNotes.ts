@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AdminNoteDO } from "@/lib/types/custom";
+import { AdminNoteDO } from "@/lib/types/data-objects";
 import fetcher from "@/utils/fetcher";
 
 // export const useAddAdminNote = (memberId: string) => {

@@ -1,4 +1,4 @@
-import { GMGamePlayerDO } from "@/lib/types/custom";
+import { GMGamePlayerDO } from "@/lib/types/data-objects";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 

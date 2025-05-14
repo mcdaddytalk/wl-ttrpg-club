@@ -1,11 +1,15 @@
-import { format } from 'date-fns';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Image from 'next/image';
 import Link from 'next/link';
-
-/** Boolean cell with icon + tooltip */
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDate, formatRelativeDate, toSentenceCase } from '@/utils/helpers';
+import { Badge } from '../ui/badge';
+
+// Extend dayjs with the localizedFormat plugin
+dayjs.extend(localizedFormat);
 
 export function BooleanCellWithTooltip({
   value,
@@ -37,20 +41,33 @@ export function BooleanCellWithTooltip({
 export function DateCell({
   date,
   label = 'Date',
-  formatStr = 'PPPp',
+  formatStr = 'LLL', // default to a nice localized date+time
 }: {
   date?: string | null;
   label?: string;
   formatStr?: string;
 }) {
   if (!date) return <span className="text-muted-foreground">—</span>;
-  const parsed = new Date(date);
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span>{format(parsed, formatStr)}</span>
+        <span>{formatDate(date, { formatStr })}</span>
       </TooltipTrigger>
-      <TooltipContent>{`${label}: ${parsed.toISOString()}`}</TooltipContent>
+      <TooltipContent>{`${label}: ${new Date(date).toISOString()}`}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+export function RelativeDateCell({ date }: { date?: string | null }) {
+  if (!date) return <span className="text-muted-foreground">—</span>;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span>{formatRelativeDate(date)}</span>
+      </TooltipTrigger>
+      <TooltipContent>{dayjs(date).toISOString()}</TooltipContent>
     </Tooltip>
   );
 }
@@ -62,7 +79,25 @@ export function TextUppercaseCell({
     value: string;
 }) {
     return (
-        <span className="text-sm font-medium ">{value.charAt(0).toUpperCase() + value.slice(1)}</span>
+        <span className="text-sm font-medium ">{toSentenceCase(value)}</span>
+    )
+}
+
+export function BadgeCell({ 
+    value,
+    variant = 'default',
+    className,
+    uppercase = false
+}: { 
+    value: string;
+    variant?: "default" | "destructive" | "outline" | "secondary" | null | undefined;
+    className?: string;
+    uppercase?: boolean
+}) {
+    return (
+      <Badge variant={variant} className={`${className}`}>
+        {uppercase ? toSentenceCase(value) : (value)}
+      </Badge>
     )
 }
 

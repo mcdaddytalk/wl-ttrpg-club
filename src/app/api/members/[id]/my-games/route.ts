@@ -93,9 +93,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         system: gr.games.system ?? '',
         visibility: (gr.games.visibility ?? 'public') as GameVisibility,
         coverImage: gr.games.cover_image ?? '',
-        scheduled_for: gr.games.game_schedule[0].next_game_date 
-            ? new Date(gr.games.game_schedule[0].next_game_date)
-            : new Date(),
+        scheduled_for: gr.games.game_schedule[0].next_game_date ?? null,
         status: (gr.games.game_schedule[0].status ?? '') as GameSchedStatus,
         location: (gr.games.game_schedule[0].locations ?? { id: '', name: '', address: '', url: '', type: ''}) as unknown as Location,
         gamemasterId: gr.games.gamemaster_id ?? '',

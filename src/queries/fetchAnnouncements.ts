@@ -1,4 +1,6 @@
-import { AnnouncementDO, Audience } from "@/lib/types/custom";
+import { Audience } from "@/lib/types/custom";
+import { AnnouncementDO } from "@/lib/types/data-objects";
+
 import fetcher from "@/utils/fetcher";
 import { getURL, toSearchParams } from "@/utils/helpers";
 import logger from "@/utils/logger";
