@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { useUpdateGame } from "@/hooks/useUpdateGame";
+// import { useUpdateGame } from "@/hooks/useUpdateGame";
 import { 
     Dialog, 
     DialogContent, 
@@ -15,6 +15,7 @@ import DatetimePicker from '@/components/ui/datetime-picker'
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { GMGameDO } from "@/lib/types/data-objects";
+import { useUpdateGameDetails } from "@/hooks/gamemaster/useGamemasterGames";
 
 
 
@@ -33,7 +34,7 @@ export const SetGameTimeModal: React.FC<SetGameTimeModalProps> = ({
     onConfirm,
     onClose
 }) => {
-    const { mutate: setGameTime, isPending } = useUpdateGame();
+    const { mutate: setGameTime, isPending } = useUpdateGameDetails(game.id);
 
     const [nextGameDate, setNextGameDate] = useState<string | undefined>(
         game.scheduled_next ?? undefined

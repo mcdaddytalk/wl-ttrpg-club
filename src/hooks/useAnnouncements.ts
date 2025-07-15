@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchAnnouncements, AnnouncementQueryParams } from '@/queries/fetchAnnouncements';
-import { logger } from '@sentry/nextjs';
+import logger from '@/utils/logger';
 
 export const useAnnouncements = (
     params: AnnouncementQueryParams = {},

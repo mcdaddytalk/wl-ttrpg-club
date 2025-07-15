@@ -6,9 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Archive, MailOpen, Mail, Reply, Forward  } from "lucide-react";
 import { DateCell, LinkCell, TextUppercaseCell } from "@/components/DataTable/data-table-cell-helpers";
-import { Checkbox } from "@radix-ui/react-checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 
-export const getColumns = (): ColumnDef<MessageDO>[] => [
+interface ColumnDefOptions {
+    onArchive: (message: MessageDO) => void;
+    onMarkRead: (message: MessageDO) => void;
+    onReply: (message: MessageDO) => void;
+    onForward: (message: MessageDO) => void;
+}
+
+export const getColumns = ({
+    onArchive,
+    onMarkRead,
+    onReply,
+    onForward
+}: ColumnDefOptions): ColumnDef<MessageDO>[] => [
     {
         id: 'select',
         header: ({ table }) => (
@@ -30,7 +42,22 @@ export const getColumns = (): ColumnDef<MessageDO>[] => [
         ),
         enableSorting: false,
         enableHiding: false,
-        size: 80,
+        size: 20,
+    },
+    {
+        accessorKey: "is_read",
+        header: "Read",
+        cell: ({ row }) => {
+            const message = row.original;
+            return (
+                <Button variant="secondary" size="sm" onClick={() => onMarkRead(message)}>
+                    { message.is_read ? <MailOpen className="h-4 w-4" /> : <Mail className="h-4 w-4" /> }
+                </Button>
+            );
+        },
+        enableSorting: true,
+        enableHiding: false,
+        size: 40,
     },
     {
         accessorKey: "sender_id",
@@ -109,9 +136,7 @@ export const getColumns = (): ColumnDef<MessageDO>[] => [
                 <div className="flex items-center gap-x-2">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button variant="secondary" size="sm" onClick={() => message.onMarkRead?.(message.id)}>
-                                    { message.is_read ? <MailOpen className="h-4 w-4" /> : <Mail className="h-4 w-4" /> }
-                                </Button>
+                                
                             </TooltipTrigger>
                             <TooltipContent>
                                 { message.is_read ? "Mark as unread" : "Mark as read" }
@@ -119,7 +144,7 @@ export const getColumns = (): ColumnDef<MessageDO>[] => [
                         </Tooltip>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button variant="secondary" size="sm" onClick={() => message.onReply?.(message)}>
+                                <Button variant="secondary" size="sm" onClick={() => onReply(message)}>
                                     <Reply className="h-4 w-4" />
                                 </Button>
                             </TooltipTrigger>
@@ -129,7 +154,7 @@ export const getColumns = (): ColumnDef<MessageDO>[] => [
                         </Tooltip>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button variant="secondary" size="sm" onClick={() => message.onForward?.(message)}>
+                                <Button variant="secondary" size="sm" onClick={() => onForward(message)}>
                                     <Forward className="h-4 w-4" />
                                 </Button>
                             </TooltipTrigger>
@@ -139,7 +164,7 @@ export const getColumns = (): ColumnDef<MessageDO>[] => [
                         </Tooltip>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button variant="destructive" size="sm" onClick={() => message.onArchive?.(message.id)}>
+                                <Button variant="destructive" size="sm" onClick={() => onArchive(message)}>
                                     <Archive className="h-4 w-4" />
                                 </Button>
                             </TooltipTrigger>    

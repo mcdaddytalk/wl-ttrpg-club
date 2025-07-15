@@ -2,6 +2,7 @@ import { DOW, GameInterval, GameSchedStatus } from "@/lib/types/custom";
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "./useQueryClient";
 import logger from '@/utils/logger';
+import fetcher from "@/utils/fetcher";
 
 export const useUpdateGame = () => {
     const queryClient = useQueryClient();
@@ -32,7 +33,7 @@ export const useUpdateGame = () => {
             dayOfWeek?: DOW;
             gm_id: string
         }) => {
-            const response = await fetch(`/api/gamemaster/${gm_id}/games`,                 
+            return fetcher(`/api/gamemaster/games/${id}`,                 
         {
                 method: "PUT",
                 headers: {
@@ -48,16 +49,13 @@ export const useUpdateGame = () => {
                     location_id,
                     nextGameDate,
                     interval,
-                    dayOfWeek
+                    dayOfWeek,
+                    gm_id
                 }),
             });
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
         },
-        onSuccess: (_data, { gm_id }) => {
-                queryClient.invalidateQueries({ queryKey: ["games", gm_id, "gm", "full"] });
+        onSuccess: (_data, { id }) => {
+                queryClient.invalidateQueries({ queryKey: ["gamemaster", "game", id] });
         },
         onError: (error) => {
             logger.error(error);

@@ -31,8 +31,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             )
         )            
     `)
-    .eq('member_id', user.id)
-    .limit(3) as unknown as UpcomingGamesResponse;
+    .eq('member_id', user.id) as unknown as UpcomingGamesResponse;
 
   if (error) {
     logger.error(error)
@@ -43,11 +42,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ message: 'No games found' }, { status: 404 });
   }
 
-  const sortedData = data.sort((a, b) => {
-    const dateA = new Date(a.games.game_schedule[0].next_game_date);
-    const dateB = new Date(b.games.game_schedule[0].next_game_date);
-    return dateA.getTime() - dateB.getTime();
-  });
+  const now = new Date();
+
+  logger.info("Before filtering", data.map(entry => entry.games.game_schedule[0].next_game_date));
+  
+  const sortedData = data
+    .filter(entry => {
+      const schedule = entry.games?.game_schedule?.[0];
+      return schedule?.next_game_date && new Date(schedule.next_game_date) > now;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.games.game_schedule[0].next_game_date);
+      const dateB = new Date(b.games.game_schedule[0].next_game_date);
+      return dateA.getTime() - dateB.getTime();
+    })
+    .slice(0, 3);
 
   logger.info(sortedData);
 
