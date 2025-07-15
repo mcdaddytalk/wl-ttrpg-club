@@ -1,5 +1,6 @@
 "use client"
 
+import React, { useState } from "react"
 import { useMyGames } from "@/hooks/member/useMyGames";
 import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
@@ -7,12 +8,36 @@ import { SkeletonArray } from "@/components/ui/skeleton-array";
 import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/button";
 import { redirect, useRouter } from "next/navigation";
+import { formatDate } from "@/utils/helpers";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import { toast } from "sonner";
+import logger from "@/utils/logger";
 
 export default function MyGamesDashboard(): React.ReactElement {
+  const router = useRouter();
   const session = useSession();
   const user: User = (session?.user as User) ?? {};
+  
   const { games, upcomingGames, error, isLoading, loadingUpcoming, leaveGame } = useMyGames();
-  const router = useRouter();
+  const [gamePendingLeave, setGamePendingLeave] = useState<string | null>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  
+  const handleConfirmLeave = async () => {
+    if (!gamePendingLeave) return;
+  
+    try {
+      setConfirmLoading(true);
+      await leaveGame.mutateAsync(gamePendingLeave);
+      toast.success("You have left the game.");
+    } catch (err) {
+      toast.error("Failed to leave the game.");
+      logger.error(err);
+    } finally {
+      setConfirmLoading(false);
+      setGamePendingLeave(null);
+    }
+  };
+
 
   if (error) redirect("/error");
   if (!user) return <div><p className="text-center text-red-500">You must be logged in to view this page.</p></div>;
@@ -47,7 +72,7 @@ export default function MyGamesDashboard(): React.ReactElement {
                     onClick={() => router.push(`/games/adventure/${game.id}`)}
                   >
                     <td className="border border-gray-300 p-2">{game.title}</td>
-                    <td className="border border-gray-300 p-2">{game.scheduled_for ? new Date(game.scheduled_for).toLocaleDateString() : "TBD"}</td>
+                    <td className="border border-gray-300 p-2">{game.scheduled_for ? formatDate(game.scheduled_for) : "TBD"}</td>
                     <td className="border border-gray-300 p-2">{game.location.name || "TBD"}</td>
                     <td className="border border-gray-300 p-2">
                       {game.gm_given_name} {game.gm_surname}
@@ -67,13 +92,29 @@ export default function MyGamesDashboard(): React.ReactElement {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {games?.map((game) => (
             <GameCard key={game.id} game={game} onClick={() => router.push(`/games/adventure/${game.id}`)}>
-              <Button variant="destructive" onClick={(e) => { e.stopPropagation(); leaveGame.mutate(game.id); }}>
+              <Button
+                variant="destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setGamePendingLeave(game.id);
+                }}
+              >
                 Leave Game
               </Button>
             </GameCard>
           ))}
         </div>
       )}
+      <ConfirmationModal
+        title="Leave Game?"
+        description="Are you sure you want to leave this game? You may need to request a new invite to rejoin."
+        isOpen={!!gamePendingLeave}
+        isLoading={confirmLoading}
+        onCancel={() => {
+          if (!confirmLoading) setGamePendingLeave(null);
+        }}
+        onConfirm={handleConfirmLeave}
+      />
     </div>
   );
 }

@@ -33,6 +33,10 @@ export type GMGameSummaryDO = Omit<GMGameSummary, "starting_seats" | "max_seats"
     email: string;
     displayName: string
   }
+  schedStatus: GameSchedStatus;
+  scheduled_next: string | null;
+  interval: GameInterval;
+  dow: DOW;
   schedules: GameSchedule;
 }
 
@@ -197,6 +201,7 @@ export type MessageUserDO = {
   given_name: string;
   surname: string;
 }
+
 export type MessageDO = Omit<MessageData, "sender" | "recipient"> & {
   sender: MessageUserDO;
   recipient: MessageUserDO;
@@ -206,6 +211,7 @@ export type MessageDO = Omit<MessageData, "sender" | "recipient"> & {
   onReply?: (message: MessageDO) => void;
   onForward?: (message: MessageDO) => void;  
 }
+
 export type RoleDO = {
   id: string;
   name: string;

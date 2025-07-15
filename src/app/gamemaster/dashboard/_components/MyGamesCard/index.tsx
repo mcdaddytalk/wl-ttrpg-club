@@ -26,7 +26,7 @@ export function MyGamesCard() {
                 <div>
                   <p className="font-medium leading-tight">{game.title}</p>
                   <p className="text-sm text-muted-foreground">
-                    {game.system} • {game.status} • {game.schedules?.next_game_date ? format(new Date(game.schedules.next_game_date), "PPP") : "No date"}
+                    {game.system} • {game.status} • {game.schedStatus} • {game.scheduled_next ? format(new Date(game.scheduled_next), "PPP") : "No date"}
                   </p>
                 </div>
                 <Button size="sm" variant="outline" asChild>

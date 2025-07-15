@@ -168,3 +168,53 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ message: `Message Sent Successfully`, body }, { status: 200 })
 }
+
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
+
+    if (request.method !== 'PATCH') {
+        return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
+    }
+
+    const body = await request.json();
+  // logger.log(body)
+    
+    const { user_id, is_read, is_archived, selectedMessages } = body;
+
+    const selectedMessagesIds: string[] = selectedMessages.map((message: MessageDO) => message.id);
+
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+    }
+
+    if (user.id !== user_id) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+    }
+
+    if (!selectedMessagesIds.length) {
+        logger.debug(`PATCH /api/messages`, { user_id, is_read, is_archived, selectedMessagesIds });
+        return NextResponse.json({ message: `Message ID is required` }, { status: 403 })
+    }
+
+    if (is_archived) {
+        logger.debug(`PATCH /api/messages`, { user_id, is_archived, selectedMessagesIds });
+    }
+    
+    const { error: messageError } = await supabase
+        .from('messages')
+        .update({
+            is_read,
+            is_archived,
+            deleted_at: is_archived ? new Date().toISOString() : null})
+        .in('id', selectedMessagesIds)
+    
+    if (messageError) {
+        logger.error(messageError)
+        return NextResponse.json({ message: messageError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: `Message Sent Successfully`, body }, { status: 200 })
+}
+

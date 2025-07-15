@@ -67,6 +67,7 @@ export const useUpdateGameDetails = (id: string) => {
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gamemaster", "games", "full"] });
       queryClient.invalidateQueries({ queryKey: ["gamemaster", "game", id] });
     }
   });
