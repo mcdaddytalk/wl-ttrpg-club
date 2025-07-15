@@ -75,7 +75,12 @@ export const useMarkAllMyMessagesAsRead = (userId: string) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ user_id: userId, is_read: true, selectedMessages }),
+                body: JSON.stringify({ 
+                    user_id: userId, 
+                    is_read: true, 
+                    is_archived: false,
+                    selectedMessages 
+                }),
             });
         },
         onSuccess: () => {
@@ -94,11 +99,11 @@ export const useMarkAllMyMessagesAsArchived = (userId: string) => {
     return useMutation({
         mutationFn: async (selectedMessages: MessageDO[]) => {
             return fetcher<MessageDO[]>(`/api/messages`, {
-                method: 'PUT',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ user_id: userId, selectedMessages }),
+                body: JSON.stringify({ user_id: userId, is_archived: true, is_read: true, selectedMessages }),
             });
         },
         onSuccess: () => {

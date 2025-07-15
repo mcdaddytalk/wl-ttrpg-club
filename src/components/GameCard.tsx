@@ -2,6 +2,7 @@ import { RegisteredGameDO } from "@/lib/types/custom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import GameImage from "@/components/GameImage";
+import { formatDate } from "@/utils/helpers";
 
 
 type Props = {
@@ -33,12 +34,7 @@ export const GameCard: React.FC<Props> = ({ game, children, onClick }) => {
         />
         <p className="text-sm text-gray-500">Gamemaster: {game.gm_given_name + " " + game.gm_surname}</p>
         {game.location && <p className="text-sm text-gray-500">Location: {game.location.name}</p>}
-        {game.scheduled_for
-          ? (
-            <p className="text-sm text-gray-500">Date: {new Date(game.scheduled_for).toLocaleDateString()}</p>
-          ) : (
-            <p className="text-sm text-gray-500">Date: TBD</p>
-          )}
+        <p className="text-sm text-gray-500">Date: {game.scheduled_for ? formatDate(game.scheduled_for) : "TBD"}</p>
         {children}
       </CardContent>
     </Card>

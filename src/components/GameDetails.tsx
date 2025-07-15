@@ -8,7 +8,7 @@ import { SiStatuspal } from "react-icons/si";
 import { Badge } from "@/components/ui/badge";
 import { useToggleFavorite } from "@/hooks/useToggleFavorite";
 import { User } from "@supabase/supabase-js";
-import { StarOff } from "lucide-react";
+// import { StarOff } from "lucide-react";
 import MessageModal from "@/components/modals/MessageModal";
 import { useState } from "react";
 import { useToggleRegistration } from "@/hooks/useToggleRegistration";
@@ -19,30 +19,10 @@ import EmailShareIcon from "@/components/EmailShareIcon";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import GameLocation from "@/components/GameLocation";
 import GameImage from "@/components/GameImage";
-import { formatDate, toSentenceCase } from "@/utils/helpers";
+import { formatDate, seatsAvailable, toSentenceCase } from "@/utils/helpers";
 import { GameData } from "@/lib/types/custom";
-
-const enhanceStatus = (game: GameData) => {
-    const { status, currentSeats, startingSeats } = game;
-    if (status === 'awaiting-players') {
-        const seatsNeeded = startingSeats > 0 ? startingSeats - currentSeats : startingSeats;
-        if (seatsNeeded <= 0) return 'Active';
-        return (
-            <Badge variant="default" className="bg-blue-300 text-slate-700 rounded-lg" >
-                <LuUsers />
-                <span>{seatsNeeded} NEEDED TO START</span>
-            </Badge>        
-        )
-    }
-    return status.charAt(0).toString().toUpperCase() + status.slice(1);
-}
-
-const seatsAvailable = (game: GameData) => {
-    if (game.currentSeats === null) return "N/A";
-    if (game.maxSeats === null) return "N/A";
-    if (game.maxSeats - game.currentSeats === 0) return "Full";
-    return `${game.currentSeats} / ${game.maxSeats}`;
-};
+import { FavoriteBadge } from "@/app/games/_components/FavoriteBadge";
+import { enhanceStatus } from "@/utils/ui-helpers";
 
 interface GameDetailsProps {
     user: User;
@@ -117,7 +97,7 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
     
     return ( game 
         ?
-        <div className="flex flex-col lg:gap-4 p-4 lg:grid lg:grid-cols-3 lg:auto-rows-auto">
+        <div className="flex flex-col gap-y-6 lg:gap-4 p-4 lg:grid lg:grid-cols-3 lg:auto-rows-auto">
             <div id="game-image" className="flex justify-center items-center mb-4 lg:mb-0 lg:col-span-3">
                     <GameImage 
                         src={game.coverImage}
@@ -148,7 +128,7 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                                     handleToggleFavorite(game.game_id, game.favorite);
                                 }}
                             >
-                                {game.favorite ? '🌟 Favorite' : <div className="flex items-center gap-2"><StarOff size={12} /><span className="text-slate-300"> Favorite</span></div>}
+                                <FavoriteBadge isFavorite={game.favorite} />
                             </Badge>
                             {game.pending && <Badge key={`pending-${game.id}`} className="right-2 cursor-pointer">🫂 Pending Approval</Badge>}
                             {game.registered && <Badge key={`registered-${game.id}`} className="right-2 cursor-pointer">🎉 Registered</Badge>}
@@ -180,6 +160,7 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                             ? (
                             <Button
                                 className="w-full"
+                                aria-label="Cancel Registration"
                                 onClick={(e) => {
                                     e.preventDefault();
                                     // TODO: Remove game from calendar
@@ -192,17 +173,19 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                                 <Button
                                     className="w-full"
                                     disabled={seatsAvailable(game) === "Full"}
+                                    aria-label="Join Game"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         handleAddRegistration(game.game_id, game.registered);                                        
                                     }}
                                 >
-                                    {seatsAvailable(game) === "Full" ? "Full" : "Add Game"}
+                                    {seatsAvailable(game) === "Full" ? "Full" : "Join Game"}
                                 </Button>
 
                         )}
                         <Button
                             className="w-full"
+                            aria-label="Message Gamemaster"
                             onClick={(e) => {
                                 e.preventDefault(); 
                                 setMessageModalOpen(true);
@@ -220,7 +203,9 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                     style={{ flexGrow: 3, minHeight: "75%" }}
                 >
                     <h2 className="text-2xl font-bold mb-2 text-slate-700">About the Adventure</h2>
-                    <p>{game.description}</p>
+                    <div className="overflow-auto max-h-[400px] prose">
+                        <p>{game.description}</p>
+                    </div>
                 </div>
                 {/* MODALS GO HERE */}
                 <MessageModal 

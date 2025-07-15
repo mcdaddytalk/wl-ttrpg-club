@@ -1,4 +1,4 @@
-import { DaysOfWeek, DOW, GameInterval } from "@/lib/types/custom";
+import { DaysOfWeek, DOW, GameData, GameInterval } from "@/lib/types/custom";
 import { ENVS } from "@/utils/constants/envs"
 import { NextRequest } from "next/server";
 import dayjs from 'dayjs';
@@ -284,4 +284,12 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
       .replace(/\s+/g, " ")
       .trim()
   }
+
   
+  
+  export const seatsAvailable = (game: GameData) => {
+      if (game.currentSeats === null) return "N/A";
+      if (game.maxSeats === null) return "N/A";
+      if (game.maxSeats - game.currentSeats === 0) return "Full";
+      return `${game.currentSeats} / ${game.maxSeats}`;
+  };

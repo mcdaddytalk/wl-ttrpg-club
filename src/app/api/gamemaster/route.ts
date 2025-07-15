@@ -1,4 +1,4 @@
-import { SupabaseGMGameSummaryListResponse } from "@/lib/types/custom";
+import { DOW, GameInterval, GameSchedStatus, SupabaseGMGameSummaryListResponse } from "@/lib/types/custom";
 import { GMGameSummaryDO } from "@/lib/types/data-objects";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -66,6 +66,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     visibility: game.visibility,
     playerCount: game.game_registrations.count,
     playerLimit: game.max_seats,
+    interval: game.game_schedules.interval as GameInterval,
+    dow: game.game_schedules.day_of_week as DOW,
+    schedStatus: game.game_schedules.status as GameSchedStatus,
+    scheduled_next: game.game_schedules.next_game_date,
     gamemaster: {
       id: game.gamemaster_id,
       email: game.gamemaster?.email,
