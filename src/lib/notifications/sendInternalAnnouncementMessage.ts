@@ -19,7 +19,7 @@ export async function sendInternalAnnouncementMessage(announcement: Announcement
       subject: announcement.title,
       content: announcement.body,
       category: 'announcement',
-      link_url: '/announcements',
+      link_url: '/member/announcements',
     }));
 
   if (!messages.length) return;

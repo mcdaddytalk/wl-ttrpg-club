@@ -13,9 +13,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { calculateNextGameDate } from '@/utils/helpers';
 import { toast } from "sonner";
-import { useUpdateGame } from "@/hooks/useUpdateGame";
+// import { useUpdateGame } from "@/hooks/useUpdateGame";
 import { DaysOfWeek, DOW, GAME_INTERVALS, GAME_SCHED_STATUS, GameInterval, GameSchedStatus, Location } from "@/lib/types/custom";
 import { GMGameDO } from "@/lib/types/data-objects";
+import { useUpdateGameDetails } from "@/hooks/gamemaster/useGamemasterGames";
 
 interface EditGameModalProps {
     isOpen: boolean,
@@ -41,7 +42,7 @@ export const EditGameModal: React.FC<EditGameModalProps> = ({ isOpen, game, onCo
     const [gameLocationId, setGameLocationId] = useState(game.location.id);
     const [error, setError] = useState<string | null>(null);
 
-    const { mutate: editGame, isPending } = useUpdateGame();
+    const { mutate: editGame, isPending } = useUpdateGameDetails(game.id);
 
     const handleEditSubmit = async () => {
         setError(null)
