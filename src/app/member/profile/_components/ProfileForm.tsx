@@ -82,8 +82,8 @@ export default function ProfileForm({ user }: ProfileFormProps): React.ReactElem
     redirect('/error');
   }
 
-  logger.info('Profile:', profile)
-  logger.info('EXPERIENCE_LEVEL:', profile?.experience_level)
+  logger.debug('Profile:', profile)
+  logger.debug('EXPERIENCE_LEVEL:', profile?.experience_level)
 
   return (
     <form onSubmit={handleSubmit((values) => updateProfile(values))} className="space-y-8">

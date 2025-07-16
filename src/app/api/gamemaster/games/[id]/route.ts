@@ -68,7 +68,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
   const pendingRegistrants = registered?.filter((reg: any) => reg.status === "pending");
   const confirmedRegistrants = registered?.filter((reg: any) => reg.status === "confirmed");
 
-  logger.info("Game data", gameData)
+  logger.debug("Game data", gameData)
 
   const games: GMGameDO = {
     id: gameData.id,

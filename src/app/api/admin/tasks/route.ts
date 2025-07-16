@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
         description: parsed.data.description ?? null,
     };
 
-    logger.info('Inserting task:', payload);
+    logger.debug('Inserting task:', payload);
 
     const { data: task, error: taskError } = await supabaseAdmin
       .from('admin_tasks')
