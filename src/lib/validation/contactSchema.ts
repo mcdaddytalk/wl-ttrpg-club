@@ -9,14 +9,24 @@ export const contactSchema = z.object({
 
   parentFirstName: z.string().optional(),
   parentSurname: z.string().optional(),
-  parentEmail: z.string().email().optional(),
-  parentPhone: z.string().optional(),
+  parentEmail: z.string().optional().or(z.literal('')),
+  parentPhone: z.string().optional().or(z.literal('')),
 
   experienceLevel: z.string().min(1),
   gamemasterInterest: z.string().min(1),
   preferredSystem: z.string().min(1),
   availability: z.string().min(1),
   agreeToRules: z.boolean()
+}).superRefine((data, ctx) => {
+  if (data.isMinor) {
+    if (!data.parentEmail || !data.parentEmail.includes('@')) {
+      ctx.addIssue({
+        path: ['parentEmail'],
+        code: 'custom',
+        message: 'Parent email is required for minors and must be valid.'
+      });
+    }
+  }
 });
 
 export type ContactFormData = z.infer<typeof contactSchema>;

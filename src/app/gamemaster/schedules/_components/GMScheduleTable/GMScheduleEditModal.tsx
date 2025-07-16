@@ -63,7 +63,7 @@ export function GMScheduleEditModal({ open, onClose, onUpdate, schedule, locatio
           ...values,
           next_game_date: fromDatetimeLocal(values.next_game_date ?? ""),
         }
-        logger.info("Patched schedule", patched)
+        logger.debug("Patched schedule", patched)
         onUpdate(patched)
         toast.success("Schedule updated")
         onClose()
