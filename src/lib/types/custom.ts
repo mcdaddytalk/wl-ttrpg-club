@@ -695,7 +695,7 @@ export type GMLocationResponse = {
   pageSize: number;
 };
 
-export const CONTACT_CATEGORIES = ['general', 'bug report', 'feature request', 'support', 'question', 'feedback', 'other'] as const;
+export const CONTACT_CATEGORIES = ['general', 'bug report', 'feature request', 'support', 'question', 'feedback', 'new contact', 'other'] as const;
 export type ContactCategory = typeof CONTACT_CATEGORIES[number];
 export type ContactData = {
     name: string;

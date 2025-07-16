@@ -106,7 +106,7 @@ const nonMinorSchema = z.object({
         .or(z.literal(''))
 });
 
-export const formSchema = z.discriminatedUnion(
+export const contactFormSchema = z.discriminatedUnion(
     'isMinor',
     [
         minorSchema.merge(baseSchema),
