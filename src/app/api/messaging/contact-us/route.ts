@@ -1,27 +1,17 @@
 import { NextResponse } from "next/server";
 import { Resend } from 'resend';
 import { ContactUsAutoReply, ContactUsEmail } from "@/components/EmailTemplate";
-import { ContactUsAutoReply, ContactUsEmail } from "@/components/EmailTemplate";
 import logger from "@/utils/logger";
 import { ENVS } from "@/utils/constants/envs";
 import { ContactData } from "@/lib/types/custom";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { checkRateLimit } from "@/server/rate-limit";
 import { sendDiscordContactAlert } from "@/lib/notifications/sendDiscordContactAlert";
-import { ContactData } from "@/lib/types/custom";
-import { createSupabaseServerClient } from "@/utils/supabase/server";
-import { checkRateLimit } from "@/server/rate-limit";
-import { getURL } from "@/utils/helpers";
+// import { getURL } from "@/utils/helpers";
 
 const resend = new Resend(ENVS.RESEND_API_KEY);
 
 export async function POST(request: Request): Promise<NextResponse> {
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
-
-    if (!checkRateLimit(ip)) {
-        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
-    }
-    
     const ip = request.headers.get('x-forwarded-for') || 'unknown';
 
     if (!checkRateLimit(ip)) {
@@ -72,48 +62,56 @@ export async function POST(request: Request): Promise<NextResponse> {
             react: ContactUsAutoReply({ name }),
         });
         
-        const adminLink = getURL(`/admin/contact-submissions#${id}`);
-        await fetch(ENVS.DISCORD_CONTACT_WEBHOOK, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: 'ContactBot',
-              avatar_url: 'https://kaje.org/logo.png', // optional
-              embeds: [
-                {
-                  title: `📨 New Contact Message: ${category.toUpperCase()}`,
-                  color: 0x5865f2, // Discord blurple
-                  fields: [
-                    {
-                      name: '👤 From',
-                      value: `**${name}**\n<${email}>`,
-                      inline: true,
-                    },
-                    {
-                      name: '📂 Category',
-                      value: `\`${category}\``,
-                      inline: true,
-                    },
-                    {
-                      name: '💬 Message Preview',
-                      value:
-                        message.length > 300
-                          ? message.slice(0, 300) + '...'
-                          : message || '_No message provided._',
-                    },
-                    {
-                        name: '🔗 View in Admin',
-                        value: `[Open Submission](${adminLink})`,
-                    }
-                  ],
-                  footer: {
-                    text: 'WL-TTRPG Contact Form',
-                  },
-                  timestamp: new Date().toISOString(),
-                },
-              ],
-            }),
-          });
+        await sendDiscordContactAlert({
+            id,
+            name,
+            email,
+            category,
+            message,
+        });
+
+        // const adminLink = getURL(`/admin/contact-submissions#${id}`);
+        // await fetch(ENVS.DISCORD_WEBHOOK_CONTACT, {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({
+        //       username: 'ContactBot',
+        //       avatar_url: 'https://kaje.org/logo.png', // optional
+        //       embeds: [
+        //         {
+        //           title: `📨 New Contact Message: ${category.toUpperCase()}`,
+        //           color: 0x5865f2, // Discord blurple
+        //           fields: [
+        //             {
+        //               name: '👤 From',
+        //               value: `**${name}**\n<${email}>`,
+        //               inline: true,
+        //             },
+        //             {
+        //               name: '📂 Category',
+        //               value: `\`${category}\``,
+        //               inline: true,
+        //             },
+        //             {
+        //               name: '💬 Message Preview',
+        //               value:
+        //                 message.length > 300
+        //                   ? message.slice(0, 300) + '...'
+        //                   : message || '_No message provided._',
+        //             },
+        //             {
+        //                 name: '🔗 View in Admin',
+        //                 value: `[Open Submission](${adminLink})`,
+        //             }
+        //           ],
+        //           footer: {
+        //             text: 'WL-TTRPG Contact Form',
+        //           },
+        //           timestamp: new Date().toISOString(),
+        //         },
+        //       ],
+        //     }),
+        //   });
           
 
         return NextResponse.json({ status: 200 });
