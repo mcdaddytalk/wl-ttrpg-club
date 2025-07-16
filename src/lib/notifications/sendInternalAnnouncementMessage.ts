@@ -24,6 +24,9 @@ export async function sendInternalAnnouncementMessage(announcement: Announcement
 
   if (!messages.length) return;
 
-  const { error: messageError } = await supabase.from('messages').insert(messages);
+  const { error: messageError } = await supabase
+    .from('messages')
+    .insert(messages);
+
   if (messageError) throw messageError;
 }
