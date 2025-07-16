@@ -1567,6 +1567,9 @@ export type Database = {
         | "feedback"
         | "announcement"
         | "reminder"
+        | "support"
+        | "admin"
+        | "gm"
       registrant_status_enum: "banned" | "approved" | "rejected" | "pending"
       resource_category:
         | "rules"
@@ -1762,6 +1765,9 @@ export const Constants = {
         "feedback",
         "announcement",
         "reminder",
+        "support",
+        "admin",
+        "gm",
       ],
       registrant_status_enum: ["banned", "approved", "rejected", "pending"],
       resource_category: [
