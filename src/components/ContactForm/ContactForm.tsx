@@ -17,14 +17,14 @@ import {
 } from '@/components/ui/form'
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { formSchema } from "./schema"
+import { contactFormSchema } from "./schema"
 // import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner"
 import { useState } from "react"
 import { useRouter } from 'next/navigation';
 import RulesList from "../RulesList/page"
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof contactFormSchema>;
 
 const steps = [
     { 
@@ -62,7 +62,7 @@ export const ContactForm = () => {
     const router = useRouter();
     
     const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(contactFormSchema),
         defaultValues: {
             firstName: '',
             surname: '',

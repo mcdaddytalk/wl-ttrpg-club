@@ -42,7 +42,7 @@ export default function Avatar({
         toast.error('Failed to load avatar.')
       }
     }
-    logger.info('Avatar URL:', url)
+    logger.debug('Avatar URL:', url)
     if (url) downloadImage(url)
   }, [url, supabase])
 

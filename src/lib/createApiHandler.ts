@@ -74,7 +74,7 @@ export function createApiHandler<U,T>(
         }
 
         user = session.user;
-        logger.info(`[${requestId}] API call by user ${user.id} (${user.email})`, { path: req.url });
+        logger.debug(`[${requestId}] API call by user ${user.id} (${user.email})`, { path: req.url });
       }
       
       // ✅ Role-Based Access Control (RBAC)

@@ -31,7 +31,7 @@ export const GAME_VISIBILITY= ['public', 'private'] as const;
 export type GameVisibility = (typeof GAME_VISIBILITY)[number];
 export const AUDIENCES = ['public', 'members', 'gamemasters', 'admins'] as const;
 export type Audience = (typeof AUDIENCES)[number];
-export const MESSAGE_CATEGORIES = ['admin', 'announcement', 'general', 'gm', 'invite', 'support'] as const;
+export const MESSAGE_CATEGORIES = ['admin', 'announcement', 'general', 'gm', 'invite', 'support', 'system', 'feedback', 'reminder'] as const;
 export type MessageCategory = (typeof MESSAGE_CATEGORIES)[number];
 export const TASK_STATUSES = ['pending', 'in_progress', 'complete', 'archived'] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];
@@ -695,7 +695,7 @@ export type GMLocationResponse = {
   pageSize: number;
 };
 
-export const CONTACT_CATEGORIES = ['general', 'bug report', 'feature request', 'support', 'question', 'feedback', 'other'] as const;
+export const CONTACT_CATEGORIES = ['general', 'bug report', 'feature request', 'support', 'question', 'feedback', 'new contact', 'other'] as const;
 export type ContactCategory = typeof CONTACT_CATEGORIES[number];
 export type ContactData = {
     name: string;
