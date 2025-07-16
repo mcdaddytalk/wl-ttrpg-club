@@ -7,7 +7,7 @@ export async function fetcher<T>(
 ): Promise<T> {
     const fullUrl = params ? `${url}?${params.toString()}` : url;
 
-    logger.info(`API Request: ${fullUrl}`);
+    logger.debug(`API Request: ${fullUrl}`);
     const response = await fetch(fullUrl, {
       ...options,
       headers: {
@@ -16,7 +16,7 @@ export async function fetcher<T>(
       },
     });
   
-    logger.info(`API Response: ${response.status} ${response.statusText}`);
+    logger.debug(`API Response: ${response.status} ${response.statusText}`);
     if (!response.ok) {
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }

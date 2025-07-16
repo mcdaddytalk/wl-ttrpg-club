@@ -60,8 +60,6 @@ export default function GamemasterDashboard(): React.ReactElement {
     refreshGames();
   };
 
-  // logger.info(gamemasters)
-
   if (!user) return <div>Please log in to access the dashboard.</div>;
   
   return (

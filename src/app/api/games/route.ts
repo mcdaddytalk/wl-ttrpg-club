@@ -65,7 +65,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ message: gamesError.message }, { status: 500 });
     }
 
-    // logger.info(`gamesData: ${JSON.stringify(gamesData)}`)
+    logger.debug(`gamesData: ${JSON.stringify(gamesData)}`)
     // const gameIds = gamesData?.map((game) => game.id) ?? [];
 
     const { data: favoritesData, error: favoritesError } = await fetchFavorites(supabase);
