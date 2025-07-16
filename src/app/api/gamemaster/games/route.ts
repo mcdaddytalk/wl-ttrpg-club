@@ -65,7 +65,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ message: `No games found` }, { status: 404 })
     }
 
-    // logger.info(`GAME DATA: ${JSON.stringify(gamesData)}`)
+    logger.debug(`GAME DATA: ${JSON.stringify(gamesData)}`)
     
     if (gamesData) {
       gamesData.sort((a, b) => {

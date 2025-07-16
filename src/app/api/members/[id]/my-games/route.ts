@@ -84,7 +84,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         return NextResponse.json({ message: 'No games found' }, { status: 404 });
     }
 
-    // logger.info(gamesData[0].games)
+    logger.debug(gamesData[0].games)
 
     const myGames: RegisteredGameDO[] = gamesData.filter((gr) => gr.games !== null).map((gr) => ({
         id: gr.games.id,

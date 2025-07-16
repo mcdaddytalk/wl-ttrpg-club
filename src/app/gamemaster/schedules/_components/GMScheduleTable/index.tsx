@@ -35,10 +35,10 @@ export const GMScheduleTable = ({ className }: GMScheduleTableProps): React.Reac
     // const [isRemoveScheduleModalOpen, setRemoveLocationModalOpen] = useState(false);
 
     const openModal = (modal: string, schedule?: GMGameScheduleDO) => {
-        logger.info("Opening modal", modal)
-        logger.info("Schedule", schedule)    
+        logger.debug("Opening modal", modal)
+        logger.debug("Schedule", schedule)    
         if (schedule) setEditingSchedule(schedule);
-        logger.info("Editing schedule", editingSchedule)
+        logger.debug("Editing schedule", editingSchedule)
         // if (modal === 'addSchedule') setAddScheduleModalOpen(true);
         if (modal === 'editSchedule') setEditLocationModalOpen(true);
         // if (modal === 'removeSchedule') setRemoveLocationModalOpen(true);
@@ -53,7 +53,7 @@ export const GMScheduleTable = ({ className }: GMScheduleTableProps): React.Reac
     }
     
     const handleScheduleUpdate = async (values: ScheduleUpdateInput) => {
-        logger.info("Updating schedule", values)
+        logger.debug("Updating schedule", values)
         if (!editingSchedule) return
         await updateSchedule.mutateAsync({ ...values })
         closeModal()        

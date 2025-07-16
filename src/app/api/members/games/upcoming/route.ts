@@ -44,7 +44,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const now = new Date();
 
-  logger.info("Before filtering", data.map(entry => entry.games.game_schedule[0].next_game_date));
+  logger.debug("Before filtering", data.map(entry => entry.games.game_schedule[0].next_game_date));
   
   const sortedData = data
     .filter(entry => {
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     })
     .slice(0, 3);
 
-  logger.info(sortedData);
+  logger.debug(sortedData);
 
   const games: UpcomingGameDO[] = sortedData.map((entry) => ({
     id: entry.game_id,
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     location: entry.games.game_schedule[0].location
   }));
 
-  logger.info(games);
+  logger.debug(games);
 
   return NextResponse.json(games);
 }

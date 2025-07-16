@@ -17,7 +17,7 @@ export default function GlobalError({
 
   useEffect(() => {
     const eventId = Sentry.captureException(error);
-    logger.info(`Reported with Sentry Event ID: ${eventId}`);
+    logger.warn(`Reported with Sentry Event ID: ${eventId}`);
     if (error?.digest === '404') {
       router.push('/not-found');
     }
