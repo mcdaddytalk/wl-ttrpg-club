@@ -130,6 +130,7 @@ export async function GET( request: NextRequest): Promise<NextResponse> {
         visibility: gameSchedule.games.visibility,
         startingSeats: gameSchedule.games.starting_seats,
         currentSeats: seatCounts![gameSchedule.game_id] || 0,
+        isGM: gameSchedule.games.gamemaster_id === user.id,
         favorite: false,
         registered: false,
         pending: false,
