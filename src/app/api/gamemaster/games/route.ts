@@ -175,7 +175,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const body = await request.json();
 
-  const { title, description, system, visibility, interval, dayOfWeek, nextGameDate, maxSeats, startingSeats, location_id } = body;
+  const { title, description, system, visibility, interval, day_of_week: dayOfWeek, next_game_date: nextGameDate, max_seats: maxSeats, starting_seats: startingSeats, location_id } = body;
 
   try {
     const { data, error } = await supabase.from('games').insert({

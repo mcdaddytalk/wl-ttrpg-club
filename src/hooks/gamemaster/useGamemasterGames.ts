@@ -33,19 +33,11 @@ export const useGamemasterGamesFull = () => {
 
 export const useCreateGame = () => {
   return useMutation({
-    mutationFn: async (payload: any) => {
-      const res = await fetch("/api/gamemaster/games", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to create game");
-      }
-
-      return res.json();
-    },
+    mutationFn: (payload: any) => fetcher<GMGameDO>("/api/gamemaster/games", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
   });
 };
 
