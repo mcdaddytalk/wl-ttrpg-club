@@ -11,16 +11,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         return NextResponse.json({ message: "Method not allowed" }, { status: 405 });
     }
 
-    const { body } = await request.json();
-    const { newGMId } = body;
-
+    const { id } = await params;
+    const { newGMId } = await request.json();
+    
+    logger.debug(`PATCH /api/admin/games/${id}/gamemaster`, { newGMId });
+    
     if (!newGMId) {
         return NextResponse.json({ message: "Missing new GM ID" }, { status: 400 });
     }
 
     const supabase = await createSupabaseServerClient();
-    const { id } = await params;
-
+    
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {

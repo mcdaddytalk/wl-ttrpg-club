@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import logger from "@/utils/logger";
 
 interface TransferGameModalProps {
     isOpen: boolean;
@@ -44,6 +45,9 @@ export const TransferGameModal: React.FC<TransferGameModalProps> = ({
     const gamemaster = gamemasters.find((gm) => gm.id === gamemaster_id) || null;
     const availableGMs = gamemasters.filter((gm) => gm.id !== gamemaster_id);
     const [selectedGamemaster, setGamemaster] = useState<MemberDO | null>(gamemaster);
+
+    logger.debug("Available GMs", availableGMs);
+    logger.debug("Selected GM", selectedGamemaster);
 
     const handleSubmit = async () => {
         if (!selectedGamemaster) return;
