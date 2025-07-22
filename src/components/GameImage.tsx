@@ -12,6 +12,7 @@ type GameImageProps = {
     height?: number;
     className?: string;
     onClick?: (e: React.MouseEvent<HTMLImageElement>) => void;
+    variant?: "default" | "small" | "banner";
 }
 
 const GameImage: React.FC<GameImageProps> = ({ 
@@ -21,7 +22,8 @@ const GameImage: React.FC<GameImageProps> = ({
     width = 400, 
     height = 400,
     className, 
-    onClick 
+    onClick,
+    variant = 'default' 
 }) => {
     const fetchImageUrlMutation = useFetchImageUrl();
     const { mutate: fetchImageUrl } = fetchImageUrlMutation;
@@ -38,6 +40,8 @@ const GameImage: React.FC<GameImageProps> = ({
             ? fetchImageUrlMutation.data
             : "/images/defaults/default_game.webp"; // Fallback image
 
+    const variantClasses = variant === "small" ? "w-12 h-12" : variant === "banner" ? "w-full h-[180px] md:h-[240px] lg:h-[320px]" : "";
+
     return (
         <Image
             src={imageUrl}
@@ -46,7 +50,7 @@ const GameImage: React.FC<GameImageProps> = ({
             height={height}
             priority
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className={`object-cover ${className}`}
+            className={`object-cover rounded-md shadow ${variantClasses} ${className}`}
             onClick={onClick}
         />
     );

@@ -205,6 +205,9 @@ export const getColumns = ({ onOpenModal, router }: ColumnOptions): ColumnDef<Me
                         <DropdownMenuItem onClick={() => onOpenModal('resetPassword', member)}>
                             <KeyIcon className="w-4 h-4 mr-2" /> Reset Password
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onOpenModal('changeEmail', member)}>
+                            <KeyIcon className="w-4 h-4 mr-2" /> Change Auth Email
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onOpenModal('manageRoles', member)}>
                             <Button
                                 variant="outline"

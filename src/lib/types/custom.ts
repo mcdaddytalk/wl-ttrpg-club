@@ -435,6 +435,7 @@ export type GameData = {
   maxSeats: number;
   currentSeats: number;
   startingSeats: number;
+  isGM: boolean;
   favorite: boolean;
   registered: boolean;
   pending: boolean;

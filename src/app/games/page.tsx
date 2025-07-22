@@ -29,6 +29,7 @@ export default function GamesDashboard(): React.ReactElement {
     // logger.log('Enhancing games...');
       setEnhancedGames(games.map((game) => ({
         ...game,
+        isGM: game.gamemaster_id === user?.id || false,
         favorite: favorites.some((favorite) => favorite.game_id === game.game_id) || false,
         pending: game.registrations.some((registration) => registration.member_id === user?.id && registration.status === 'pending') || false,
         registered: game.registrations.some((registration) => registration.member_id === user?.id && registration.status === 'approved') || false

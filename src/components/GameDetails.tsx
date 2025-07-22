@@ -13,7 +13,7 @@ import MessageModal from "@/components/modals/MessageModal";
 import { useState } from "react";
 import { useToggleRegistration } from "@/hooks/useToggleRegistration";
 import EmailShareButton from "@/components/EmailShareButton";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { EmailOptions } from "@/lib/types/social-share";
 import EmailShareIcon from "@/components/EmailShareIcon";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
@@ -30,6 +30,7 @@ interface GameDetailsProps {
 }
 export default function GameDetails({ user, game }: GameDetailsProps): React.ReactElement {
     const pathname = usePathname();
+    const router = useRouter();
 
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [confirmModalAction, setConfirmModalAction] = useState<(() => void) | null>(null);
@@ -41,6 +42,14 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
     const { mutate: toggleFavorite } = useToggleFavorite();
     const { mutate: toggleRegistration } = useToggleRegistration();
     if (!game) return <div className="text-slate-500">Select a game to view details</div>;
+
+    const isGM = user?.id === game.gamemaster_id;
+    const isRegistered = game.registrations.some((registration) => registration.member_id === user?.id && registration.status === 'approved');
+    const isPending = game.registrations.some((registration) => registration.member_id === user?.id && registration.status === 'pending');
+
+    const handleGameEdit = (gameId: string) => {
+        router.push(`/gamemaster/games/${gameId}`);
+    }
 
     const handleToggleFavorite = (gameId: string, currentFavorite: boolean) => {
         toggleFavorite({userId: user?.id, gameId, favorite: currentFavorite});
@@ -105,7 +114,8 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                         system={game.system}
                         width={256}
                         height={256} 
-                        className="rounded-md shadow w-full lg:max-w-none" 
+                        className="rounded-md shadow"
+                        variant="banner" 
                     />
             </div>
             {/* <div id="game-info"className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-4 p-4 border border-green-500"> */}
@@ -130,6 +140,7 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                             >
                                 <FavoriteBadge isFavorite={game.favorite} />
                             </Badge>
+                            {isGM && <Badge key={`gm-${game.id}`} className="right-2 cursor-pointer">🎲 Gamemaster</Badge>}
                             {game.pending && <Badge key={`pending-${game.id}`} className="right-2 cursor-pointer">🫂 Pending Approval</Badge>}
                             {game.registered && <Badge key={`registered-${game.id}`} className="right-2 cursor-pointer">🎉 Registered</Badge>}
                         </div>
@@ -144,7 +155,9 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                             <LuCalendar className="text-xl" />
                             <span>{formatDate(game.nextGameDate)}</span>
                         </div>
-                        <GameLocation location={game.location}/>
+                        
+                        <GameLocation location={game.location} showFullLocation={isRegistered || isGM ? true : false} />
+                        
                         <div className="flex items-center gap-2">
                             <SiStatuspal className="text-xl" />
                             <span>{ enhanceStatus(game) }</span>
@@ -156,43 +169,59 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                         </div>
                     </div>
                     <div className="flex flex-col w-full gap-4 mt-4">
-                        { game.registered || game.pending
+                        {
+                            isGM
                             ? (
-                            <Button
-                                className="w-full"
-                                aria-label="Cancel Registration"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    // TODO: Remove game from calendar
-                                    handleRemoveRegistration(game.game_id, game.registered);
-                                }}
-                            >
-                                {game.registered ? "Cancel Registration" : "Pending"}
-                            </Button>
-                            ): (
+                                // Do GM stuff
                                 <Button
                                     className="w-full"
-                                    disabled={seatsAvailable(game) === "Full"}
-                                    aria-label="Join Game"
+                                    aria-label="Edit Game"
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        handleAddRegistration(game.game_id, game.registered);                                        
+                                        handleGameEdit(game.game_id);
                                     }}
                                 >
-                                    {seatsAvailable(game) === "Full" ? "Full" : "Join Game"}
+                                    Edit Game
                                 </Button>
-
-                        )}
-                        <Button
-                            className="w-full"
-                            aria-label="Message Gamemaster"
-                            onClick={(e) => {
-                                e.preventDefault(); 
-                                setMessageModalOpen(true);
-                            }}
-                        >
-                            Message Gamemaster
-                        </Button>
+                            ) : isRegistered || isPending
+                                ? (
+                                    <Button
+                                        className="w-full"
+                                        aria-label="Cancel Registration"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            // TODO: Remove game from calendar
+                                            handleRemoveRegistration(game.game_id, game.registered);
+                                        }}
+                                    >
+                                        {game.registered ? "Cancel Registration" : "Pending"}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        className="w-full"
+                                        disabled={seatsAvailable(game) === "Full"}
+                                        aria-label="Join Game"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleAddRegistration(game.game_id, game.registered);                                        
+                                        }}
+                                    >
+                                        {seatsAvailable(game) === "Full" ? "Full" : "Join Game"}
+                                    </Button>
+                                )
+                        }
+                        { !isGM &&
+                            <Button
+                                className="w-full"
+                                aria-label="Message Gamemaster"
+                                onClick={(e) => {
+                                    e.preventDefault(); 
+                                    setMessageModalOpen(true);
+                                }}
+                            >
+                                Message Gamemaster
+                            </Button>
+                        }
                         <EmailShareButton className="cursor-pointer w-full" url={pathname} options={emailOptions(game)}>
                             <EmailShareIcon size={64} round />
                         </EmailShareButton>
