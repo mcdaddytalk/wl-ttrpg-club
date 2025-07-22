@@ -11,10 +11,11 @@ export default async function AdminMembersDashboard() {
     const supabase = await createSupabaseServerClient();
     const queryClient = new QueryClient();
     const queryKey = getMembersQueryKey(params);
+    const queryFn = () => fetchMembersWithParams(supabase, params);
     
     await queryClient.prefetchQuery({
         queryKey,
-        queryFn: () => fetchMembersWithParams(supabase, params),
+        queryFn
     });
 
     logger.debug("Dehydrated state: ", dehydrate(queryClient));
