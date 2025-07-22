@@ -25,6 +25,7 @@ import { usePaginatedMembers } from "@/hooks/usePaginatedMembers";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 import { useSendPasswordReset } from "@/hooks/useSendPasswordReset";
 import { useRemoveMember } from "@/hooks/useRemoveMember";
+import { ChangeEmailModal } from "@/components/modals/ChangeEmailModal";
 
 interface AdminMembersTableProps {
     className?: string
@@ -48,6 +49,7 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
     const [isRemoveMemberModalOpen, setRemoveMemberModalOpen] = useState(false);
     const [isManageRolesModalOpen, setManageRolesModalOpen] = useState(false);
     const [isPasswordResetModalOpen, setPasswordResetModalOpen] = useState(false);
+    const [isChangeEmailModalOpen, setChangeEmailModalOpen] = useState(false);
     const [selectedMember, setSelectedMember] = useState<MemberDO | null>(null);
     
     const enhancedMembers = members?.map((member) => ({
@@ -60,6 +62,7 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
         if (modal === 'removeMember') setRemoveMemberModalOpen(true);
         if (modal === 'manageRoles') setManageRolesModalOpen(true);
         if (modal === 'passwordReset') setPasswordResetModalOpen(true);
+        if (modal === 'changeEmail') setChangeEmailModalOpen(true);
         setActiveModal(modal);
     }
     const closeModal = () => {
@@ -67,12 +70,17 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
         if (activeModal === 'removeMember') setRemoveMemberModalOpen(false);
         if (activeModal === 'manageRoles') setManageRolesModalOpen(false);
         if (activeModal === 'passwordReset') setPasswordResetModalOpen(false);
+        if (activeModal === 'changeEmail') setChangeEmailModalOpen(false);
         setActiveModal(null);
     }
         
     const handleAddMemberConfirm = () => {
         closeModal();
     };
+
+    const handelChangeEmailConfirm = () => {        
+        closeModal();
+    }
 
     const handleRemoveMemberConfirm = (id: string) => {
         removeMember(
@@ -242,6 +250,15 @@ const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactEl
                     allRoles={allRoles || []}
                     isOpen={isManageRolesModalOpen}
                     onCancel={() => closeModal()}
+                />
+            )}
+            {/* Change Email Modal */}
+            {activeModal === "changeEmail" && selectedMember && (
+                <ChangeEmailModal
+                    member={selectedMember}
+                    isOpen={isChangeEmailModalOpen}
+                    onCancel={() => closeModal()}
+                    onConfirm={handelChangeEmailConfirm}
                 />
             )}
         </section>

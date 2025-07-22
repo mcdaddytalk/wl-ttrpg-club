@@ -1,4 +1,5 @@
 // import { GetMembersSchema } from "@/app/admin/_lib/validations";
+import { GetMembersSchema } from "@/app/admin/_lib/adminMembers";
 import { 
     // MemberData, 
     TypedSupabaseClient 
@@ -43,54 +44,74 @@ export const fetchMembersFull = () => {
     })
 }
 
-// export const fetchMembersWithParams = async (params: GetMembersSchema) => {
-//     const { page, pageSize, sort, email, experienceLevel, isAdmin, isMinor } = params;
+export async function fetchMembersWithParams(
+  supabase: TypedSupabaseClient,
+  params: GetMembersSchema
+): Promise<{ members: MemberDO[]; count: number }> {
+  const {
+    page,
+    pageSize,
+    sort,
+    email,
+    experienceLevel,
+    isAdmin,
+    isMinor,
+    status,
+ //   filters,
+  } = params;
 
-//     let query = supabase
-//         .from("members")
-//         .select("*, profiles(*), member_roles(*)")
-//         .range((page - 1) * pageSize, page * pageSize - 1);
+  let query = supabase
+    .from("members")
+    .select("*, profiles(*), member_roles(roles(*))", { count: "exact" })
+    .range((page - 1) * pageSize, page * pageSize - 1);
 
-//     if (sort) {
-//         sort.forEach(({ id, desc }) => {
-//             query = query.order(id, { ascending: !desc });
-//         })
-//     }
+  if (sort?.length) {
+    sort.forEach(({ id, desc }) => {
+      query = query.order(id, { ascending: !desc });
+    });
+  }
 
-//     // Apply filters
-//     if (email) query = query.ilike("email", `%${email}%`);
-//     if (experienceLevel && experienceLevel.length) query = query.in("profiles.experience_level", experienceLevel);
-//     if (isAdmin !== undefined) query = query.eq("is_admin", isAdmin);
-//     if (isMinor !== undefined) query = query.eq("is_minor", isMinor);
+  if (email) query = query.ilike("email", `%${email}%`);
+  if (experienceLevel?.length)
+    query = query.in("profiles.experience_level", experienceLevel);
+  if (isAdmin !== undefined && isAdmin !== null)
+    query = query.eq("is_admin", isAdmin === "true");
+  if (isMinor !== undefined && isMinor !== null)
+    query = query.eq("is_minor", isMinor === "true");
+  if (status) query = query.eq("status", status);
 
-//     const { data: membersData, error, count } = await query;
-    
-//     if (error) throw new Error(error.message);
-//     if (!membersData) return { members: [], count: 0 };
+  const { data, error, count } = await query;
 
-//     const members: MemberDO[] = (membersData as unknown as MemberData[]).map((memberData) => {
-//         const { id, email, phone, provider, createdAt, updatedAt } = memberData;
-//         return {
-//             id,
-//             email,
-//             provider: provider ?? '',
-//             phone: phone ? phone : memberData.profiles.phone ?? '',
-//             given_name: memberData.profiles.given_name ?? '',
-//             surname: memberData.profiles.surname ?? '',
-//             displayName: `${memberData.profiles.given_name} ${memberData.profiles.surname}`,
-//             birthday: memberData.profiles.birthday ? new Date(memberData.profiles.birthday) : null,
-//             experienceLevel: memberData.profiles.experience_level,
-//             isAdmin: memberData.is_admin,
-//             isMinor: memberData.is_minor,
-//             createdAt,
-//             updatedAt,
-//             bio: memberData.profiles.bio ?? '',
-//             avatar: memberData.profiles.avatar ?? '',        
-//             roles: memberData.member_roles.map(role => role.roles)
-//         }
-//     });
-//     return { members, count };
-// }
+  if (error) throw new Error(error.message);
+  if (!data) return { members: [], count: 0 };
+
+  const members: MemberDO[] = data.map((m: any) => ({
+    id: m.id,
+    email: m.email,
+    provider: m.provider ?? "",
+    phone: m.phone ?? m.profiles?.phone ?? "",
+    given_name: m.profiles?.given_name ?? "",
+    surname: m.profiles?.surname ?? "",
+    displayName: `${m.profiles?.given_name ?? ""} ${m.profiles?.surname ?? ""}`,
+    birthday: m.profiles?.birthday ? m.profiles.birthday : null,
+    experienceLevel: m.profiles?.experience_level,
+    isAdmin: m.is_admin,
+    isMinor: m.is_minor,
+    created_at: m.createdAt,
+    updated_at: m.updatedAt,
+    updated_by: m.updated_by,
+    bio: m.profiles?.bio ?? "",
+    avatar: m.profiles?.avatar ?? "",
+    roles: m.member_roles?.map((r: { roles: any; }) => r.roles) ?? [],
+    status: m.status,
+    consent: m.consent,
+    last_login_at: m.last_login_at,
+    deleted_at: m.deleted_at,
+    deleted_by: m.deleted_by
+  }));
+
+  return { members, count: count ?? 0 };
+}
 
 export const fetchRoles = () => {
     return queryOptions({
