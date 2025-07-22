@@ -100,6 +100,24 @@ export const getUserRoles = async (): Promise<string[]> => {
     return roleData.map((role) => role.roles.name)
 }
 
+type ChangeEmailVariables = {
+    oldEmail: string,
+    newEmail: string,
+    id: string
+}
+export async function sendChangeEmail({oldEmail, newEmail, id}: ChangeEmailVariables): Promise<void> {
+    const supabase = await createSupabaseServerClient();
+    const { error: authUserError } = await supabase.auth.admin.updateUserById(id, { email: newEmail });
+    if (authUserError) throw new Error(authUserError.message);
+    await supabase.auth.admin.generateLink({
+        type: 'email_change_new',
+        email: oldEmail,
+        newEmail: newEmail
+    })
+    const { error: memberError } = await supabase.from('members').update({ email: newEmail }).eq('id', id);
+    if (memberError) throw new Error(memberError.message)    
+}
+
 export async function signOut(): Promise<{ error: AuthError | null }> {
     const supabase = await createSupabaseServerClient();
     // const cookieStore = await cookies()

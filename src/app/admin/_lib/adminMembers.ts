@@ -62,3 +62,9 @@ import {
   export type GetMembersSchema = Awaited<ReturnType<typeof searchParamsCache.parse>>
   export type CreateMemberSchema = z.infer<typeof createMemberSchema>
   export type UpdateMemberSchema = z.infer<typeof updateMemberSchema>
+
+  export const defaultMembersParams = searchParamsCache.parse({}) as GetMembersSchema;
+
+  export function getMembersQueryKey(params: GetMembersSchema) {
+    return ["admin", "members", "full", params];
+  }
