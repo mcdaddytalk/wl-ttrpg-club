@@ -59,6 +59,16 @@ const GameCarouselCard = ({ game, onToggleFavorite, className }: GameCarouselCar
                                 {game.favorite ? "⭐ Favorite" : "☆ Add Favorite"}
                             </Badge>
 
+                            {/* GM Badge */}
+                            {game.isGM && (
+                                <Badge 
+                                    key={`gm-${game.id}`} 
+                                    className="top-2 right-10"
+                                >
+                                    Gamemaster
+                                </Badge>
+                            )}
+
                             {/* Pending Approval Badge */}
                             {game.pending &&(
                                 <Badge 

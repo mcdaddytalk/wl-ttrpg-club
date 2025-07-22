@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import ScheduledGamesCard from "@/app/gamemaster/_components/ScheduledGamesCard/ScheduledGamesCard";
 import { ContactListDO, GMGameDO, MemberDO } from "@/lib/types/data-objects";
 import useSession from "@/utils/supabase/use-session";
@@ -15,20 +14,24 @@ import { useGameMembers, useGameRegistrants, useRefreshRegistrants } from "@/hoo
 import { useGamemasterLocations } from "@/hooks/gamemaster/useGamemasterLocations";
 
 export default function GamemasterDashboard(): React.ReactElement {
-  const queryClient = useQueryClient();
   const session = useSession();
   const user: User = (session?.user as User) ?? null;
 
   const [selectedGame, setSelectedGame] = useState<GMGameDO | null>(null);
   const gamemasterId = user?.id;
 
-  const contactList = queryClient.getQueryData<ContactListDO[]>(['members', 'full']) || [];
-
+  // const contactList = queryClient.getQueryData<ContactListDO[]>(['members', 'full']) || [];
   const { members } = useGameMembers();
   const { games, isLoading: isGamesLoading } = useGamemasterGamesFull();
   const { data: players } = useGameRegistrants(selectedGame?.id ?? "");
   const { locations } = useGamemasterLocations();
-  const gamemasters = queryClient.getQueryData<MemberDO[]>(['gamemasters', 'full']) || [];
+  //const gamemasters = queryClient.getQueryData<MemberDO[]>(['gamemasters', 'full']) || [];
+  const contactList: ContactListDO[] = members.map((member) => ({
+    id: member.id,
+    given_name: member.given_name || "",
+    surname: member.surname || "",
+  }))
+  const gamemasters: MemberDO[] = members.filter((member) => member.roles.some((role) => role.name === "gamemaster"));
 
   const { mutate: refreshGames } = useRefreshGames();
   const { mutate: refreshRegistrants } = useRefreshRegistrants();

@@ -12,6 +12,7 @@ import {
     DropdownMenuSeparator, 
     DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
+import { DateCell, TextUppercaseCell } from "@/components/DataTable/data-table-cell-helpers"
 
 interface ColumnOptions {
     onOpenModal: (modalName: string, data: GMGameDO) => void
@@ -41,7 +42,8 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameDO>[
         accessorKey: "interval",
         header: "Interval",
         cell: ({ row }) => {
-            return (row.getValue("interval") as string).charAt(0).toUpperCase() + (row.getValue("interval") as string).slice(1)
+            const interval = row.getValue("interval") as string || 'Unknown';
+            return TextUppercaseCell({ value: interval })
         },
         enableSorting: true,
         enableHiding: false
@@ -50,7 +52,8 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameDO>[
         accessorKey: "dow",
         header: "Day of Week",
         cell: ({ row }) => {
-            return (row.getValue("dow") as string).charAt(0).toUpperCase() + (row.getValue("dow") as string).slice(1)
+            const dow = row.getValue("dow") as string || 'Unknown';
+            return TextUppercaseCell({ value: dow })
         },
         enableSorting: true,
         enableHiding: true
@@ -59,8 +62,7 @@ export const getColumns = ({ onOpenModal }: ColumnOptions): ColumnDef<GMGameDO>[
         accessorKey: "scheduled_next",
         header: "Next Session",
         cell: ({ row }) => {
-            const data = row.getValue("scheduled_next") as Date;
-            return new Date(data).toLocaleDateString()
+            return DateCell({ date: row.getValue("scheduled_next") })
         },
         enableSorting: true,
         enableHiding: false

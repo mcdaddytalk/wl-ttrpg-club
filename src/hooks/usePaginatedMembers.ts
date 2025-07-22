@@ -1,4 +1,4 @@
-import { searchParamsCache } from "@/app/admin/_lib/adminMembers";
+import { defaultMembersParams, searchParamsCache } from "@/app/admin/_lib/adminMembers";
 import { MemberDO } from "@/lib/types/data-objects";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation"
@@ -11,7 +11,8 @@ interface UsePaginatedMembersResult {
 
 export const usePaginatedMembers = () => {
     const searchParams = useSearchParams();
-    const params = searchParamsCache.parse(Object.fromEntries(searchParams.entries()));
+    const parsed = searchParamsCache.parse(Object.fromEntries(searchParams.entries()));
+    const params = { ...defaultMembersParams, ...parsed };
 
     return useQuery<UsePaginatedMembersResult>({    
         queryKey: ['admin', 'members', 'full', params],

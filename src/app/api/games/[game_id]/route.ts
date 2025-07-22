@@ -100,6 +100,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ga
         maxSeats: gameData.games.max_seats,
         currentSeats: seatCounts || 0,
         startingSeats: gameData.games.starting_seats,
+        isGM: false,
         favorite: false,
         registered: false,
         pending: false,
