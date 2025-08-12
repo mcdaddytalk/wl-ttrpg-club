@@ -1,4 +1,4 @@
-import { DaysOfWeek, DOW, GameData, GameInterval } from "@/lib/types/custom";
+import { DaysOfWeek, DOW, GameData, GameInterval, ProfileData } from "@/lib/types/custom";
 import { ENVS } from "@/utils/constants/envs"
 import { NextRequest } from "next/server";
 import dayjs from 'dayjs';
@@ -284,8 +284,6 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
       .replace(/\s+/g, " ")
       .trim()
   }
-
-  
   
   export const seatsAvailable = (game: GameData) => {
       if (game.currentSeats === null) return "N/A";
@@ -293,3 +291,11 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
       if (game.maxSeats - game.currentSeats === 0) return "Full";
       return `${game.currentSeats} / ${game.maxSeats}`;
   };
+
+export function getDisplayName(profile: Partial<ProfileData>): string {
+  const given = profile.given_name?.trim() || "";
+  const surname = profile.surname?.trim() || "";
+
+  if (given && surname) return `${given} ${surname}`;
+  return given || surname || "Unknown Member";
+}

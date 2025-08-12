@@ -51,6 +51,8 @@ export const RESOURCE_CATEGORIES = ['rules', 'lore', 'characters', 'map', 'exter
 export type ResourceCategory = (typeof RESOURCE_CATEGORIES)[number];
 export const RESOURCE_VISIBILITY = ['admins', 'gamemasters', 'members', 'public'] as const;
 export type ResourceVisibility = (typeof RESOURCE_VISIBILITY)[number];
+export const RESOURCE_TYPES = ['file', 'url'] as const;
+export type ResourceType = (typeof RESOURCE_TYPES)[number];
 
 /* Supabase Support Types */
 export type TypedSupabaseClient = SupabaseClient<Database>
@@ -358,8 +360,6 @@ export type FeedbackData = {
 }
 export type SupabaseFeedbackListResponse = SupabaseDataResponse<FeedbackData>
 export type SupabaseFeedbackResponse = SupabaseDataResponseSingle<FeedbackData>
-
-export type GameResourceDO = GameResourceData;
 export type GameResourceData = {
   id: string;
   title: string;
@@ -368,14 +368,24 @@ export type GameResourceData = {
   category: ResourceCategory;
   visibility: ResourceVisibility;
   external_url?: string;
-  file_url?: string;
+  file_name?: string;
+  download_url?: string;
   author_id: string;
   pinned: boolean;
   created_at: string;
   updated_at: string | null;
   deleted_at: string | null;
   deleted_by: string | null;
+  resource_type: ResourceType;
+  storage_path?: string | null;
+  game_id: string;
+  games?: GameData;
+  created_by: string;
+  created_by_user?: MemberData;
 }
+
+export type SupabaseGameResourceListResponse = SupabaseDataResponse<GameResourceData>
+export type SupabaseGameResourceResponse = SupabaseDataResponseSingle<GameResourceData>
 
 export type TaskDO = Omit<TaskData, "assigned_to" | "assigned_to_user" | "created_at" | "updated_at" | "deleted_at"> & {
   assigned_to: {
@@ -492,6 +502,7 @@ export type GMGameData = {
   max_seats: number;
   starting_seats: number;
   visibility: GameVisibility;
+  content_warnings: string;
   game_schedule: SupaGameScheduleData[];
   gamemaster_id: string;
   gamemaster: MemberData;
