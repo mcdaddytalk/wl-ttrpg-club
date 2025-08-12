@@ -107,12 +107,12 @@ const LocationsTable = ({ className, locations, total, gamemaster }: LocationsTa
                     <CardTitle className="text-xl font-bold">Locations</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex justify-between items-center mb-2">
                         <Button
                             className="bg-green-400 hover:bg-green-600 text-slate-700 rounded-md px-4 py-2"
                             onClick={() => openModal("addLocation")}
                         >
-                            Add Location
+                            + Add Location
                         </Button>
                     </div>
 

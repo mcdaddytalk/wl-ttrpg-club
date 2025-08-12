@@ -1,4 +1,4 @@
-import { AdminNote, Audience, AuditTrailData, ExperienceLevel, MemberStatus, MessageData, Location, DOW, GameInterval, GameSchedStatus, GameStatus, GameVisibility, MemberData, GMGameSummary, GameSchedule } from "./custom";
+import { AdminNote, Audience, AuditTrailData, ExperienceLevel, MemberStatus, MessageData, Location, DOW, GameInterval, GameSchedStatus, GameStatus, GameVisibility, MemberData, GMGameSummary, GameSchedule, ResourceVisibility, ResourceCategory, ResourceType, GameResourceData } from "./custom";
 
 /* DO Types */
 export type AdminNoteDO = Omit<AdminNote, | 'updated_at' | 'deleted_at' | 'author'> & {
@@ -51,7 +51,9 @@ export type GMGameDO = {
   interval: GameInterval;
   dow: DOW;
   maxSeats: number;
+  startingSeats: number;
   status: GameStatus;
+  content_warnings: string;
   schedStatus: GameSchedStatus;
   location_id: string;
   location: Location;
@@ -62,6 +64,31 @@ export type GMGameDO = {
   gamemaster: MemberData;
   onShowDetails?: (game: GMGameDO) => void;
   onEditGame?: (game: GMGameDO) => void;
+}
+
+export type GameResourceDO = GameResourceData & {
+  game_title: string;
+  uploader_name: string;
+};
+export type GMGameResourceDO = {
+  id: string;
+  title: string;
+  body: string;
+  summary: string;
+  game_id: string;
+  category: ResourceCategory;
+  visibility: ResourceVisibility;
+  resource_type: ResourceType;
+  pinned: boolean;
+  external_url: string | null;
+  file_name: string | null;
+  download_url?: string | null;
+  storage_path: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string | null;
+  deleted_at: string | null;
+  deleted_by: string | null;
 }
 
 export type AnnouncementDO = {

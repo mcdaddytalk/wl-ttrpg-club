@@ -796,12 +796,17 @@ export type Database = {
           body: string | null
           category: Database["public"]["Enums"]["resource_category"]
           created_at: string | null
+          created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
           external_url: string | null
+          file_name: string | null
           file_url: string | null
+          game_id: string | null
           id: string
           pinned: boolean | null
+          resource_type: Database["public"]["Enums"]["resource_type"] | null
+          storage_path: string | null
           summary: string | null
           title: string
           updated_at: string | null
@@ -812,12 +817,17 @@ export type Database = {
           body?: string | null
           category?: Database["public"]["Enums"]["resource_category"]
           created_at?: string | null
+          created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
           external_url?: string | null
+          file_name?: string | null
           file_url?: string | null
+          game_id?: string | null
           id?: string
           pinned?: boolean | null
+          resource_type?: Database["public"]["Enums"]["resource_type"] | null
+          storage_path?: string | null
           summary?: string | null
           title: string
           updated_at?: string | null
@@ -828,12 +838,17 @@ export type Database = {
           body?: string | null
           category?: Database["public"]["Enums"]["resource_category"]
           created_at?: string | null
+          created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
           external_url?: string | null
+          file_name?: string | null
           file_url?: string | null
+          game_id?: string | null
           id?: string
           pinned?: boolean | null
+          resource_type?: Database["public"]["Enums"]["resource_type"] | null
+          storage_path?: string | null
           summary?: string | null
           title?: string
           updated_at?: string | null
@@ -855,6 +870,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "game_resources_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "game_resources_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "game_resources_deleted_by_fkey"
             columns: ["deleted_by"]
             isOneToOne: false
@@ -866,6 +895,13 @@ export type Database = {
             columns: ["deleted_by"]
             isOneToOne: false
             referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_resources_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
             referencedColumns: ["id"]
           },
         ]
@@ -932,6 +968,7 @@ export type Database = {
       }
       games: {
         Row: {
+          content_warnings: string | null
           cover_image: string
           created_at: string | null
           deleted_at: string | null
@@ -949,6 +986,7 @@ export type Database = {
           visibility: Database["public"]["Enums"]["game_visibility"]
         }
         Insert: {
+          content_warnings?: string | null
           cover_image?: string
           created_at?: string | null
           deleted_at?: string | null
@@ -966,6 +1004,7 @@ export type Database = {
           visibility?: Database["public"]["Enums"]["game_visibility"]
         }
         Update: {
+          content_warnings?: string | null
           cover_image?: string
           created_at?: string | null
           deleted_at?: string | null
@@ -1489,6 +1528,18 @@ export type Database = {
           count: number
         }[]
       }
+      is_admin: {
+        Args: { uid: string }
+        Returns: boolean
+      }
+      is_gamemaster_for_game: {
+        Args: { uid: string; game: string }
+        Returns: boolean
+      }
+      is_member_of_game: {
+        Args: { uid: string; game: string }
+        Returns: boolean
+      }
       transfer_game_ownership: {
         Args: {
           game_id: string
@@ -1578,6 +1629,7 @@ export type Database = {
         | "map"
         | "external"
         | "misc"
+      resource_type: "url" | "file"
       resource_visibility: "public" | "members" | "gamemasters" | "admins"
       task_priority: "low" | "medium" | "high" | "critical"
       task_status: "pending" | "in_progress" | "complete" | "archived"
@@ -1778,6 +1830,7 @@ export const Constants = {
         "external",
         "misc",
       ],
+      resource_type: ["url", "file"],
       resource_visibility: ["public", "members", "gamemasters", "admins"],
       task_priority: ["low", "medium", "high", "critical"],
       task_status: ["pending", "in_progress", "complete", "archived"],
