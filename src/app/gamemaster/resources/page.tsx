@@ -7,7 +7,7 @@ import { useState } from "react";
 import { GameResourceFilterParams } from "@/lib/validation/gameResources";
 import { GameResourcePreviewModal } from "@/components/modals/GameResourceModal";
 import { GameResourceDO } from "@/lib/types/data-objects";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AddGameResourceModal } from "@/components/modals/AddGameResourceModal";
 import { useGamemasterGamesFull } from "@/hooks/gamemaster/useGamemasterGames";
