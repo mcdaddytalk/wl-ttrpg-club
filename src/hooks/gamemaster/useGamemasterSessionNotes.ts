@@ -2,21 +2,30 @@ import { GMSessionNoteDO } from "@/lib/types/custom";
 import { SessionNoteFormValues } from "@/lib/validation/sessionNotes";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "../useQueryClient";
+import fetcher from "@/utils/fetcher";
 
-export function useGamemasterSessionNotes() {
-    return useQuery<GMSessionNoteDO[]>({
-      queryKey: ["gamemaster", "session_notes"],
-      queryFn: async () => {
-        const res = await fetch("/api/gamemaster/session-notes");
-        if (!res.ok) throw new Error("Failed to load session notes");
-        return res.json();
-      },
+export function useGamemasterSessionNotes(gameId?: string) {
+    const query = useQuery<GMSessionNoteDO[]>({
+      queryKey: ["gamemaster", "session_notes", { gameId: gameId  ?? "all" }],
+      queryFn: () => {
+        const qs = gameId ? `?game_id=${gameId}` : "";
+        return fetcher(`/api/gamemaster/session-notes${qs}`);
+      }
     });
+
+    return {
+      notes: query.data ?? [],
+      isLoading: query.isLoading,
+      isError: query.isError,
+      error: query.error,
+      refetch: query.refetch
+    }
   }
 
 export function useSaveSessionNote(
   noteId?: string,
-  onSaved?: () => void
+  onSaved?: () => void,
+  gameIdForInvalidate?: string
 ) {
   const queryClient = useQueryClient();
 
@@ -24,34 +33,34 @@ export function useSaveSessionNote(
     mutationFn: async (values: SessionNoteFormValues) => {
       const method = noteId ? "PATCH" : "POST";
       const url = noteId ? `/api/gamemaster/session-notes/${noteId}` : "/api/gamemaster/session-notes";
-      const res = await fetch(url, {
+      return  fetcher(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      if (!res.ok) throw new Error("Failed to save session note");
-      return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gm", "session_notes"] });
-      if (onSaved) onSaved();
+      // Invalidate both the filtered and the "all" cache
+      queryClient.invalidateQueries({ queryKey: ["gamemaster", "session_notes", { gameId: "all" }] });
+      if (gameIdForInvalidate) {
+        queryClient.invalidateQueries({ queryKey: ["gamemaster", "session_notes", { gameId: gameIdForInvalidate }] });
+      }
+      onSaved?.();
     },
   });
 }
 
-export function useDeleteSessionNote() {
-    const queryClient = useQueryClient();
-    return useMutation({
-      mutationFn: async (noteId: string) => {
-        const res = await fetch(`/api/gamemaster/session-notes/${noteId}`, {
-          method: "DELETE",
-        });
-        if (!res.ok) throw new Error("Failed to delete note");
-        return res.json();
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["gm", "session_notes"] });
+export function useDeleteSessionNote(gameIdForInvalidate?: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (noteId: string) =>
+      fetcher(`/api/gamemaster/session-notes/${noteId}`, { method: "DELETE" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gamemaster", "session_notes", { gameId: "all" }] });
+      if (gameIdForInvalidate) {
+        queryClient.invalidateQueries({ queryKey: ["gamemaster", "session_notes", { gameId: gameIdForInvalidate }] });
       }
-    }); 
+    },
+  });
 }
   

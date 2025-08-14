@@ -7,10 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { Markdown } from '@/components/Markdown';
 
 export default function AdminTaskDetails() {
   const {
@@ -54,7 +53,7 @@ export default function AdminTaskDetails() {
             <div>
               <h3 className="font-semibold text-lg">{task.title}</h3>
               <div className={cn('prose prose-sm text-muted-foreground')}>
-                <Markdown remarkPlugins={[remarkGfm]}>
+                <Markdown>
                     {task.description || 'No description'}
                 </Markdown>
               </div>
