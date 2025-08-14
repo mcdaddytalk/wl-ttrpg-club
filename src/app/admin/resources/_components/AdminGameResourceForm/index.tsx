@@ -11,10 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Markdown } from "@/components/Markdown";
 
 const schema = z.object({
   id: z.string().optional(),
@@ -83,7 +82,7 @@ export default function AdminGameResourceForm({ defaultValues, onSaved }: Props)
             </Button>
             {previewing && (
               <div className="prose border rounded p-2 mt-2">
-                <Markdown remarkPlugins={[remarkGfm]}>{form.watch("body") || ""}</Markdown>
+                <Markdown>{form.watch("body") || ""}</Markdown>
               </div>
             )}
           </div>

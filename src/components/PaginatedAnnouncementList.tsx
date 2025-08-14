@@ -10,9 +10,6 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import { useQueryClient } from '@/hooks/useQueryClient';
@@ -33,6 +30,8 @@ import {
   parseAsBoolean,
   parseAsString,
 } from 'nuqs';
+import { cn } from '@/lib/utils';
+import { Markdown } from './Markdown';
 
 dayjs.extend(relativeTime);
 
@@ -140,7 +139,7 @@ export default function PaginatedAnnouncementList() {
                 Published {dayjs(a.published_at).fromNow()} ago
               </div>
               <div className={cn('prose max-w-none', !isExpanded && isExpandable && 'line-clamp-5')}>
-                <Markdown remarkPlugins={[remarkGfm]}>{bodyToRender}</Markdown>
+                <Markdown>{bodyToRender}</Markdown>
               </div>
               {isExpandable && (
                 <div className="mt-2 text-sm text-blue-600">

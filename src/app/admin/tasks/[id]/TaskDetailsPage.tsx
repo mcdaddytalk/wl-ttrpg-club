@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
-import remarkGfm from 'remark-gfm';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import Markdown from 'react-markdown';
 import { useAdminTask } from '@/hooks/admin/useAdminTasks';
+import { Markdown } from '@/components/Markdown';
 
 interface TaskDetailsPageProps {
   id: string;
@@ -25,7 +24,7 @@ export const TaskDetailsPage = ({ id}: TaskDetailsPageProps): React.ReactElement
       </div>
 
       <div className="prose prose-sm text-muted-foreground">
-        <Markdown remarkPlugins={[remarkGfm]}>
+        <Markdown>
             {task.description || 'No description'}
         </Markdown>
       </div>

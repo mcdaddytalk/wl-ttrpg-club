@@ -15,6 +15,7 @@ export const useGamemasterGames = () => {
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
+    refetch: query.refetch
   }
 };
 
@@ -29,6 +30,7 @@ export const useGamemasterGamesFull = () => {
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
+    refetch: query.refetch
   }
 }
 

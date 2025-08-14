@@ -5,11 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { AnnouncementDO } from '@/lib/types/data-objects';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { createSupabaseAnonClient } from '@/utils/supabase/anon';
+import { Markdown } from '../Markdown';
 
 const LOCAL_STORAGE_KEY = 'announcementsWidgetDismissed';
 
@@ -113,7 +112,7 @@ export function PublicAnnouncementsWidget() {
                             id={`announcement-${a.id}`}
                             className={cn('prose max-w-none mt-1 transition-all', !isExpanded && 'line-clamp-5')}
                         >
-                            <Markdown remarkPlugins={[remarkGfm]}>{bodyToRender}</Markdown>
+                            <Markdown>{bodyToRender}</Markdown>
                         </div>
                         <button
                             onClick={toggleExpand}
@@ -128,7 +127,7 @@ export function PublicAnnouncementsWidget() {
                             {a.title}
                         </h3>
                         <div className="prose max-w-none mt-1">
-                            <Markdown remarkPlugins={[remarkGfm]}>{a.body}</Markdown>
+                            <Markdown>{a.body}</Markdown>
                         </div>
                         </>
                     )}

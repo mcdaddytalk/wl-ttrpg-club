@@ -3,12 +3,11 @@
 import { GameResourceDO } from "@/lib/types/data-objects";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { Copy, ExternalLink } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { Markdown } from "../Markdown";
 
 interface GameResourcePreviewModalProps {
   resource: GameResourceDO | null;
@@ -69,7 +68,7 @@ export function GameResourcePreviewModal({ resource, isOpen, onClose }: GameReso
           {/* If markdown body exists, render it */}
           {resource.body ? (
             <div className="prose dark:prose-invert max-w-full">
-              <Markdown remarkPlugins={[remarkGfm]}>{resource.body}</Markdown>
+              <Markdown>{resource.body}</Markdown>
             </div>
           ) : resource.resource_type === "file" && resource.download_url ? (
             <>

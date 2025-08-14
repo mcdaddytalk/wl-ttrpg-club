@@ -1,72 +1,67 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
-import { SessionNoteSchema } from "@/lib/validation/sessionNotes";
 import logger from "@/utils/logger";
+import z from "zod";
+import { SessionNoteInsertSchema } from "@/lib/validation/sessionNotes";
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
-    if (req.method !== "POST") {
-      return NextResponse.json({ message: "Method not allowed" }, { status: 405 });
-    }
-  
-    const supabase = await createSupabaseServerClient();
-    const {
-        data: { user },
-        error,
-    } = await supabase.auth.getUser();
-
-    if (error || !user) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const body = await req.json();
-    const result = SessionNoteSchema.safeParse(body);
-
-    if (!result.success) {
-        return NextResponse.json({ errors: result.error.flatten() }, { status: 400 });
-    }
-
-    const note = result.data;
-
-    const { error: insertError } = await supabase
-        .from("session_notes")
-        .insert({
-            ...note,
-            game_id: body.game_id,
-            author_id: user.id,
-        });
-
-    if (insertError) {
-        logger.error("Error creating session note", insertError);
-        return NextResponse.json({ message: "Failed to create note" }, { status: 500 });
-    }
-
-    return NextResponse.json({ message: "Note created" }, { status: 201 });
-}
+const querySchema = z.object({
+    game_id: z.string().uuid().optional(),
+})
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
     if (req.method !== "GET") {
         return NextResponse.json({ message: "Method not allowed" }, { status: 405 });
     }
     const supabase = await createSupabaseServerClient();
-    const {
-        data: { user },
-        error,
-    } = await supabase.auth.getUser();
+    const { data: auth, error: authError } = await supabase.auth.getUser();
+    if (authError || !auth?.user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    if (error || !user) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const { searchParams } = new URL(req.url);
+    const parse = querySchema.safeParse({ game_id: searchParams.get("game_id") ?? undefined });
+    if (!parse.success) {
+        return NextResponse.json({ errors: parse.error.flatten() }, { status: 400 });
     }
 
-    const { data, error: notesError } = await supabase
-        .from("session_notes")
-        .select("*")
-        .eq("author_id", user.id)
-        .order("session_date", { ascending: false });
+    // Use the view so we get game_title and soft-delete filtering
+  let q = supabase.from("session_notes_view").select("*").order("session_date", { ascending: false });
 
-    if (notesError) {
-        logger.error("Error fetching session notes", notesError);
+    if (parse.data.game_id) q = q.eq("game_id", parse.data.game_id);
+
+    const { data, error } = await q;
+    if (error) {
+        logger.error("Error fetching session notes", error);
         return NextResponse.json({ message: "Failed to load notes" }, { status: 500 });
     }
 
     return NextResponse.json(data);
+}
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  if (req.method !== "POST") {
+    return NextResponse.json({ message: "Method not allowed" }, { status: 405 });
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: auth, error: authError } = await supabase.auth.getUser();
+  if (authError || !auth?.user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+  const json = await req.json();
+  const parsed = SessionNoteInsertSchema.safeParse(json);
+  if (!parsed.success) {
+    return NextResponse.json({ errors: parsed.error.flatten() }, { status: 400 });
+  }
+
+  const payload = {
+    ...parsed.data,
+    author_id: auth.user.id,   // trust server
+  };
+
+  const { data, error } = await supabase.from("session_notes").insert(payload).select("*").single();
+
+  if (error) {
+    logger.error("Error creating session note", error);
+    return NextResponse.json({ message: "Failed to create note" }, { status: 500 });
+  }
+
+  return NextResponse.json(data, { status: 201 });
 }

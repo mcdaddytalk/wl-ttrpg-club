@@ -1402,41 +1402,41 @@ export type Database = {
         Row: {
           author_id: string
           body: string
-          created_at: string | null
+          created_at: string
           deleted_at: string | null
           game_id: string
           id: string
-          is_visible_to_players: boolean | null
+          is_visible_to_players: boolean
           schedule_id: string | null
           session_date: string
           title: string | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           author_id: string
-          body: string
-          created_at?: string | null
+          body?: string
+          created_at?: string
           deleted_at?: string | null
           game_id: string
           id?: string
-          is_visible_to_players?: boolean | null
+          is_visible_to_players?: boolean
           schedule_id?: string | null
           session_date: string
           title?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           author_id?: string
           body?: string
-          created_at?: string | null
+          created_at?: string
           deleted_at?: string | null
           game_id?: string
           id?: string
-          is_visible_to_players?: boolean | null
+          is_visible_to_players?: boolean
           schedule_id?: string | null
           session_date?: string
           title?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -1504,6 +1504,52 @@ export type Database = {
         }
         Relationships: []
       }
+      session_notes_view: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          created_by: string | null
+          deleted_at: string | null
+          game_id: string | null
+          game_title: string | null
+          id: string | null
+          is_visible_to_players: boolean | null
+          schedule_id: string | null
+          session_date: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_notes_author_id_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "session_notes_author_id_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "game_schedule"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       clean_expired_invites: {
@@ -1534,6 +1580,10 @@ export type Database = {
       }
       is_gamemaster_for_game: {
         Args: { uid: string; game: string }
+        Returns: boolean
+      }
+      is_gamemaster_of_game: {
+        Args: { uid: string; game_id: string }
         Returns: boolean
       }
       is_member_of_game: {

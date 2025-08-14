@@ -689,11 +689,12 @@ export type InviteStat = {
 export type GMSessionNoteDO = {
   id: string;
   game_id: string;
-  schedule_id: string;
-  author_id: string;
-  session_date: string;
-  title: string;
+  game_title?: string;
+  title: string | null;
   body: string;
+  session_date: string;
+  schedule_id: string | null;
+  created_by: string;    // alias of author_id from view
   is_visible_to_players: boolean;
   created_at: string;
   updated_at: string;
