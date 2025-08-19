@@ -64,7 +64,10 @@ const clientSchema = z.object({
 const serverSchema = z.object({
     DEBUG: z.string().optional().default('false').transform((val) => val.toLowerCase() === 'true'),
     BRAND_NAME: z.string(),
-    BRAND_LOGO: z.string().url(),
+    BRAND_LOGO: z.union([
+        z.string().url(),             // absolute URLs
+        z.string().regex(/^\/(?!\/).+/) // single-leading-slash relative path like /images/foo.webp
+    ]),
     BRAND_EMAIL: z.string().email(),
     SUPPORT_EMAIL: z.string().email(),
     NEXT_PUBLIC_SITE_URL: z.string().url(),
