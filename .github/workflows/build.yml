@@ -17,6 +17,10 @@ jobs:
         env:
             CI: true
             NEXT_PRIVATE_LOGGING_BUFFERED: false
+            BRAND_NAME: "WLTTRPG"
+            BRAND_EMAIL: "wlttrpg@localhost"
+            SUPPORT_EMAIL: "support@localhost"
+            BRAND_LOGO: "https://example.com/logo.png"
             NEXT_PUBLIC_SITE_URL: http://localhost:3000
             NEXT_PUBLIC_SUPABASE_URL: https://test-url.com
             NEXT_PUBLIC_SUPABASE_ANON_KEY: not_a_real+key
