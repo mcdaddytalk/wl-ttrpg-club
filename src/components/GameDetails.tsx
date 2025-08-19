@@ -115,7 +115,8 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                         width={256}
                         height={256} 
                         className="rounded-md shadow"
-                        variant="banner" 
+                        variant="banner"
+                        highPriority
                     />
             </div>
             {/* <div id="game-info"className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-4 p-4 border border-green-500"> */}

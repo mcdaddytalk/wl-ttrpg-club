@@ -13,19 +13,25 @@ type LogAuditParams = {
   metadata?: Record<string, any>;
 };
 
-export async function logAuditEvent({
-  action,
-  actor_id,
-  target_type,
-  target_id,
-  summary,
-  metadata,
-}: LogAuditParams) {
+export async function logAuditEvent(input: Omit<LogAuditParams, 'actor_id'> & { actor_id?: string }) {
   const supabase = await createSupabaseServerClient();
-
+  const {
+    action,
+    actor_id,
+    target_type,
+    target_id,
+    summary,
+    metadata,
+  } = input;
+  let actor = actor_id;
+  if (!actor) {
+    const { data: { user } } = await supabase.auth.getUser();
+    actor = user?.id ?? null as any;
+  }
+   
   logger.debug("Audit trail logging:", {
       action,
-      actor_id,
+      actor_id: actor,
       target_type,
       target_id,
       summary,
@@ -35,7 +41,7 @@ export async function logAuditEvent({
   const { error } = await supabase.from("audit_trail").insert([
     {
       action,
-      actor_id,
+      actor_id: actor,
       target_type,
       target_id,
       summary,
@@ -45,3 +51,36 @@ export async function logAuditEvent({
 
   if (error) console.error("Audit event logging failed:", error.message);
 }
+
+// export async function logAuditEvent({
+//   action,
+//   actor_id,
+//   target_type,
+//   target_id,
+//   summary,
+//   metadata,
+// }: LogAuditParams) {
+//   const supabase = await createSupabaseServerClient();
+
+//   logger.debug("Audit trail logging:", {
+//       action,
+//       actor_id,
+//       target_type,
+//       target_id,
+//       summary,
+//       metadata,
+//     });
+
+//   const { error } = await supabase.from("audit_trail").insert([
+//     {
+//       action,
+//       actor_id,
+//       target_type,
+//       target_id,
+//       summary,
+//       metadata,
+//     },
+//   ]);
+
+//   if (error) console.error("Audit event logging failed:", error.message);
+// }

@@ -107,7 +107,9 @@ export async function fetchMembersWithParams(
     consent: m.consent,
     last_login_at: m.last_login_at,
     deleted_at: m.deleted_at,
-    deleted_by: m.deleted_by
+    deleted_by: m.deleted_by,
+    deletion_requested_at: m.deletion_requested_at,
+    deletion_reason: m.deletion_reason
   }));
 
   return { members, count: count ?? 0 };

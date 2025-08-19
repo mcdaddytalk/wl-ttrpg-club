@@ -86,25 +86,29 @@ export default function MyGamesDashboard(): React.ReactElement {
       </div>
 
       {/* 🎮 Registered Games */}
-      <h2 className="text-xl font-semibold mt-6 mb-2">Registered Games</h2>
-      {isLoading ? <SkeletonArray count={3} /> : (
-        games?.length === 0 ? <p className="text-gray-500">You are not registered for any games.</p> :
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {games?.map((game) => (
-            <GameCard key={game.id} game={game} onClick={() => router.push(`/games/adventure/${game.id}`)}>
-              <Button
-                variant="destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setGamePendingLeave(game.id);
-                }}
-              >
-                Leave Game
-              </Button>
-            </GameCard>
-          ))}
+      <div className="mb-6">
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h2 className="text-xl font-semibold mb-2">Registered Games</h2>
+          {isLoading ? <SkeletonArray count={3} /> : (
+            games?.length === 0 ? <p className="text-gray-500">You are not registered for any games.</p> :
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {games?.map((game) => (
+                <GameCard key={game.id} game={game} onClick={() => router.push(`/games/adventure/${game.id}`)}>
+                  <Button
+                    variant="destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setGamePendingLeave(game.id);
+                    }}
+                  >
+                    Leave Game
+                  </Button>
+                </GameCard>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>      
       <ConfirmationModal
         title="Leave Game?"
         description="Are you sure you want to leave this game? You may need to request a new invite to rejoin."

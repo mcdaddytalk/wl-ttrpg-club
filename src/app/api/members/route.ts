@@ -62,6 +62,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         deleted_at: member.deleted_at,
         updated_by: member.updated_by,
         deleted_by: member.deleted_by,
+        deletion_requested_at: member.deletion_requested_at,
+        deletion_reason: member.deletion_reason,
         avatar: member.profiles.avatar || 'default',
         roles: member.member_roles.map((role) => role.roles),        
     }));

@@ -176,7 +176,7 @@ export default function PaginatedAnnouncementList() {
             </Select>
             <Button
               variant={showUnreadOnly ? "default" : "outline"}
-              onClick={() => setShowUnreadOnly((prev) => !prev)}
+              onClick={() => setShowUnreadOnly((prev: any) => !prev)}
             >
               {showUnreadOnly ? "Show All" : "Show Unread Only"}
             </Button>
@@ -231,13 +231,13 @@ export default function PaginatedAnnouncementList() {
           </div>
         )} 
         <div className="flex justify-between items-center pt-2">
-          <Button variant="ghost" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>
+          <Button variant="ghost" onClick={() => setPage((p: number) => Math.max(0, p - 1))} disabled={page === 0}>
             Previous
           </Button>
           <span className="text-sm text-muted-foreground">
             Page {page + 1} of {totalPages || 1}
           </span>
-          <Button variant="ghost" onClick={() => setPage((p) => p + 1)} disabled={page + 1 >= totalPages}>
+          <Button variant="ghost" onClick={() => setPage((p: number) => p + 1)} disabled={page + 1 >= totalPages}>
             Next
           </Button>
         </div>       

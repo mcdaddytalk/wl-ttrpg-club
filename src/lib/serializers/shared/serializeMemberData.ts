@@ -16,6 +16,8 @@ export function serializeMemberData(member: any): MemberDO {
     updated_by: member.updated_by,
     deleted_at: member.deleted_at,
     deleted_by: member.deleted_by,
+    deletion_requested_at: member.deletion_requested_at,
+    deletion_reason: member.deletion_reason,
     given_name: member.profiles?.given_name,
     surname: member.profiles?.surname,
     displayName: `${member.profiles?.given_name} ${member.profiles?.surname}`,

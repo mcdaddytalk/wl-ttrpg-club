@@ -24,6 +24,7 @@ export const GameCard: React.FC<Props> = ({ game, children, onClick }) => {
           src={game.coverImage} 
           alt={game.title}
           system={game.system} 
+          variant="default"
           width={400} 
           height={200} 
           className="rounded-lg object-cover cursor-pointer"

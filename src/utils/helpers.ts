@@ -298,6 +298,8 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
       .replace(/\s+/g, " ")
       .trim()
   }
+
+  export function capitalize(s: string) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
   
   export const seatsAvailable = (game: GameData) => {
       if (game.currentSeats === null) return "N/A";
