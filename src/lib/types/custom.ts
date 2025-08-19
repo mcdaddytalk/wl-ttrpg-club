@@ -37,13 +37,17 @@ export const TASK_STATUSES = ['pending', 'in_progress', 'complete', 'archived'] 
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 export const TASK_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
 export type TaskPriority = (typeof TASK_PRIORITIES)[number];
-export const MEMBER_STATUSES = ['active', 'inactive', 'pending', 'banned'] as const;
+export const MEMBER_STATUSES = ['active', 'inactive', 'pending', 'banned', 'soft_deleted'] as const;
 export type MemberStatus = (typeof MEMBER_STATUSES)[number];
 export const INVITE_STATUSES = ['pending', 'accepted', 'expired', 'declined'] as const;
 export type InviteStatus = (typeof INVITE_STATUSES)[number];
 export const NOTE_TARGET_TYPE = ['member', 'game'] as const;
 export type NoteTargetType = (typeof NOTE_TARGET_TYPE)[number];
-export const AUDIT_ACTION = ["create", "update", "delete", "accept", "login", "system"] as const;
+export const AUDIT_ACTION = [
+  "create", "update", "delete", "accept", "login", "system", "invite", 
+  "password_changed", "password_reset", "provider_linked", "provider_unlinked",
+  "account_hard_deleted", "account_soft_deleted", "account_restored"
+] as const;
 export type AuditAction = (typeof AUDIT_ACTION)[number];
 export const FEEDBACK_CATEGORIES = ['bug', 'feature', 'praise', 'other'] as const;
 export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
@@ -53,6 +57,8 @@ export const RESOURCE_VISIBILITY = ['admins', 'gamemasters', 'members', 'public'
 export type ResourceVisibility = (typeof RESOURCE_VISIBILITY)[number];
 export const RESOURCE_TYPES = ['file', 'url'] as const;
 export type ResourceType = (typeof RESOURCE_TYPES)[number];
+export const PROVIDER_ALL = ['google', 'discord'] as const;
+export type ProvidersAll = (typeof PROVIDER_ALL)[number];
 
 /* Supabase Support Types */
 export type TypedSupabaseClient = SupabaseClient<Database>
@@ -172,6 +178,8 @@ export type MemberData = {
   updated_by: string;
   deleted_at: string | null;
   deleted_by: string;
+  deletion_requested_at: string | null;
+  deletion_reason: string | null;
   admin_notes: AdminNote[] | null;
   profiles: ProfileData;
   member_roles: RoleData[];
@@ -205,6 +213,11 @@ export type MessageData = {
 }
 export type SupabaseMessageListResponse = SupabaseDataResponse<MessageData>
 export type SupabaseMessageResponse = SupabaseDataResponseSingle<MessageData>
+
+export type OauthProvider = {
+  id: string;
+  provider: ProvidersAll;
+}
 
 export type GMGameSummary = {
   id: string;

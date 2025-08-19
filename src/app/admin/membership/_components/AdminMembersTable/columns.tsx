@@ -149,7 +149,8 @@ export const getColumns = ({ onOpenModal, router }: ColumnOptions): ColumnDef<Me
             active: "bg-green-500",
             inactive: "bg-gray-400",
             pending: "bg-yellow-500",
-            banned: "bg-red-500"
+            banned: "bg-red-500",
+            soft_deleted: "bg-gray-400",
           }[status];
       
           return (

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { createSupabaseAnonClient } from '@/utils/supabase/anon';
-import { Markdown } from '../Markdown';
+import { Markdown } from '@/components/Markdown';
 
 const LOCAL_STORAGE_KEY = 'announcementsWidgetDismissed';
 
@@ -93,9 +93,34 @@ export function PublicAnnouncementsWidget() {
 
             return (
                 <li key={a.id} className="text-sm group border-b pb-3">
-                    <p className="text-muted-foreground italic">
-                        {formatDistanceToNow(new Date(a.published_at!))} ago
-                    </p>
+                  {(() => {
+                    const publishedAt = a.published_at ? new Date(a.published_at) : null;
+                    const updatedAt = a.updated_at ? new Date(a.updated_at) : null;
+
+                    return (
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-muted-foreground italic">
+                            Published:{" "}
+                            {publishedAt ? (
+                              <time dateTime={publishedAt.toISOString()}>
+                                {formatDistanceToNow(publishedAt, { addSuffix: true })}
+                              </time>
+                            ) : (
+                              "—"
+                            )}
+                          </p>
+
+                          {updatedAt && (
+                            <p className="text-muted-foreground italic">
+                              Updated:{" "}
+                              <time dateTime={updatedAt.toISOString()}>
+                                {formatDistanceToNow(updatedAt, { addSuffix: true })}
+                              </time>
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
                     {isExpandable ? (
                         <>
                         <button

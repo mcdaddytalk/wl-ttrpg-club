@@ -213,6 +213,8 @@ export type MemberDO = {
   created_at: string;
   updated_at: string;
   updated_by: string;
+  deletion_requested_at: string | null;
+  deletion_reason: string | null;
   deleted_at: string | null;
   deleted_by: string;
   admin_notes?: AdminNote[] | null;

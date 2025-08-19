@@ -88,7 +88,7 @@ export default async function RootLayout({
               <ToastHandler />
             </Suspense>
               <div className="flex-grow dark:bg-black-overlay bg-white-overlay">
-                <main className="container w-full max-w-screen-2xl mx-auto overflow-auto">
+                <main className="container w-full max-w-screen-3xl mx-auto overflow-auto">
                   {children}
                 </main>
               </div>

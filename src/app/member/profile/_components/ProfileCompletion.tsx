@@ -33,6 +33,8 @@ const labelForField = (field: keyof ProfileData): string => {
   return labelMap[field] ?? field
 }
 
+const STORAGE_KEY = 'profileCompletionCelebrated'
+
 export function ProfileCompletion({ profile }: ProfileCompletionProps) {
     
   const filledFields = fieldsToCheck.filter((field) => {
@@ -43,16 +45,50 @@ export function ProfileCompletion({ profile }: ProfileCompletionProps) {
   const progressPercent = Math.round((filledFields.length / fieldsToCheck.length) * 100)
 
   const hasCelebratedRef = useRef(false)
+  const prevPercentRef = useRef(progressPercent)
+
+  // Initialize from localStorage once
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        hasCelebratedRef.current = window.localStorage.getItem(STORAGE_KEY) === 'true'
+      }
+    } catch {
+      // ignore storage errors (e.g., Safari private mode)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
-    if (progressPercent === 100 && !hasCelebratedRef.current) {
+    const prev = prevPercentRef.current
+    const reachedNow = progressPercent === 100
+    const wasBelow = prev < 100
+
+    // Respect reduced motion preferences
+    const prefersReduced = typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (reachedNow && wasBelow && !hasCelebratedRef.current && !prefersReduced) {
       hasCelebratedRef.current = true
+      try {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(STORAGE_KEY, 'true')
+        }
+      } catch {
+        // ignore storage errors
+      }
+
       confetti({
-        particleCount: 100,
-        spread: 70,
+        particleCount: 120,
+        spread: 75,
         origin: { y: 0.6 },
+        scalar: 1.0,
       })
     }
+
+    // update previous after handling logic
+    prevPercentRef.current = progressPercent
   }, [progressPercent])
 
   const missingFields = fieldsToCheck.filter((field) => !filledFields.includes(field))

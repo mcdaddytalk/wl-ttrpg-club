@@ -63,6 +63,10 @@ const clientSchema = z.object({
 // Client-side env vars are also available on the server
 const serverSchema = z.object({
     DEBUG: z.string().optional().default('false').transform((val) => val.toLowerCase() === 'true'),
+    BRAND_NAME: z.string(),
+    BRAND_LOGO: z.string().url(),
+    BRAND_EMAIL: z.string().email(),
+    SUPPORT_EMAIL: z.string().email(),
     NEXT_PUBLIC_SITE_URL: z.string().url(),
     NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
@@ -104,6 +108,10 @@ const parseEnvs = (
 }
 
 const processEnv: PROCESS_ENV = {
+    BRAND_NAME: process.env.BRAND_NAME,
+    BRAND_LOGO: process.env.BRAND_LOGO,
+    BRAND_EMAIL: process.env.BRAND_EMAIL,
+    SUPPORT_EMAIL: process.env.SUPPORT_EMAIL,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

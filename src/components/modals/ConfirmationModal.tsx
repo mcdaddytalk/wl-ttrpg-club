@@ -20,6 +20,10 @@ interface ConfirmationModalProps {
     onConfirm: () => void;
     confirmDelayMs?: number;
     isLoading?: boolean;
+    children?: React.ReactNode;
+    confirmLabel?: string;
+    confirmDisabled?: boolean;
+    confirmVariant?: React.ComponentProps<typeof Button>["variant"];
 }   
 
 export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ 
@@ -29,7 +33,11 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     onCancel, 
     onConfirm,
     confirmDelayMs = 2000,
-    isLoading = false
+    isLoading = false,
+    children,
+    confirmLabel = "Confirm",
+    confirmDisabled = false,
+    confirmVariant = "destructive",
 }) => {
     const [delayPassed, setDelayPassed] = useState(false);
 
@@ -39,28 +47,34 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           const timeout = setTimeout(() => setDelayPassed(true), confirmDelayMs);
           return () => clearTimeout(timeout);
         }
-      }, [isOpen, confirmDelayMs]);
+    }, [isOpen, confirmDelayMs]);
+
+    const disableConfirm = !delayPassed || isLoading || confirmDisabled;
     
     return (
         <Dialog open={isOpen} onOpenChange={onCancel}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription className="text-sm text-slate-600">{description}</DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                    <div className="flex gap-2 justify-end">
-                        <Button variant="destructive" onClick={onCancel} disabled={isLoading}>Cancel</Button>
-                        <Button
-                            variant="outline"
-                            onClick={onConfirm}
-                            disabled={!delayPassed || isLoading}
-                        >
-                            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm"}
-                        </Button>
-                    </div>
-                </DialogFooter>
-            </DialogContent>
+        <DialogContent>
+            <DialogHeader>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription className="text-sm text-slate-600">
+                {description}
+            </DialogDescription>
+            </DialogHeader>
+
+            {/* NEW: custom body slot */}
+            {children ? <div className="mt-3 space-y-3">{children}</div> : null}
+
+            <DialogFooter>
+            <div className="flex gap-2 justify-end">
+                <Button variant={confirmVariant} onClick={onCancel} disabled={isLoading}>
+                Cancel
+                </Button>
+                <Button variant="outline" onClick={onConfirm} disabled={disableConfirm}>
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : confirmLabel}
+                </Button>
+            </div>
+            </DialogFooter>
+        </DialogContent>
         </Dialog>
-    )
-}
+    );
+};
