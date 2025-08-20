@@ -130,20 +130,47 @@ export async function signOut(): Promise<{ error: AuthError | null }> {
     redirect('/')
 }
 
-export async function signInWithProvider(provider: Provider, redirectUrl = '/member'): Promise<void> {
+type OAuthOpts = {
+  /** Where the provider should send the browser back to (your callback page) */
+  redirectTo?: string;
+  /** Where your callback should send the user next (e.g., /member/account) */
+  postLoginRedirect?: string;
+  /** Try to force provider re-consent / account picker (best-effort) */
+  force?: boolean;
+};
+
+export async function signInWithProvider(
+    provider: Provider,
+    opts: OAuthOpts = {}
+): Promise<void> {
     const supabase = await createSupabaseServerClient();
-    const redirectTo = getURL('/auth/callback');
+    const postLogin = opts.postLoginRedirect ?? '/member/account';
+    const callbackUrl = (opts.redirectTo ?? getURL('/auth/callback')) + `?next=${encodeURIComponent(postLogin)}`;
+
     const credentials: SignInWithOAuthCredentials = {
         provider,
         options: {
-            redirectTo
-        }
-    }
+            redirectTo: callbackUrl,
+            // Some IdPs respect OIDC prompt; this is a safe best‑effort for “force”
+            queryParams: opts.force ? { prompt: 'consent' } : undefined,
+        },
+    };
+
     const { data, error } = await supabase.auth.signInWithOAuth(credentials);
-    if (data.url) redirect(data.url)
-    logger.error(error);
-    if (error) throw new Error(error.message)
-    redirect(redirectUrl)
+
+    if (error) {
+        // log and bubble
+        logger.error(error);
+        throw new Error(error.message);
+    }
+
+    if (data?.url) {
+        // Normal path: hand control to the provider
+        redirect(data.url);
+    }
+
+    // Fallback: if no URL was returned (uncommon), go straight to the intended location
+    redirect(postLogin);
 }
 
 export async function signInWithPassword(email: string, password: string, redirectUrl = '/member'): Promise<AuthTokenResponsePassword> {

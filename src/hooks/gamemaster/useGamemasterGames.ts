@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import fetcher from "@/utils/fetcher";
 import {  GMGameSummaryDO, GMGameDO } from "@/lib/types/data-objects";
 import { useQueryClient } from "../useQueryClient";
+import logger from "@/utils/logger";
 
 export const useGamemasterGames = () => {
   const query = useQuery<GMGameSummaryDO[]>({
@@ -14,6 +15,7 @@ export const useGamemasterGames = () => {
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
+    refetch: query.refetch
   }
 };
 
@@ -28,6 +30,7 @@ export const useGamemasterGamesFull = () => {
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
+    refetch: query.refetch
   }
 }
 
@@ -52,6 +55,7 @@ export const useUpdateGameDetails = (id: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: any) => {
+      logger.debug("useUpdateGameDetails", payload);
       return await fetcher(`/api/gamemaster/games/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

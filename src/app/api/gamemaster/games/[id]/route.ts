@@ -81,7 +81,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
     interval: gameData.game_schedule[0].interval,
     dow: gameData.game_schedule[0].day_of_week,
     maxSeats: gameData.max_seats,
+    startingSeats: gameData.starting_seats,
     status: gameData.status,
+    content_warnings: gameData.content_warnings,
     schedStatus: gameData.game_schedule[0].status,
     location_id: gameData.game_schedule[0].location_id,
     location: gameData.game_schedule[0].location,
@@ -96,19 +98,35 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<Params> } ): Promise<NextResponse> {
-    if (request.method !== "PATCH") {
-        return NextResponse.json({ message: "Method not allowed" }, { status: 405 });
-    }
+  if (request.method !== "PATCH") {
+      return NextResponse.json({ message: "Method not allowed" }, { status: 405 });
+  }
 
-    const { id } = await params;
+  const { id } = await params;
 
-    const supabase = await createSupabaseServerClient();
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
 
-    const body = await request.json();
+  const body = await request.json();
 
-    const { title, description, system, interval, dayOfWeek, nextGameDate, maxSeats, location_id } = body;
+  logger.debug("Updating game", body);
+  const { 
+    title, 
+    description, 
+    max_seats: maxSeats,
+    starting_seats: startingSeats,
+    visibility,
+    cover_image: coverImage,
+    content_warnings,
+    system,
+    status, 
+    interval, 
+    day_of_week: dayOfWeek,
+    next_game_date: nextGameDate,
+    schedule_status:schedStatus,    
+    location_id 
+  } = body;
 
   try {
     const { error } = await supabase.from('games').update({
@@ -116,6 +134,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       description,
       system,
       max_seats: maxSeats,
+      starting_seats: startingSeats,
+      visibility,
+      cover_image: coverImage,
+      content_warnings,
+      status
     }).eq('id', id);
 
     if (error) {
@@ -128,6 +151,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         .update({
             interval,
             location_id,
+            status: schedStatus,
             first_game_date: nextGameDate,
             next_game_date: nextGameDate,
             day_of_week: dayOfWeek,

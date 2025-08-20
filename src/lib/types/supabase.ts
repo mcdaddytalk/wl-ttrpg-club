@@ -63,6 +63,13 @@ export type Database = {
             referencedRelation: "members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_admin_notes_author"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
         ]
       }
       admin_task_tags: {
@@ -157,6 +164,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "admin_tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
             foreignKeyName: "admin_tasks_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
@@ -169,6 +183,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -209,6 +230,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_reads_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -277,6 +305,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "announcements_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
             foreignKeyName: "announcements_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
@@ -289,6 +324,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcements_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -337,6 +379,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_audit_actor"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -389,6 +438,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broadcast_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -448,6 +504,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broadcast_recipients_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -585,6 +648,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "feedback_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
             foreignKeyName: "feedback_member_id_fkey"
             columns: ["member_id"]
             isOneToOne: false
@@ -597,6 +667,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -637,6 +714,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_favorites_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -709,6 +793,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "game_invites_gamemaster_id_fkey"
+            columns: ["gamemaster_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
             foreignKeyName: "game_invites_invitee_fkey"
             columns: ["invitee"]
             isOneToOne: false
@@ -721,6 +812,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_invites_invitee_fkey"
+            columns: ["invitee"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -775,6 +873,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_game_registrations_members"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
             foreignKeyName: "game_registrations_updated_by_fkey"
             columns: ["updated_by"]
             isOneToOne: false
@@ -788,6 +893,13 @@ export type Database = {
             referencedRelation: "members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "game_registrations_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
         ]
       }
       game_resources: {
@@ -796,12 +908,17 @@ export type Database = {
           body: string | null
           category: Database["public"]["Enums"]["resource_category"]
           created_at: string | null
+          created_by: string | null
           deleted_at: string | null
           deleted_by: string | null
           external_url: string | null
+          file_name: string | null
           file_url: string | null
+          game_id: string | null
           id: string
           pinned: boolean | null
+          resource_type: Database["public"]["Enums"]["resource_type"] | null
+          storage_path: string | null
           summary: string | null
           title: string
           updated_at: string | null
@@ -812,12 +929,17 @@ export type Database = {
           body?: string | null
           category?: Database["public"]["Enums"]["resource_category"]
           created_at?: string | null
+          created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
           external_url?: string | null
+          file_name?: string | null
           file_url?: string | null
+          game_id?: string | null
           id?: string
           pinned?: boolean | null
+          resource_type?: Database["public"]["Enums"]["resource_type"] | null
+          storage_path?: string | null
           summary?: string | null
           title: string
           updated_at?: string | null
@@ -828,12 +950,17 @@ export type Database = {
           body?: string | null
           category?: Database["public"]["Enums"]["resource_category"]
           created_at?: string | null
+          created_by?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
           external_url?: string | null
+          file_name?: string | null
           file_url?: string | null
+          game_id?: string | null
           id?: string
           pinned?: boolean | null
+          resource_type?: Database["public"]["Enums"]["resource_type"] | null
+          storage_path?: string | null
           summary?: string | null
           title?: string
           updated_at?: string | null
@@ -855,6 +982,34 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "game_resources_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "game_resources_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "game_resources_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_resources_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
             foreignKeyName: "game_resources_deleted_by_fkey"
             columns: ["deleted_by"]
             isOneToOne: false
@@ -866,6 +1021,20 @@ export type Database = {
             columns: ["deleted_by"]
             isOneToOne: false
             referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_resources_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "game_resources_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
             referencedColumns: ["id"]
           },
         ]
@@ -932,6 +1101,7 @@ export type Database = {
       }
       games: {
         Row: {
+          content_warnings: string | null
           cover_image: string
           created_at: string | null
           deleted_at: string | null
@@ -949,6 +1119,7 @@ export type Database = {
           visibility: Database["public"]["Enums"]["game_visibility"]
         }
         Insert: {
+          content_warnings?: string | null
           cover_image?: string
           created_at?: string | null
           deleted_at?: string | null
@@ -966,6 +1137,7 @@ export type Database = {
           visibility?: Database["public"]["Enums"]["game_visibility"]
         }
         Update: {
+          content_warnings?: string | null
           cover_image?: string
           created_at?: string | null
           deleted_at?: string | null
@@ -996,6 +1168,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_games_members"
+            columns: ["gamemaster_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -1029,6 +1208,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "location_perms_gamemaster_id_fkey"
+            columns: ["gamemaster_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
           {
             foreignKeyName: "location_perms_location_id_fkey"
@@ -1091,6 +1277,13 @@ export type Database = {
             referencedRelation: "members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "locations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
         ]
       }
       member_roles: {
@@ -1128,6 +1321,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "member_roles_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
             foreignKeyName: "member_roles_role_id_fkey"
             columns: ["role_id"]
             isOneToOne: false
@@ -1142,6 +1342,8 @@ export type Database = {
           created_at: string | null
           deleted_at: string | null
           deleted_by: string | null
+          deletion_reason: string | null
+          deletion_requested_at: string | null
           email: string
           id: string
           is_admin: boolean
@@ -1158,6 +1360,8 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          deletion_reason?: string | null
+          deletion_requested_at?: string | null
           email: string
           id?: string
           is_admin?: boolean
@@ -1174,6 +1378,8 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
+          deletion_reason?: string | null
+          deletion_requested_at?: string | null
           email?: string
           id?: string
           is_admin?: boolean
@@ -1246,6 +1452,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "messages_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
             foreignKeyName: "messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
@@ -1258,6 +1471,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
         ]
       }
@@ -1313,6 +1533,13 @@ export type Database = {
             referencedRelation: "members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_profiles_members"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
         ]
       }
       role_permissions: {
@@ -1363,41 +1590,41 @@ export type Database = {
         Row: {
           author_id: string
           body: string
-          created_at: string | null
+          created_at: string
           deleted_at: string | null
           game_id: string
           id: string
-          is_visible_to_players: boolean | null
+          is_visible_to_players: boolean
           schedule_id: string | null
           session_date: string
           title: string | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           author_id: string
-          body: string
-          created_at?: string | null
+          body?: string
+          created_at?: string
           deleted_at?: string | null
           game_id: string
           id?: string
-          is_visible_to_players?: boolean | null
+          is_visible_to_players?: boolean
           schedule_id?: string | null
           session_date: string
           title?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           author_id?: string
           body?: string
-          created_at?: string | null
+          created_at?: string
           deleted_at?: string | null
           game_id?: string
           id?: string
-          is_visible_to_players?: boolean | null
+          is_visible_to_players?: boolean
           schedule_id?: string | null
           session_date?: string
           title?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -1413,6 +1640,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
           },
           {
             foreignKeyName: "session_notes_game_id_fkey"
@@ -1465,6 +1699,77 @@ export type Database = {
         }
         Relationships: []
       }
+      session_notes_view: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          created_by: string | null
+          deleted_at: string | null
+          game_id: string | null
+          game_title: string | null
+          id: string | null
+          is_visible_to_players: boolean | null
+          schedule_id: string | null
+          session_date: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_notes_author_id_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "is_admin"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "session_notes_author_id_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_author_id_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_members_pending_hard_delete"
+            referencedColumns: ["member_id"]
+          },
+          {
+            foreignKeyName: "session_notes_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "game_schedule"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_members_pending_hard_delete: {
+        Row: {
+          deletion_requested_at: string | null
+          email: string | null
+          member_id: string | null
+        }
+        Insert: {
+          deletion_requested_at?: string | null
+          email?: string | null
+          member_id?: string | null
+        }
+        Update: {
+          deletion_requested_at?: string | null
+          email?: string | null
+          member_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       clean_expired_invites: {
@@ -1478,16 +1783,36 @@ export type Database = {
       get_announcement_recipients: {
         Args: { audience: string }
         Returns: {
-          id: string
           consent: boolean
+          id: string
         }[]
       }
       get_tag_counts: {
         Args: Record<PropertyKey, never>
         Returns: {
-          tag_id: string
           count: number
+          tag_id: string
         }[]
+      }
+      is_admin: {
+        Args: { uid: string }
+        Returns: boolean
+      }
+      is_gamemaster_for_game: {
+        Args: { game: string; uid: string }
+        Returns: boolean
+      }
+      is_gamemaster_of_game: {
+        Args: { game_id: string; uid: string }
+        Returns: boolean
+      }
+      is_member_of_game: {
+        Args: { game: string; uid: string }
+        Returns: boolean
+      }
+      is_soft_deleted: {
+        Args: { uid: string }
+        Returns: boolean
       }
       transfer_game_ownership: {
         Args: {
@@ -1513,6 +1838,14 @@ export type Database = {
         | "login"
         | "system"
         | "accept"
+        | "password_changed"
+        | "provider_linked"
+        | "provider_unlinked"
+        | "account_soft_deleted"
+        | "account_hard_deleted"
+        | "account_restored"
+        | "password_reset"
+        | "invite"
       category_enum:
         | "support"
         | "feedback"
@@ -1559,7 +1892,12 @@ export type Database = {
       gamemaster_interest_enum: "yes" | "no" | "maybe"
       location_type: "vtt" | "discord" | "physical"
       LocationScope: "admin" | "gm" | "disabled"
-      member_status: "active" | "inactive" | "pending" | "banned"
+      member_status:
+        | "active"
+        | "inactive"
+        | "pending"
+        | "banned"
+        | "soft_deleted"
       message_category_enum:
         | "general"
         | "system"
@@ -1578,6 +1916,7 @@ export type Database = {
         | "map"
         | "external"
         | "misc"
+      resource_type: "url" | "file"
       resource_visibility: "public" | "members" | "gamemasters" | "admins"
       task_priority: "low" | "medium" | "high" | "critical"
       task_status: "pending" | "in_progress" | "complete" | "archived"
@@ -1711,7 +2050,22 @@ export const Constants = {
       admin_note_target_type: ["member", "game", "announcement", "invite"],
       app_function: ["games", "members", "schedules", "messages"],
       app_permission: ["create", "read", "update", "delete"],
-      audit_action: ["create", "update", "delete", "login", "system", "accept"],
+      audit_action: [
+        "create",
+        "update",
+        "delete",
+        "login",
+        "system",
+        "accept",
+        "password_changed",
+        "provider_linked",
+        "provider_unlinked",
+        "account_soft_deleted",
+        "account_hard_deleted",
+        "account_restored",
+        "password_reset",
+        "invite",
+      ],
       category_enum: [
         "support",
         "feedback",
@@ -1757,7 +2111,13 @@ export const Constants = {
       gamemaster_interest_enum: ["yes", "no", "maybe"],
       location_type: ["vtt", "discord", "physical"],
       LocationScope: ["admin", "gm", "disabled"],
-      member_status: ["active", "inactive", "pending", "banned"],
+      member_status: [
+        "active",
+        "inactive",
+        "pending",
+        "banned",
+        "soft_deleted",
+      ],
       message_category_enum: [
         "general",
         "system",
@@ -1778,6 +2138,7 @@ export const Constants = {
         "external",
         "misc",
       ],
+      resource_type: ["url", "file"],
       resource_visibility: ["public", "members", "gamemasters", "admins"],
       task_priority: ["low", "medium", "high", "critical"],
       task_status: ["pending", "in_progress", "complete", "archived"],

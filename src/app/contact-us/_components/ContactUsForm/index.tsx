@@ -25,7 +25,7 @@ export function ContactUsForm() {
   });
 
   const onSubmit = async (data: ContactFormData) => {
-    const res = await fetch('/api/contact-us', {
+    const res = await fetch('/api/messaging/contact-us', {
       method: 'POST',
       body: JSON.stringify(data),
     });

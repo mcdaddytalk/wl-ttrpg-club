@@ -6,7 +6,7 @@ import { GameResourceFilters } from "@/components/GameResources/GameResourceFilt
 import { useRef, useState } from "react";
 import { GameResourceFilterParams } from "@/lib/validation/gameResources";
 import { GameResourcePreviewModal } from "@/components/modals/GameResourceModal";
-import { GameResourceDO } from "@/lib/types/custom";
+import { GameResourceDO } from "@/lib/types/data-objects";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -95,7 +95,7 @@ export default function MemberResourcesPage() {
                     {/* All Resources Section */}
                     <div ref={allResourcesRef}>
                       <h2 className="text-2xl font-semibold mb-4">All Resources</h2>
-                      <GameResourceList onSelect={handleOpenPreview} resources={rest} />
+                      <GameResourceList member onSelect={handleOpenPreview} resources={rest} />
                     </div>
                   </div>
                 )}

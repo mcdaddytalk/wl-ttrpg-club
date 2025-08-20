@@ -69,7 +69,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Me
         consent: memberData.consent,
         updated_by: memberData.updated_by,
         deleted_at: memberData.deleted_at,
-        deleted_by: memberData.deleted_by
+        deleted_by: memberData.deleted_by,
+        deletion_requested_at: memberData.deletion_requested_at,
+        deletion_reason: memberData.deletion_reason
     }
     
     return NextResponse.json(memberDO, { status: 200 })

@@ -19,6 +19,8 @@ export function serializeGMGameData(game: GMGameData): GMGameDO {
     interval: schedule?.interval ?? null,
     dow: schedule?.day_of_week ?? null,
     maxSeats: game.max_seats,
+    startingSeats: game.starting_seats,
+    content_warnings: game.content_warnings,
     status: game.status,
     schedStatus: schedule?.status ?? null,
     location_id: schedule?.location_id ?? null,

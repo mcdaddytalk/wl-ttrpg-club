@@ -7,9 +7,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { AnnouncementDO } from "@/lib/types/data-objects";
+import { Markdown } from "../Markdown";
 
 export const AnnouncementPreviewModal = ({
   isOpen,
@@ -33,7 +32,7 @@ export const AnnouncementPreviewModal = ({
           </DialogDescription>
         </DialogHeader>
         <div className="prose max-w-full pt-4">
-          <Markdown remarkPlugins={[remarkGfm]}>
+          <Markdown>
             {announcement.body}
           </Markdown>
         </div>

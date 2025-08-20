@@ -7,7 +7,7 @@ import { useGamemasterSessionNotes } from "@/hooks/gamemaster/useGamemasterSessi
 import { format } from "date-fns";
 
 export function SessionNotesCard() {
-  const { data: notes = [], isLoading } = useGamemasterSessionNotes();
+  const { notes = [], isLoading } = useGamemasterSessionNotes();
 
   return (
     <Card>

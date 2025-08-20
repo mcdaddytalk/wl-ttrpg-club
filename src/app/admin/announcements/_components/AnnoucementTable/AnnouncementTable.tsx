@@ -5,8 +5,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import {
   Card, CardContent, CardHeader,
   CardTitle,
@@ -34,6 +32,7 @@ import { AnnouncementPreviewModal } from '@/components/modals/AnnouncementPrevie
 import { AnnouncementDO } from '@/lib/types/data-objects';
 import { DataTableFilterField } from '@/lib/types/data-table';
 import { toSentenceCase } from '@/utils/helpers';
+import { Markdown } from '@/components/Markdown';
 
 const formSchema = z.object({
   id: z.string().optional(),
@@ -222,7 +221,7 @@ export default function AnnouncementsDashboard() {
                                 </Button>
                                 {previewing && (
                                     <div className="prose mt-2">
-                                        <Markdown remarkPlugins={[remarkGfm]}>{form.watch('body')}</Markdown>
+                                        <Markdown>{form.watch('body')}</Markdown>
                                     </div>
                                 )}
                             </div>

@@ -19,13 +19,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
     
     const contactUsData: ContactData = await request.json();
+    logger.debug('POST /api/messaging/contact-us received', contactUsData);
+    logger.debug(`POST website: ${contactUsData.website} - ${typeof contactUsData.website}`);
     if (contactUsData && contactUsData.website) {
         logger.warn('Spam submission detected', contactUsData);
         return NextResponse.json({ error: 'Spam detected' }, { status: 400 });
     }
     try {
         const { error } = await resend.emails.send({
-            from: 'WL-TTRPG <onboarding@kaje.org>',
+            from: 'WL-TTRPG <wl-ttrpg-contact-us@kaje.org>',
             to: ['kbtalkin+contact-us+wttrpg@gmail.com'],
             subject: 'New Contact Us Form Submission',
             react: ContactUsEmail({ ...contactUsData }),
@@ -36,6 +38,7 @@ export async function POST(request: Request): Promise<NextResponse> {
             return NextResponse.json({ error }, { status: 500 });
         }
         
+        delete contactUsData.website
         const supabase = await createSupabaseServerClient();
         const { data: submission, error: submissionError } = await supabase
             .from('contact_submissions')
