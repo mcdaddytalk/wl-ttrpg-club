@@ -40,9 +40,11 @@ function isPathMatch(pathname: string, prefixes: string[]) {
 }
 
 function isPublicPath(pathname: string) {
-  if (PUBLIC_PATHS.has(pathname)) return true;
-  // Treat assets & next internals as public – matcher also filters these
+  if (pathname === '/' || PUBLIC_PATHS.has(pathname)) return true;
+  if (CALLBACK_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) return true;
   if (pathname.startsWith('/_next/')) return true;
+  if (pathname.startsWith('/.well-known/')) return true;
+  if (pathname === '/robots.txt' || pathname === '/sitemap.xml' || pathname === '/manifest.json') return true;
   return false;
 }
 
@@ -72,6 +74,14 @@ export async function middleware(request: NextRequest) {
     });
 
     const { session } = await getInitialSession();
+
+    const { pathname } = request.nextUrl;
+    logger.debug('MW hit', {
+      pathname,
+      isPublic: isPublicPath(pathname),
+      isProtectedPage: isPathMatch(pathname, PROTECTED_PAGE_PREFIXES),
+      hasSession: !!session,
+    });
 
     // Rate limiting (as you had)
     const requestId = crypto.randomUUID();
@@ -110,8 +120,21 @@ export async function middleware(request: NextRequest) {
   const { session } = await getInitialSession();
   const { pathname } = request.nextUrl;
 
+  logger.debug('MW hit', {
+    pathname,
+    isPublic: isPublicPath(pathname),
+    isProtectedPage: isPathMatch(pathname, PROTECTED_PAGE_PREFIXES),
+    hasSession: !!session,
+  });
+
   // If the route is public, just pass through with the supabase-updated response.
   if (isPublicPath(pathname)) {
+    logger.debug('MW PublicPath Hit', {
+      pathname,
+      isPublic: isPublicPath(pathname),
+      isProtectedPage: isPathMatch(pathname, PROTECTED_PAGE_PREFIXES),
+      hasSession: !!session,
+    });
     return supaResp;
   }
 
@@ -175,6 +198,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Match everything except Next internals & static assets (your existing pattern)
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|\\.well-known/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
