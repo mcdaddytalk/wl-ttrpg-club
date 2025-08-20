@@ -1,4 +1,3 @@
-// import { GetMembersSchema } from "@/app/admin/_lib/validations";
 import { GetMembersSchema } from "@/app/admin/_lib/adminMembers";
 import { 
     // MemberData, 
@@ -64,26 +63,6 @@ export async function fetchMembersWithParams(
     .from("members")
     .select("*, profiles(*), member_roles(roles(*))", { count: "exact" })
     .range((page - 1) * pageSize, page * pageSize - 1);
-export async function fetchMembersWithParams(
-  supabase: TypedSupabaseClient,
-  params: GetMembersSchema
-): Promise<{ members: MemberDO[]; count: number }> {
-  const {
-    page,
-    pageSize,
-    sort,
-    email,
-    experienceLevel,
-    isAdmin,
-    isMinor,
-    status,
- //   filters,
-  } = params;
-
-  let query = supabase
-    .from("members")
-    .select("*, profiles(*), member_roles(roles(*))", { count: "exact" })
-    .range((page - 1) * pageSize, page * pageSize - 1);
 
   if (sort?.length) {
     sort.forEach(({ id, desc }) => {
@@ -127,7 +106,9 @@ export async function fetchMembersWithParams(
     consent: m.consent,
     last_login_at: m.last_login_at,
     deleted_at: m.deleted_at,
-    deleted_by: m.deleted_by
+    deleted_by: m.deleted_by,
+    deletion_requested_at: m.deletion_requested_at,
+    deletion_reason: m.deletion_reason
   }));
 
   return { members, count: count ?? 0 };

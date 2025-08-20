@@ -83,8 +83,6 @@ const GameImage: React.FC<GameImageProps> = ({
         );
     }
 
-    const variantClasses = variant === "small" ? "w-12 h-12" : variant === "banner" ? "w-full h-[180px] md:h-[240px] lg:h-[320px]" : "";
-
     return (
         <Image
             src={imageUrl}
