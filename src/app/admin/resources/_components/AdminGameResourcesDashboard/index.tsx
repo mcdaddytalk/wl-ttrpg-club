@@ -5,7 +5,7 @@ import { useAdminGameResources } from "@/hooks/admin/useAdminGameResources";
 import AdminGameResourcesTable from "../AdminGameResourcesTable";
 import { useState } from "react";
 import AdminGameResourceForm from "../AdminGameResourceForm";
-import { GameResourceDO } from "@/lib/types/custom";
+import { GameResourceDO } from "@/lib/types/data-objects";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
 
 export default function AdminGameResourcesDashboard() {

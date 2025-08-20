@@ -40,9 +40,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ message: "Invalid input", errors: result.error.format() }, { status: 400 });
     }
   
-    const insertData: Omit<GameResourceData, "id" | "created_at" | "updated_at" | "deleted_at" | "deleted_by"> = {
+    const insertData: Omit<GameResourceData, "id" | "created_at" | "updated_at" | "deleted_at" | "deleted_by" | "games" | "created_by_user"> = {
       ...result.data,
-      author_id: user.id
+      author_id: user.id,
     };
   
     const { data, error } = await supabase

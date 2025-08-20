@@ -37,13 +37,17 @@ export const TASK_STATUSES = ['pending', 'in_progress', 'complete', 'archived'] 
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 export const TASK_PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
 export type TaskPriority = (typeof TASK_PRIORITIES)[number];
-export const MEMBER_STATUSES = ['active', 'inactive', 'pending', 'banned'] as const;
+export const MEMBER_STATUSES = ['active', 'inactive', 'pending', 'banned', 'soft_deleted'] as const;
 export type MemberStatus = (typeof MEMBER_STATUSES)[number];
 export const INVITE_STATUSES = ['pending', 'accepted', 'expired', 'declined'] as const;
 export type InviteStatus = (typeof INVITE_STATUSES)[number];
 export const NOTE_TARGET_TYPE = ['member', 'game'] as const;
 export type NoteTargetType = (typeof NOTE_TARGET_TYPE)[number];
-export const AUDIT_ACTION = ["create", "update", "delete", "accept", "login", "system"] as const;
+export const AUDIT_ACTION = [
+  "create", "update", "delete", "accept", "login", "system", "invite", 
+  "password_changed", "password_reset", "provider_linked", "provider_unlinked",
+  "account_hard_deleted", "account_soft_deleted", "account_restored"
+] as const;
 export type AuditAction = (typeof AUDIT_ACTION)[number];
 export const FEEDBACK_CATEGORIES = ['bug', 'feature', 'praise', 'other'] as const;
 export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
@@ -51,6 +55,10 @@ export const RESOURCE_CATEGORIES = ['rules', 'lore', 'characters', 'map', 'exter
 export type ResourceCategory = (typeof RESOURCE_CATEGORIES)[number];
 export const RESOURCE_VISIBILITY = ['admins', 'gamemasters', 'members', 'public'] as const;
 export type ResourceVisibility = (typeof RESOURCE_VISIBILITY)[number];
+export const RESOURCE_TYPES = ['file', 'url'] as const;
+export type ResourceType = (typeof RESOURCE_TYPES)[number];
+export const PROVIDER_ALL = ['google', 'discord'] as const;
+export type ProvidersAll = (typeof PROVIDER_ALL)[number];
 
 /* Supabase Support Types */
 export type TypedSupabaseClient = SupabaseClient<Database>
@@ -170,6 +178,8 @@ export type MemberData = {
   updated_by: string;
   deleted_at: string | null;
   deleted_by: string;
+  deletion_requested_at: string | null;
+  deletion_reason: string | null;
   admin_notes: AdminNote[] | null;
   profiles: ProfileData;
   member_roles: RoleData[];
@@ -203,6 +213,11 @@ export type MessageData = {
 }
 export type SupabaseMessageListResponse = SupabaseDataResponse<MessageData>
 export type SupabaseMessageResponse = SupabaseDataResponseSingle<MessageData>
+
+export type OauthProvider = {
+  id: string;
+  provider: ProvidersAll;
+}
 
 export type GMGameSummary = {
   id: string;
@@ -358,8 +373,6 @@ export type FeedbackData = {
 }
 export type SupabaseFeedbackListResponse = SupabaseDataResponse<FeedbackData>
 export type SupabaseFeedbackResponse = SupabaseDataResponseSingle<FeedbackData>
-
-export type GameResourceDO = GameResourceData;
 export type GameResourceData = {
   id: string;
   title: string;
@@ -368,14 +381,24 @@ export type GameResourceData = {
   category: ResourceCategory;
   visibility: ResourceVisibility;
   external_url?: string;
-  file_url?: string;
+  file_name?: string;
+  download_url?: string;
   author_id: string;
   pinned: boolean;
   created_at: string;
   updated_at: string | null;
   deleted_at: string | null;
   deleted_by: string | null;
+  resource_type: ResourceType;
+  storage_path?: string | null;
+  game_id: string;
+  games?: GameData;
+  created_by: string;
+  created_by_user?: MemberData;
 }
+
+export type SupabaseGameResourceListResponse = SupabaseDataResponse<GameResourceData>
+export type SupabaseGameResourceResponse = SupabaseDataResponseSingle<GameResourceData>
 
 export type TaskDO = Omit<TaskData, "assigned_to" | "assigned_to_user" | "created_at" | "updated_at" | "deleted_at"> & {
   assigned_to: {
@@ -492,6 +515,7 @@ export type GMGameData = {
   max_seats: number;
   starting_seats: number;
   visibility: GameVisibility;
+  content_warnings: string;
   game_schedule: SupaGameScheduleData[];
   gamemaster_id: string;
   gamemaster: MemberData;
@@ -678,11 +702,12 @@ export type InviteStat = {
 export type GMSessionNoteDO = {
   id: string;
   game_id: string;
-  schedule_id: string;
-  author_id: string;
-  session_date: string;
-  title: string;
+  game_title?: string;
+  title: string | null;
   body: string;
+  session_date: string;
+  schedule_id: string | null;
+  created_by: string;    // alias of author_id from view
   is_visible_to_players: boolean;
   created_at: string;
   updated_at: string;

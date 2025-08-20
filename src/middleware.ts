@@ -1,13 +1,26 @@
 import { NextRequest , NextResponse} from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
-// import { createSupabaseReqResClient } from "./utils/supabase/server"
 import { getInitialSession } from "./server/authActions"
 import logger from "@/utils/logger"
 import { getClientIp, RATE_LIMIT } from "./utils/helpers"
-// import logger from "@/utils/logger"
-// import { RoleData, SupabaseRoleListResponse } from "./lib/types/custom";
+import { createClient } from "@supabase/supabase-js"
 
-const protectedApiRoutes = [
+// ====== CONFIG ======
+const LOGIN_PATH = '/login';
+const CALLBACK_PATHS = ['/auth/callback', '/verify-email', '/reset-password'];
+const PUBLIC_PATHS = new Set<string>([
+  '/', LOGIN_PATH, ...CALLBACK_PATHS,
+  '/about', '/contact', // (add any other fully public pages)
+]);
+
+const PROTECTED_PAGE_PREFIXES = [
+  '/member',
+  '/gamemaster',
+  '/admin',
+  '/games',        // adjust if some games pages are public
+];
+
+const PROTECTED_API_PREFIXES = [
   '/api/admin',
   '/api/broadcasts',
   '/api/gamemaster',
@@ -16,107 +29,152 @@ const protectedApiRoutes = [
   '/api/members',
   '/api/messages',
   '/api/messaging',
-  '/api/roles',  
-]
+  '/api/roles',
+];
 
+// ====== RATE-LIMIT MEMORY MAP (your existing) ======
 const rateLimitMap = new Map<string, { count: number; lastRequest: number }>();
 
-export async function middleware(request: NextRequest) {
-  await updateSession(request)
-  const response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
- 
-  const { session } = await getInitialSession();
+function isPathMatch(pathname: string, prefixes: string[]) {
+  return prefixes.some((p) => pathname === p || pathname.startsWith(p + '/'));
+}
 
-  if (protectedApiRoutes.some((path) => request.nextUrl.pathname.startsWith(path))) {
+function isPublicPath(pathname: string) {
+  if (PUBLIC_PATHS.has(pathname)) return true;
+  // Treat assets & next internals as public – matcher also filters these
+  if (pathname.startsWith('/_next/')) return true;
+  return false;
+}
+
+function buildLoginRedirectURL(req: NextRequest, toPath: string) {
+  const url = req.nextUrl.clone();
+  url.pathname = LOGIN_PATH;
+  const fullTarget = toPath + (req.nextUrl.search || '');
+  url.search = `?redirect=${encodeURIComponent(fullTarget)}`;
+  return url;
+}
+
+export async function middleware(request: NextRequest) {
+  // Let Supabase update/refresh cookies. Use its response as a base.
+  const supaResp = await updateSession(request);
+
+  // ===== 1) PROTECTED API HANDLING (unchanged, but using supaResp.headers) =====
+  if (isPathMatch(request.nextUrl.pathname, PROTECTED_API_PREFIXES)) {
+    const response = NextResponse.next({ request: { headers: request.headers } });
+
+    // Copy any Set-Cookie etc. from updateSession into this API response
+    supaResp.headers.forEach((val, key) => {
+      if (key.toLowerCase() === 'set-cookie') {
+        response.headers.append('set-cookie', val);
+      } else {
+        response.headers.set(key, val);
+      }
+    });
+
+    const { session } = await getInitialSession();
+
+    // Rate limiting (as you had)
     const requestId = crypto.randomUUID();
     const ip = getClientIp(request);
     logger.debug(`[${requestId}] Incoming request from IP: ${ip}`);
 
-    // ✅ Rate Limiting
     const rateLimitKey = `${ip}-${request.nextUrl.pathname}`;
     const now = Date.now();
     const rateData = rateLimitMap.get(rateLimitKey);
-
     if (rateData && now - rateData.lastRequest < RATE_LIMIT.timeWindow) {
       rateData.count += 1;
       if (rateData.count > RATE_LIMIT.maxRequests) {
         logger.warn(`[${requestId}] Rate limit exceeded for IP: ${ip}`);
-        return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
       }
     } else {
       rateLimitMap.set(rateLimitKey, { count: 1, lastRequest: now });
     }
 
-    const token = session?.access_token
-    // logger.debug('TOKEN', token)
+    const token = session?.access_token;
     if (!token) {
-      logger.error(`Unauthorized API request: ${request.nextUrl.pathname}`)
-      // logger.error(`Unauthorized API request: ${request.nextUrl.pathname}`)
-      response.headers.set('Authorization', '')
-      return new NextResponse('unauthorized', { status: 401 })
+      logger.error(`Unauthorized API request: ${request.nextUrl.pathname}`);
+      response.headers.set('Authorization', '');
+      return new NextResponse('unauthorized', { status: 401 });
     }
-    const headers = new Headers(request.headers)
-    headers.set("x-user-id", session.user.id);
-    headers.set("x-user-email", session.user.email ?? "");
+
+    const headers = new Headers(request.headers);
+    headers.set('x-user-id', session.user.id);
+    headers.set('x-user-email', session.user.email ?? '');
     headers.set('Authorization', `Bearer ${token}`);
 
-    return NextResponse.next({ headers })
+    return NextResponse.next({ headers });
   }
 
-  const url = request.nextUrl;
-  
-  // const { data: roleData, error: roleError } = await supabase.from('member_roles').select('roles(id, name)').eq('member_id', user?.id) as unknown as SupabaseRoleListResponse;
-  // if (roleError) {
-  //   logger.error('ROLE ERROR ', roleError)
-  // }
-  // if (!roleData) {
-  //   logger.error('NO ROLE DATA ', roleData)
-  // }
-  
-  // const roles = roleData ? (roleData as RoleData[])?.map((role) => role.roles.name) : [];
-  
+  // ===== 2) PAGE ROUTES: SESSION & REDIRECT LOGIC =====
+  const { session } = await getInitialSession();
+  const { pathname } = request.nextUrl;
+
+  // If the route is public, just pass through with the supabase-updated response.
+  if (isPublicPath(pathname)) {
+    return supaResp;
+  }
+
+  // If the path is a protected page and user is NOT logged in -> redirect to /login?redirect=<full-path>
+  if (isPathMatch(pathname, PROTECTED_PAGE_PREFIXES) && !session) {
+    const loginURL = buildLoginRedirectURL(request, pathname);
+    return NextResponse.redirect(loginURL);
+  }
+
+  if (isPathMatch(pathname, PROTECTED_PAGE_PREFIXES) && session) {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { global: { headers: { Authorization: `Bearer ${session?.access_token}` } } }
+    ) 
+
+    const { data: m } = await supabase
+      .from('members')
+      .select('status')
+      .eq('id', session?.user.id)
+      .single();
+
+    if (m?.status === 'soft_deleted' && !pathname.startsWith('/member/account')) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/member/account';
+      url.searchParams.set('restore', '1');
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // ===== 3) ROLE-BASED GATING (same logic as yours, after we know we have a session) =====
   let roles: string[] = [];
   if (session) {
     roles = session.user.user_metadata.roles || [];
   }
 
-  // Role based redirect
-  // Array of restricted paths and role requirements
   const restrictedPaths = [
     { path: '/member', role: 'member' },
     { path: '/games', role: ['member', 'gamemaster', 'admin'] },
     { path: '/gamemaster', role: ['admin', 'gamemaster'] },
     { path: '/admin', role: 'admin' },
-    { path: '/account', role: 'superadmin' }
+    { path: '/account', role: 'superadmin' },
   ];
 
-  // Check if the current path is restricted
   for (const restricted of restrictedPaths) {
-    if (url.pathname.startsWith(restricted.path)) {
-      // Role check for the current restricted path
+    if (pathname === restricted.path || pathname.startsWith(restricted.path + '/')) {
       const requiredRoles = Array.isArray(restricted.role) ? restricted.role : [restricted.role];
-      if (!roles || !roles.some(role => requiredRoles.includes(role))) {
-        return NextResponse.redirect(new URL('/unauthorized', url));
+      if (!roles.some((r) => requiredRoles.includes(r))) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/unauthorized';
+        url.search = '';
+        return NextResponse.redirect(url);
       }
     }
   }
-  
-  return NextResponse.next();
+
+  // Pass through with supabase-updated response (keeps Set-Cookie headers)
+  return supaResp;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Match everything except Next internals & static assets (your existing pattern)
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
-}
+};

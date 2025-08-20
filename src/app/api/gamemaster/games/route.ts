@@ -31,7 +31,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         status,
         max_seats,
         visibility,
-        starting_seats, 
+        starting_seats,
+        content_warnings,
         gamemaster: members!fk_games_members (
           id,
           profiles (
@@ -141,8 +142,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       interval: game.game_schedule[0]?.interval,
       dow: game.game_schedule[0]?.day_of_week as DOW,
       maxSeats: game.max_seats as number,
-      visibility: game.visibility,
       startingSeats: game.starting_seats as number,
+      content_warnings: game.content_warnings ?? '',
+      visibility: game.visibility,
       status: game.status,
       schedStatus: game.game_schedule[0]?.status,
       location_id: game.game_schedule[0]?.location_id,

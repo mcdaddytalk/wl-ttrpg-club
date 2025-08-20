@@ -10,9 +10,6 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { cn } from '@/lib/utils';
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import { useQueryClient } from '@/hooks/useQueryClient';
@@ -33,6 +30,8 @@ import {
   parseAsBoolean,
   parseAsString,
 } from 'nuqs';
+import { cn } from '@/lib/utils';
+import { Markdown } from './Markdown';
 
 dayjs.extend(relativeTime);
 
@@ -140,7 +139,7 @@ export default function PaginatedAnnouncementList() {
                 Published {dayjs(a.published_at).fromNow()} ago
               </div>
               <div className={cn('prose max-w-none', !isExpanded && isExpandable && 'line-clamp-5')}>
-                <Markdown remarkPlugins={[remarkGfm]}>{bodyToRender}</Markdown>
+                <Markdown>{bodyToRender}</Markdown>
               </div>
               {isExpandable && (
                 <div className="mt-2 text-sm text-blue-600">
@@ -177,7 +176,7 @@ export default function PaginatedAnnouncementList() {
             </Select>
             <Button
               variant={showUnreadOnly ? "default" : "outline"}
-              onClick={() => setShowUnreadOnly((prev) => !prev)}
+              onClick={() => setShowUnreadOnly((prev: any) => !prev)}
             >
               {showUnreadOnly ? "Show All" : "Show Unread Only"}
             </Button>
@@ -232,13 +231,13 @@ export default function PaginatedAnnouncementList() {
           </div>
         )} 
         <div className="flex justify-between items-center pt-2">
-          <Button variant="ghost" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>
+          <Button variant="ghost" onClick={() => setPage((p: number) => Math.max(0, p - 1))} disabled={page === 0}>
             Previous
           </Button>
           <span className="text-sm text-muted-foreground">
             Page {page + 1} of {totalPages || 1}
           </span>
-          <Button variant="ghost" onClick={() => setPage((p) => p + 1)} disabled={page + 1 >= totalPages}>
+          <Button variant="ghost" onClick={() => setPage((p: number) => p + 1)} disabled={page + 1 >= totalPages}>
             Next
           </Button>
         </div>       

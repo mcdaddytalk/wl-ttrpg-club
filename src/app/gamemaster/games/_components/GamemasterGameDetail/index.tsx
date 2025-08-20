@@ -6,6 +6,7 @@ import { useGameDetails } from "@/hooks/gamemaster/useGamemasterGames";
 import GameDetailsEditor from "../GameDetailsEditor";
 import InvitedPlayersManager from "../InvitePlayerManager";
 import RegisteredPlayersManager from "../RegisteredPlayersManager";
+import { useGamemasterLocations } from "@/hooks/gamemaster/useGamemasterLocations";
 
 
 interface GamemasterGameDetailProps {
@@ -15,6 +16,7 @@ interface GamemasterGameDetailProps {
 export default function GamemasterGameDetail({ gameId }: GamemasterGameDetailProps) {
   // Fetch game details
   const { data: game, isLoading: isGameLoading } = useGameDetails(gameId);
+  const { locations } = useGamemasterLocations({ onlyActive: true });
   const { data: invites, refetch: refreshInvites } = useGamemasterInvites(gameId);
   const { data: registrants, refetch: refreshRegistrants } = useGameRegistrants(gameId);
   
@@ -25,7 +27,7 @@ export default function GamemasterGameDetail({ gameId }: GamemasterGameDetailPro
   return (
     <section className="space-y-6 p-4">
       <div className="bg-white rounded-lg shadow-md p-6">
-        <GameDetailsEditor game={game} />
+        <GameDetailsEditor game={game} locations={locations} />
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">

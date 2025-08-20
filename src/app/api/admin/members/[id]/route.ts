@@ -23,8 +23,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
     const { data: memberData, error } = await supabase
         .from('members')
         .select(`
-            id, email, phone, provider, status, is_admin, is_minor, consent, created_at, updated_at, last_login_at,
-            deleted_at, updated_by, deleted_by,
+            *,
             profiles(*),
             member_roles(
                 roles(
@@ -61,6 +60,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
             deleted_at: memberData.deleted_at,
             updated_by: memberData.updated_by,
             deleted_by: memberData.deleted_by,
+            deletion_requested_at: memberData.deletion_requested_at,
+            deletion_reason: memberData.deletion_reason,
             bio: memberData.profiles.bio ?? '',
             avatar: memberData.profiles.avatar ?? '',
             admin_notes: memberData.admin_notes,

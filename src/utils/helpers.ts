@@ -1,4 +1,4 @@
-import { DaysOfWeek, DOW, GameData, GameInterval } from "@/lib/types/custom";
+import { DaysOfWeek, DOW, GameData, GameInterval, ProfileData } from "@/lib/types/custom";
 import { ENVS } from "@/utils/constants/envs"
 import { NextRequest } from "next/server";
 import dayjs from 'dayjs';
@@ -74,6 +74,28 @@ export function formatRelativeDate(
 
   return parsed.from(from);
 }
+
+/**
+ * Convert an ISO/timestamptz string or Date to a "YYYY-MM-DDTHH:mm" local string
+ * suitable for <input type="datetime-local">.
+ *
+ * @param input ISO string | Date | null/undefined
+ * @param tz Optional IANA timezone (e.g., "America/Chicago").
+ *           If provided, formats in that zone; otherwise uses the user's local time.
+ */
+export function toDatetimeLocal(input?: string | Date | null, tz?: string): string {
+  if (!input) return "";
+
+  const d = typeof input === "string" ? dayjs(input) : dayjs(input);
+  if (!d.isValid()) return "";
+
+  const inZone = tz ? d.tz(tz) : d.local();
+  return inZone.format("YYYY-MM-DDTHH:mm");
+}
+
+export function fromDatetimeLocal(value: string): string {
+    return dayjs(value).toISOString()
+  }
 
 export function formatRecurrence(interval?: string, dayOfWeek?: DOW): string {
   const label = dayOfWeek ? toSentenceCase(dayOfWeek) : "Unscheduled"
@@ -211,15 +233,7 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
         return 'bg-muted text-muted-foreground';
     }
   }
-
-  export const toDatetimeLocal = (value?: string | null): string => {
-    return value ? dayjs(value).format("YYYY-MM-DDTHH:mm") : ""
-  }
-
-  export function fromDatetimeLocal(value: string): string {
-    return dayjs(value).toISOString()
-  }
-
+  
   export const statusBadge = (status: string): string => {
       switch (status) {
         case "draft": return "bg-yellow-100 text-yellow-800 border border-yellow-300"
@@ -285,7 +299,7 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
       .trim()
   }
 
-  
+  export function capitalize(s: string) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
   
   export const seatsAvailable = (game: GameData) => {
       if (game.currentSeats === null) return "N/A";
@@ -293,3 +307,11 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
       if (game.maxSeats - game.currentSeats === 0) return "Full";
       return `${game.currentSeats} / ${game.maxSeats}`;
   };
+
+export function getDisplayName(profile: Partial<ProfileData>): string {
+  const given = profile.given_name?.trim() || "";
+  const surname = profile.surname?.trim() || "";
+
+  if (given && surname) return `${given} ${surname}`;
+  return given || surname || "Unknown Member";
+}

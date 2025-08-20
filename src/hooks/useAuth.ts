@@ -21,7 +21,7 @@ interface AuthContext {
     error: string | null;
     signOut: () => Promise<void>;
     signInWithOTP: (email: string) => Promise<void>;
-    signInWithProvider: (provider: Provider) => Promise<void>;
+    signInWithProvider: (provider: Provider, opts?: { redirectTo?: string; force?: boolean }) => Promise<void>;
     signInWithPassword: (email: string, password: string) => Promise<void>;
     clearError: () => void;
     // Add more auth-related functions here if needed    
@@ -79,9 +79,9 @@ export function useAuth(): AuthContext {
         }
       }, [refreshSession]);
     
-      const handleSignInWithProvider = useCallback(async (provider: 'discord' | 'google') => {
+      const handleSignInWithProvider = useCallback(async (provider: Provider, opts?: { redirectTo?: string; force?: boolean }) => {
         try {
-          await signInWithProvider(provider);
+          await signInWithProvider(provider, opts);
           setError(null);
           await refreshSession(); // Refresh session state after sign-in
         } catch (error: unknown) {

@@ -64,6 +64,26 @@ export async function fetchMembersWithParams(
     .from("members")
     .select("*, profiles(*), member_roles(roles(*))", { count: "exact" })
     .range((page - 1) * pageSize, page * pageSize - 1);
+export async function fetchMembersWithParams(
+  supabase: TypedSupabaseClient,
+  params: GetMembersSchema
+): Promise<{ members: MemberDO[]; count: number }> {
+  const {
+    page,
+    pageSize,
+    sort,
+    email,
+    experienceLevel,
+    isAdmin,
+    isMinor,
+    status,
+ //   filters,
+  } = params;
+
+  let query = supabase
+    .from("members")
+    .select("*, profiles(*), member_roles(roles(*))", { count: "exact" })
+    .range((page - 1) * pageSize, page * pageSize - 1);
 
   if (sort?.length) {
     sort.forEach(({ id, desc }) => {

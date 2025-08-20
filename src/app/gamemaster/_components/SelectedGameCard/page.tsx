@@ -27,7 +27,9 @@ const SelectedGameCard = ({ game, children, onClick }: SelectedGameCardProps): R
                         <GameImage 
                             src={game.coverImage} 
                             alt={game.title}
-                            system={game.system} 
+                            system={game.system}
+                            highPriority
+                            variant="banner"
                             width={400} 
                             height={200} 
                             className="rounded-lg object-cover cursor-pointer"

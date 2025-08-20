@@ -64,7 +64,9 @@ export async function GET(request: NextRequest) {
         last_login_at: gamemaster.last_login_at,
         deleted_at: gamemaster.deleted_at,
         updated_by: gamemaster.updated_by,
-        deleted_by: gamemaster.deleted_by
+        deleted_by: gamemaster.deleted_by,
+        deletion_requested_at: gamemaster.deletion_requested_at,
+        deletion_reason: gamemaster.deletion_reason
     }));
 
     gamemasterList.sort((a, b) => a.surname.localeCompare(b.surname));

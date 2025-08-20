@@ -1,6 +1,6 @@
 "use client";
 
-import { GameResourceDO } from "@/lib/types/custom";
+import { GameResourceDO } from "@/lib/types/data-objects";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

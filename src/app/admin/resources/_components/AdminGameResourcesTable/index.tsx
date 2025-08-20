@@ -4,14 +4,15 @@ import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/DataTable/data-table";
 import { DataTableToolbar } from "@/components/DataTable/data-table-toolbar";
 import { DataTableSkeleton } from "@/components/DataTable/data-table-skeleton";
-import { GameResourceDO, RESOURCE_CATEGORIES } from "@/lib/types/custom";
+import { RESOURCE_CATEGORIES } from "@/lib/types/custom";
 import { getColumns } from "./columns";
 import { DataTableFilterField } from "@/lib/types/data-table";
 import { toSentenceCase } from "@/utils/helpers";
-import { useDeleteGameResource } from "@/hooks/admin/useAdminGameResources";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { GameResourcePreviewModal } from "@/components/modals/GameResourceModal";
 import { useState } from "react";
+import { GameResourceDO } from "@/lib/types/data-objects";
+import { useAdminDeleteGameResource } from "@/hooks/admin/useAdminGameResources";
 
 interface Props {
   data: GameResourceDO[];
@@ -26,7 +27,7 @@ export default function AdminGameResourcesTable({ data, isLoading, onEdit }: Pro
     const handleDelete = (resource: GameResourceDO) => setResourceToDelete(resource);
     const handlePreview = (resource: GameResourceDO) => setPreviewing(resource);
     
-    const { mutate: deleteResource } = useDeleteGameResource();
+    const { mutate: deleteResource } = useAdminDeleteGameResource();
     const filterFields: DataTableFilterField<GameResourceDO>[] = [
         {
         id: "title",

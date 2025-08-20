@@ -56,7 +56,12 @@ export default function Login() {
 
     const handleProviderLogin = async (provider: Provider) => {
         setLoading(true);
-        await signInWithProvider(provider, redirect);
+        await signInWithProvider(
+          provider,
+          {
+            postLoginRedirect: redirect,
+          }
+        );
         setLoading(false);
     };
   return (

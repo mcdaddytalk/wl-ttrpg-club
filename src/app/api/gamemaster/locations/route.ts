@@ -43,7 +43,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const locationIds = permData.map((p) => p.location_id);
 
   if (!locationIds?.length) {
-    logger.warn("No locationIds provided");
+    logger.warn("No locationIds returned from permission check");
     return NextResponse.json({ message: "Missing location IDs" }, { status: 400 });
   }
 
@@ -80,7 +80,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 
   if (onlyActive) {
-      query = query.eq("scope", "gm").is("deleted_at", null);
+      // query = query.eq("scope", "gm").is("deleted_at", null);
+      query = query.is("deleted_at", null);
   }
 
   query = query.range(offset, offset + pageSize - 1);

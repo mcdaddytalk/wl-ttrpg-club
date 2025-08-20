@@ -20,8 +20,10 @@ export function GameResourceFilters({ filters, onChange }: GameResourceFiltersPr
         );
 
     return (
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4">
             <Input
+                type="search"
+                id="search-resources"
                 placeholder="Search resources..."
                 value={debouncedSearch}
                 onChange={(e) => setSearch(e.target.value)}

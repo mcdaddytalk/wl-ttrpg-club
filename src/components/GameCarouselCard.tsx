@@ -42,6 +42,7 @@ const GameCarouselCard = ({ game, onToggleFavorite, className }: GameCarouselCar
                         src={game.coverImage} 
                         alt={game.title}
                         system={game.system} 
+                        highPriority
                         width={400} 
                         height={200} 
                         className="w-full h-auto" 

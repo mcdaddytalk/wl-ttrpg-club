@@ -8,12 +8,19 @@ export async function fetcher<T>(
     const fullUrl = params ? `${url}?${params.toString()}` : url;
 
     logger.debug(`API Request: ${fullUrl}`);
+
+    const isFormData = options?.body instanceof FormData;
+    const headers = isFormData
+      ? options.headers
+      : { "Content-Type": "application/json", ...options?.headers };
+
+    if (isFormData) {
+      logger.debug(`API Request Body: ${options?.body?.toString()}`);
+      logger.debug(`API Request Headers: ${JSON.stringify(headers)}`);
+    }
     const response = await fetch(fullUrl, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options?.headers,
-      },
+      headers
     });
   
     logger.debug(`API Response: ${response.status} ${response.statusText}`);
