@@ -1,4 +1,4 @@
-import { GetMembersSchema } from "@/app/admin/_lib/adminMembers";
+import { GetMembersSchema } from "@/app/admin/_lib/validations";
 import { 
     // MemberData, 
     TypedSupabaseClient 
