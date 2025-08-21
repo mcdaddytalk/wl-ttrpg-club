@@ -20,10 +20,13 @@ import { SignupOAuthButtons } from "@/components/SignupOAuthButtons";
 import { signInWithProvider } from "@/server/authActions";
 import { toast } from "sonner";
 import { Provider } from "@/lib/types/custom";
-import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SelectItem } from "@radix-ui/react-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import logger from '@/utils/logger';
+import dayjs from "dayjs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 
 // Regular expression for password and phone validation
 const passwordValidation = new RegExp(
@@ -102,6 +105,13 @@ export default function Signup() {
     }
   }, [inviteEmail, form]);
 
+  useEffect(() => {
+    const phone = form.getValues('phone');
+    if (!form.getValues('preferredContact')) {
+      form.setValue('preferredContact', phone ? 'phone' : 'email', { shouldValidate: true });
+    }
+  }, [form]);
+
   const handleSignup = async (data: SignupFormData) => {
     setLoading(true);
     try {
@@ -174,7 +184,12 @@ export default function Signup() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSignup)} className="space-y-4">
+            <form 
+              onSubmit={form.handleSubmit(handleSignup)} 
+              className="space-y-4"
+              autoComplete="on"
+              name="signupForm"
+            >
                 <FormField
                     name="email"
                     control={form.control}
@@ -182,11 +197,15 @@ export default function Signup() {
                     <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                        <Input 
-                            autoComplete="email" 
-                            type="email" 
-                            placeholder="johndoe@example.com" 
-                            {...field} 
+                        <Input
+                          id="email"
+                          inputMode="email"
+                          autoCapitalize="off"
+                          autoCorrect="off"
+                          autoComplete="username" 
+                          type="email" 
+                          placeholder="johndoe@example.com" 
+                          {...field} 
                         />
                         </FormControl>
                         <FormMessage />
@@ -200,8 +219,10 @@ export default function Signup() {
                     <FormItem>
                       <FormLabel>Phone Number (optional)</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="tel" 
+                        <Input
+                          id="phone" 
+                          type="tel"
+                          inputMode="tel" 
                           placeholder="+1234567890" 
                           autoComplete="tel" 
                           {...field} 
@@ -223,7 +244,10 @@ export default function Signup() {
                           onValueChange={(fieldValue) => field.onChange(fieldValue)}
                           defaultValue={field.value || ""}
                         >
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger 
+                            className="w-full"
+                            aria-label="Preferred contact"
+                          >
                             <SelectValue placeholder="Select an option" />
                           </SelectTrigger>
                           <SelectContent
@@ -269,8 +293,10 @@ export default function Signup() {
                     <FormItem>
                         <FormLabel>First Name</FormLabel>
                         <FormControl>
-                            <Input 
-                                placeholder="First Name" 
+                            <Input
+                                id="given-name"
+                                autoCapitalize="words"
+                                placeholder="Given Name" 
                                 autoComplete="given-name" 
                                 {...field}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -288,6 +314,8 @@ export default function Signup() {
                         <FormLabel>Last Name</FormLabel>
                         <FormControl>
                             <Input 
+                                id="family-name"
+                                autoCapitalize="words"
                                 placeholder="Surname" 
                                 autoComplete="family-name" 
                                 {...field} 
@@ -299,23 +327,75 @@ export default function Signup() {
                     )}
                 />
                 <FormField
-                    name="birthday"
-                    control={form.control}
-                    render={({ field }) => (
-                    <FormItem>
+                  name="birthday"
+                  control={form.control}
+                  render={({ field }) => {
+                    const value = field.value ?? ""; // expecting "YYYY-MM-DD"
+                    const selectedDate = value ? dayjs(value, "YYYY-MM-DD", true).toDate() : undefined;
+
+                    return (
+                      <FormItem>
                         <FormLabel>Birthday</FormLabel>
-                        <FormControl>
-                            <Input 
-                                type="date"
-                                autoComplete="bday" 
-                                {...field}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        <div className="flex gap-2">
+                          <FormControl className="flex-1">
+                            <Input
+                              id="bday"
+                              // TEXT INPUT so mobile can type:
+                              type="text"
+                              inputMode="numeric"
+                              autoComplete="bday"
+                              placeholder="YYYY-MM-DD"
+                              pattern="\d{4}-\d{2}-\d{2}"
+                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              value={value}
+                              onChange={(e) => {
+                                const next = e.target.value;
+                                // optionally auto-correct common formats like YYYY/MM/DD or MM-DD-YYYY here
+                                field.onChange(next);
+                              }}
+                              onBlur={(e) => {
+                                const v = e.target.value.trim();
+                                if (!v) return;
+                                // normalize to YYYY-MM-DD if we can parse it
+                                const parsed =
+                                  dayjs(v, "YYYY-MM-DD", true).isValid()
+                                    ? dayjs(v, "YYYY-MM-DD")
+                                    : dayjs(v.replaceAll("/", "-")); // tiny normalization affordance
+                                if (parsed.isValid()) {
+                                  field.onChange(parsed.format("YYYY-MM-DD"));
+                                }
+                              }}
                             />
-                        </FormControl>
+                          </FormControl>
+
+                          {/* Calendar button for tap/click selection */}
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button type="button" variant="outline" className="shrink-0">
+                                <CalendarIcon className="size-4" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="p-0">
+                              <Calendar
+                                mode="single"
+                                selected={selectedDate}
+                                // prevent picking a future date, matches your Zod refine
+                                disabled={(date) => date > new Date()}
+                                onSelect={(date) => {
+                                  if (!date) return;
+                                  const iso = dayjs(date).format("YYYY-MM-DD");
+                                  field.onChange(iso);
+                                }}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                         <FormMessage />
-                    </FormItem>
-                    )}
-                />
+                      </FormItem>
+                    );
+                  }}
+                />                
                 <FormField
                     name="password"
                     control={form.control}
@@ -323,8 +403,10 @@ export default function Signup() {
                     <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                        <Input 
+                        <Input
+                            id="new-password"
                             type="password" 
+                            autoComplete="new-password"
                             placeholder="*********" 
                             {...field} 
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -342,7 +424,9 @@ export default function Signup() {
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
                         <Input 
+                            id="new-password-confirm"
                             type="password" 
+                            autoComplete="new-password"
                             placeholder="*********" 
                             {...field} 
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

@@ -2,7 +2,7 @@ import { NextRequest , NextResponse} from "next/server"
 import { updateSession } from "@/utils/supabase/middleware"
 import { getInitialSession } from "./server/authActions"
 import logger from "@/utils/logger"
-import { getClientIp, RATE_LIMIT } from "./utils/helpers"
+import { getClientIp, PUBLIC_RATE_LIMIT, RATE_LIMIT, rateLimitMap } from "./utils/helpers"
 import { createClient } from "@supabase/supabase-js"
 
 // ====== CONFIG ======
@@ -32,11 +32,66 @@ const PROTECTED_API_PREFIXES = [
   '/api/roles',
 ];
 
-// ====== RATE-LIMIT MEMORY MAP (your existing) ======
-const rateLimitMap = new Map<string, { count: number; lastRequest: number }>();
+const PUBLIC_API_EXCEPTIONS = [
+  '/api/messaging/new-contact',
+  '/api/messaging/contact-us',
+];
+
+let lastSweep = Date.now();
+function maybeSweep() {
+  const now = Date.now();
+  if (now - lastSweep < 5 * 60_000) return; // every 5 min
+  lastSweep = now;
+  for (const [k, v] of rateLimitMap.entries()) {
+    if (now - v.windowStart > 10 * 60_000) rateLimitMap.delete(k);
+  }
+}
 
 function isPathMatch(pathname: string, prefixes: string[]) {
   return prefixes.some((p) => pathname === p || pathname.startsWith(p + '/'));
+}
+
+function isApiPath(pathname: string) {
+  return pathname === '/api' || pathname.startsWith('/api/');
+}
+
+// Build a stable key: IP + path
+function makeRateKeyPublicApi(ip: string, method: string, pathname: string) {
+  // If you want coarser limiting (per-IP across all public API), drop pathname
+  return `pubapi:${ip}:${method}:${pathname}`;
+}
+
+function hitPublicApiLimiter(key: string) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(key);
+
+  if (!entry) {
+    rateLimitMap.set(key, { count: 1, windowStart: now });
+    return { allowed: true, remaining: PUBLIC_RATE_LIMIT.maxRequests - 1, resetInMs: PUBLIC_RATE_LIMIT.timeWindow };
+  }
+
+  // new window?
+  if (now - entry.windowStart >= PUBLIC_RATE_LIMIT.timeWindow) {
+    entry.count = 1;
+    entry.windowStart = now;
+    return { allowed: true, remaining: PUBLIC_RATE_LIMIT.maxRequests - 1, resetInMs: PUBLIC_RATE_LIMIT.timeWindow };
+  }
+
+  // same window
+  entry.count += 1;
+  const remaining = Math.max(PUBLIC_RATE_LIMIT.maxRequests - entry.count, 0);
+  const resetInMs = PUBLIC_RATE_LIMIT.timeWindow - (now - entry.windowStart);
+
+  maybeSweep();
+
+  return { allowed: entry.count <= PUBLIC_RATE_LIMIT.maxRequests, remaining, resetInMs };
+}
+
+function isProtectedApi(pathname: string) {
+  if (PUBLIC_API_EXCEPTIONS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+    return false;
+  }
+  return isPathMatch(pathname, PROTECTED_API_PREFIXES);
 }
 
 function isPublicPath(pathname: string) {
@@ -59,9 +114,37 @@ function buildLoginRedirectURL(req: NextRequest, toPath: string) {
 export async function middleware(request: NextRequest) {
   // Let Supabase update/refresh cookies. Use its response as a base.
   const supaResp = await updateSession(request);
+  const { pathname } = request.nextUrl;
+
+  // Apply rate limit to PUBLIC API endpoints only
+  if (isApiPath(pathname) && !isProtectedApi(pathname)) {
+    const ip = getClientIp(request);        // your helper already exists
+    const key = makeRateKeyPublicApi(ip, request.method, pathname);
+    const { allowed, remaining, resetInMs } = hitPublicApiLimiter(key);
+
+    if (!allowed) {
+      const retryAfter = Math.ceil(resetInMs / 1000).toString();
+      const res = NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+      res.headers.set('Retry-After', retryAfter);
+      // Optional visibility for diagnostics:
+      res.headers.set('X-RateLimit-Limit', String(PUBLIC_RATE_LIMIT.maxRequests));
+      res.headers.set('X-RateLimit-Remaining', '0');
+      return res;
+    } else {
+      // (Optional) add rate headers for observability
+      const res = NextResponse.next();
+      res.headers.set('X-RateLimit-Limit', String(PUBLIC_RATE_LIMIT.maxRequests));
+      res.headers.set('X-RateLimit-Remaining', String(remaining));
+      // If you need the Set-Cookie from supaResp, merge it (same as you do below):
+      supaResp.headers.forEach((val, key) => {
+        if (key.toLowerCase() === 'set-cookie') res.headers.append('set-cookie', val);
+      });
+      return res;
+    }
+  }
 
   // ===== 1) PROTECTED API HANDLING (unchanged, but using supaResp.headers) =====
-  if (isPathMatch(request.nextUrl.pathname, PROTECTED_API_PREFIXES)) {
+  if (isProtectedApi(pathname)) {
     const response = NextResponse.next({ request: { headers: request.headers } });
 
     // Copy any Set-Cookie etc. from updateSession into this API response
@@ -75,7 +158,6 @@ export async function middleware(request: NextRequest) {
 
     const { session } = await getInitialSession();
 
-    const { pathname } = request.nextUrl;
     logger.debug('MW hit', {
       pathname,
       isPublic: isPublicPath(pathname),
@@ -88,17 +170,18 @@ export async function middleware(request: NextRequest) {
     const ip = getClientIp(request);
     logger.debug(`[${requestId}] Incoming request from IP: ${ip}`);
 
-    const rateLimitKey = `${ip}-${request.nextUrl.pathname}`;
+    const rateLimitKey = `protapi:${ip}:${request.method}:${pathname}`;
     const now = Date.now();
     const rateData = rateLimitMap.get(rateLimitKey);
-    if (rateData && now - rateData.lastRequest < RATE_LIMIT.timeWindow) {
+    if (!rateData || now - rateData.windowStart >= RATE_LIMIT.timeWindow) {
+      rateLimitMap.set(rateLimitKey, { count: 1, windowStart: now });
+    } else {
       rateData.count += 1;
       if (rateData.count > RATE_LIMIT.maxRequests) {
-        logger.warn(`[${requestId}] Rate limit exceeded for IP: ${ip}`);
+        logger.warn(`[${requestId}] Rate limit exceeded for IP: ${ip} Path: ${pathname}`);
         return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
       }
-    } else {
-      rateLimitMap.set(rateLimitKey, { count: 1, lastRequest: now });
+      maybeSweep();
     }
 
     const token = session?.access_token;
@@ -108,18 +191,16 @@ export async function middleware(request: NextRequest) {
       return new NextResponse('unauthorized', { status: 401 });
     }
 
-    const headers = new Headers(request.headers);
-    headers.set('x-user-id', session.user.id);
-    headers.set('x-user-email', session.user.email ?? '');
-    headers.set('Authorization', `Bearer ${token}`);
+    response.headers.set('x-user-id', session.user.id);
+    response.headers.set('x-user-email', session.user.email ?? '');
+    response.headers.set('Authorization', `Bearer ${token}`);
 
-    return NextResponse.next({ headers });
+    return response;
   }
 
   // ===== 2) PAGE ROUTES: SESSION & REDIRECT LOGIC =====
   const { session } = await getInitialSession();
-  const { pathname } = request.nextUrl;
-
+  
   logger.debug('MW hit', {
     pathname,
     isPublic: isPublicPath(pathname),
