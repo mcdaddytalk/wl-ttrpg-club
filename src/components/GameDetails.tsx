@@ -23,26 +23,33 @@ import { formatDate, seatsAvailable, toSentenceCase } from "@/utils/helpers";
 import { GameData } from "@/lib/types/custom";
 import { FavoriteBadge } from "@/app/games/_components/FavoriteBadge";
 import { enhanceStatus } from "@/utils/ui-helpers";
+import { useGameDetails } from "@/hooks/member/useGameDetails";
 
 interface GameDetailsProps {
     user: User;
-    game: GameData | null;
+    selectedGame: GameData | null;
 }
-export default function GameDetails({ user, game }: GameDetailsProps): React.ReactElement {
+export default function GameDetails({ user, selectedGame }: GameDetailsProps): React.ReactElement {
     const pathname = usePathname();
     const router = useRouter();
+    
+    const { data: liveGame } = useGameDetails(selectedGame?.game_id, user.id);
+    const game = liveGame ?? selectedGame; 
 
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [confirmModalAction, setConfirmModalAction] = useState<(() => void) | null>(null);
     const [confirmModalTitle, setConfirmModalTitle] = useState("");
     const [confirmModalDescription, setConfirmModalDescription] = useState("");
+
     
     const [isMessageModalOpen, setMessageModalOpen] = useState<boolean>(false); 
     
     const { mutate: toggleFavorite } = useToggleFavorite();
     const { mutate: toggleRegistration } = useToggleRegistration();
+
     if (!game) return <div className="text-slate-500">Select a game to view details</div>;
 
+        
     const isGM = user?.id === game.gamemaster_id;
     const isRegistered = game.registrations.some((registration) => registration.member_id === user?.id && registration.status === 'approved');
     const isPending = game.registrations.some((registration) => registration.member_id === user?.id && registration.status === 'pending');
@@ -55,10 +62,10 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
         toggleFavorite({userId: user?.id, gameId, favorite: currentFavorite});
     }
 
-    const handleRemoveRegistration = (gameId: string, currentRegistered: boolean) => {
+    const handleRemoveRegistration = (gameId: string) => {
         confirmAction(
             () => {
-                toggleRegistration({userId: user?.id, gameId, gamemasterId: game.gamemaster_id, registered: currentRegistered})
+                toggleRegistration({userId: user?.id, gameId, gamemasterId: game.gamemaster_id, registered: true})
                 toast.success("Game removed from your Calendar");                                    
             },
             'Are you sure?',
@@ -66,8 +73,8 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
         )        
     }
 
-    const handleAddRegistration = (gameId: string, currentRegistered: boolean) => {
-        toggleRegistration({userId: user?.id, gameId, gamemasterId: game.gamemaster_id, registered: currentRegistered})
+    const handleAddRegistration = (gameId: string) => {
+        toggleRegistration({userId: user?.id, gameId, gamemasterId: game.gamemaster_id, registered: false})
         toast.success("Game added to your Calendar");
     }
         
@@ -192,7 +199,7 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                                         onClick={(e) => {
                                             e.preventDefault();
                                             // TODO: Remove game from calendar
-                                            handleRemoveRegistration(game.game_id, game.registered);
+                                            handleRemoveRegistration(game.game_id);
                                         }}
                                     >
                                         {game.registered ? "Cancel Registration" : "Pending"}
@@ -204,7 +211,7 @@ export default function GameDetails({ user, game }: GameDetailsProps): React.Rea
                                         aria-label="Join Game"
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            handleAddRegistration(game.game_id, game.registered);                                        
+                                            handleAddRegistration(game.game_id);  
                                         }}
                                     >
                                         {seatsAvailable(game) === "Full" ? "Full" : "Join Game"}

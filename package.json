@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "gen:types": "npx supabase gen types typescript --project-id 'kthrpfzafznkkvalszoi' --schema public > src/lib/types/supabase.ts"
+    "gen:types": "npx supabase gen types typescript --project-id 'kthrpfzafznkkvalszoi' --schema public > src/lib/types/supabase.ts",
+    "postinstall": "node -e \"process.exit(0)\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

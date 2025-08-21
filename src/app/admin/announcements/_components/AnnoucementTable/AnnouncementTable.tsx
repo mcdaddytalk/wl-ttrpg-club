@@ -1,7 +1,7 @@
 'use client';
 
-import { useAnnouncements } from '@/hooks/useAnnouncements';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAnnouncements, useBulkDeleteAnnouncements, useSaveAnnouncement } from '@/hooks/useAnnouncements';
+import { useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -63,6 +63,8 @@ export default function AnnouncementsDashboard() {
     const queryClient = useQueryClient();
     
     const { announcements = [], isLoading } = useAnnouncements({ published: false }, 3600000);
+    const { mutate: saveAnnouncement, isPending: isSaving } = useSaveAnnouncement();
+    const { mutate: bulkDelete, isPending: isDeleting } = useBulkDeleteAnnouncements();
     
     const [previewing, setPreviewing] = useState(false);
     const [previewModalOpen, setPreviewModalOpen] = useState(false);
@@ -81,48 +83,18 @@ export default function AnnouncementsDashboard() {
             approved_by: null
         },
     });
-
-    const { mutate: saveAnnouncement, isPending: isSaving } = useMutation({
-        mutationFn: async (values: FormValues) => {
-        const method = values.id ? 'PATCH' : 'POST';
-        const endpoint = values.id ? `/api/announcements/${values.id}` : '/api/announcements';
-        const res = await fetch(endpoint, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(values),
+    
+    const handleBulkDelete = (ids: string[]) => {
+        bulkDelete(ids, {
+            onSuccess: () => {
+                toast.success('Deleted selected announcements');
+                table.resetRowSelection();
+            },
+            onError: () => {
+                toast.error('Failed to delete one or more announcements');
+            }
         });
-        if (!res.ok) throw new Error('Failed to save announcement');
-        return res.json();
-        },
-        onSuccess: (updated) => {
-            queryClient.invalidateQueries({ queryKey: ['announcements'] });
-            form.reset(DEFAULT_VALUES);
-            toast.success(`${updated.title} saved successfully`);
-        },
-        onError: () => {
-            toast.error('Failed to save announcement');
-        },
-    });
-
-    const bulkDelete = useMutation({
-        mutationFn: async () => {
-            const selectedIds = table.getSelectedRowModel().rows.map(row => row.original.id);
-            const res = await Promise.all(
-                selectedIds.map(id => fetch(`/api/announcements/${id}`, {
-                method: 'DELETE',
-            }))
-        );
-        if (res.some(r => !r.ok)) throw new Error('Some deletions failed');
-        },
-        onSuccess: () => {
-            toast.success('Deleted selected announcements');
-            table.resetRowSelection();
-            queryClient.invalidateQueries({ queryKey: ['announcements'] });
-        },
-        onError: () => {
-            toast.error('Failed to delete one or more announcements');
-        }
-    });
+    };
 
     const handleSubmit = form.handleSubmit((values) => {
         if (!values.published_at && values.published) {
@@ -132,7 +104,15 @@ export default function AnnouncementsDashboard() {
             values.published_at = new Date(values.published_at).toISOString();
         }
         values.approved_by = user?.id;
-        saveAnnouncement(values);
+        saveAnnouncement(values, {
+            onSuccess: (updated) => {
+                form.reset(DEFAULT_VALUES);
+                toast.success(`${updated.title} saved successfully`);
+            },
+            onError: () => {
+                toast.error('Failed to save announcement');
+            },
+        });
     });
 
     const handleEdit = (announcement: FormValues) => {
@@ -286,8 +266,8 @@ export default function AnnouncementsDashboard() {
                             </Button>
                             <Button 
                                 variant="destructive" 
-                                disabled={table.getSelectedRowModel().rows.length === 0}
-                                onClick={() => bulkDelete.mutate()}
+                                disabled={table.getSelectedRowModel().rows.length === 0 || isDeleting}
+                                onClick={() => handleBulkDelete(table.getSelectedRowModel().rows.map((r) => r.original.id))}
                             >
                                 Delete Selected
                             </Button>

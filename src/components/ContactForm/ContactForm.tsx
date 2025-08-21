@@ -23,6 +23,8 @@ import { toast } from "sonner"
 import { useState } from "react"
 import { useRouter } from 'next/navigation';
 import RulesList from "../RulesList/page"
+import fetcher from "@/utils/fetcher"
+import logger from "@/utils/logger"
 
 type FormValues = z.infer<typeof contactFormSchema>;
 
@@ -53,6 +55,23 @@ const steps = [
     }
 ];
 
+type ExistsResponse = { exists: boolean };
+
+async function checkEmailExists(email: string): Promise<boolean> {
+  const val = (email ?? "").trim().toLowerCase();
+  if (!val) return false;
+
+  try {
+    const params = new URLSearchParams({ email: val });
+    const data = await fetcher<ExistsResponse>("/api/contacts/exists", { method: "GET" }, params);
+    return !!data?.exists;
+  } catch (err) {
+    // Fail open on network/API errors so we don’t block the user
+    logger.warn("Email exists check failed:", err);
+    return false;
+  }
+}
+
 export const ContactForm = () => {
     const [previousStep, setPreviousStep] = useState(0)
     const [currentStep, setCurrentStep] = useState(0)
@@ -67,7 +86,7 @@ export const ContactForm = () => {
             firstName: '',
             surname: '',
             email: '',
-            phoneNumber: "+1 000-000-0000",
+            phoneNumber: "000-000-0000",
             isMinor: false,
             parentFirstName: '',
             parentSurname: '',
@@ -95,8 +114,10 @@ export const ContactForm = () => {
 
         if (!contactResponse.ok) {
             if (contactResponse.status === 409) {
-                setComplete(false)
-                toast.error('Email Already In Use.  Please use a different email address.')
+                setComplete(false);
+                form.setError("email", { type: "server", message: "Email already exists in contacts. Please use a different email." }, { shouldFocus: true });
+                toast.error("Email Already In Use. Please use a different email address.");
+                return;
             } else {
                 const { error } = contactData
                 throw new Error(error.message);
@@ -211,7 +232,7 @@ export const ContactForm = () => {
                                 <FormItem className="space-y-1">
                                 <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">First Name</FormLabel>
                                 <FormControl>
-                                    <Input autoComplete="cc-given-name" placeholder="New" {...field} className="text-white"/>
+                                    <Input autoComplete="given-name" placeholder="New" {...field} className="text-white"/>
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -225,7 +246,7 @@ export const ContactForm = () => {
                                 <FormItem className="space-y-1">
                                     <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Last Name</FormLabel>
                                     <FormControl>
-                                    <Input type="text" autoComplete="cc-family-name" placeholder="Contact" {...field} />
+                                    <Input type="text" autoComplete="family-name" placeholder="Contact" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -237,17 +258,37 @@ export const ContactForm = () => {
                             name="email"
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
-                                    <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Email</FormLabel>
-                                    <FormControl>
-                                        <Input type="email" autoComplete="email" placeholder="no-contact@email.com" {...field} />
-                                    </FormControl>
-                                    <FormDescription>
+                                <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Email
+                                </FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="email"
+                                        autoComplete="email"
+                                        placeholder="no-contact@email.com"
+                                        {...field}
+                                        onBlur={async (e) => {
+                                            field.onBlur?.();
+                                            const exists = await checkEmailExists(e.target.value);
+                                            if (exists) {
+                                                form.setError(
+                                                    "email",
+                                                    { type: "validate", message: "That email already exists in contacts. Please use a different email." },
+                                                    { shouldFocus: true }
+                                                );
+                                            } else if (form.formState.errors.email?.type === "validate") {
+                                                form.clearErrors("email");
+                                            }
+                                        }}
+                                    />
+                                </FormControl>
+                                <FormDescription>
                                         Enter your email.  If you prefer to not be contacted by email, please use <i>no-contact@email.com</i>.  You <strong>MUST</strong> provide either email or phone to be contacted
-                                    </FormDescription>
-                                    <FormMessage />
+                                </FormDescription>
+                                <FormMessage />
                                 </FormItem>
-                            )} 
-                        />
+                            )}
+                        />                        
 
                         <FormField
                             control={form.control}
@@ -256,10 +297,10 @@ export const ContactForm = () => {
                                 <FormItem className="space-y-1">
                                     <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Phone Number</FormLabel>
                                     <FormControl>
-                                        <Input type="tel" autoComplete="tel" placeholder="+1 (000) 000-0000" {...field} />
+                                        <Input type="tel" autoComplete="tel" placeholder="(000) 000-0000" {...field} />
                                     </FormControl>
                                     <FormDescription>
-                                        Enter your phone number.  If you prefer to not be contacted by phone, please use <i>+1 000-000-0000</i>.  You <strong>MUST</strong> provide either email or phone to be contacted
+                                        Enter your phone number.  If you prefer to not be contacted by phone, please use <i>000-000-0000</i>.  You <strong>MUST</strong> provide either email or phone to be contacted
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -297,7 +338,7 @@ export const ContactForm = () => {
                                     <FormItem className="space-y-2">
                                     <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">First Name</FormLabel>
                                     <FormControl>
-                                        <Input autoComplete="cc-given-name" placeholder="New" {...field} />
+                                        <Input autoComplete="given-name" placeholder="New" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -311,7 +352,7 @@ export const ContactForm = () => {
                                     <FormItem className="space-y-2">
                                         <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Last Name</FormLabel>
                                         <FormControl>
-                                        <Input type="text" autoComplete="cc-family-name" placeholder="Contact" {...field} />
+                                        <Input type="text" autoComplete="family-name" placeholder="Contact" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -339,7 +380,7 @@ export const ContactForm = () => {
                                     <FormItem>
                                     <FormLabel className="text-sm font-medium leading-none text-slate-200 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Parent Phone Number</FormLabel>
                                     <FormControl>
-                                        <Input type="tel" autoComplete="tel" placeholder="+1 (000) 000-0000" {...field} />
+                                        <Input type="tel" autoComplete="tel" placeholder="(000) 000-0000" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>

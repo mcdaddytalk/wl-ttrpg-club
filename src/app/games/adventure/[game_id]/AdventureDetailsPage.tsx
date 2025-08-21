@@ -63,7 +63,7 @@ export const AdventurePageDetails = ({ game_id }: AdventureDetailsPageProps): Re
                     </BreadcrumbList>
                 </Breadcrumb>
             
-                <GameDetails user={user} game={game} />
+                <GameDetails user={user} selectedGame={game} />
         </div>
     )
 }
