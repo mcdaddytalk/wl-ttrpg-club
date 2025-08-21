@@ -202,8 +202,9 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
   }
 
   // ✅ In-Memory Rate Limiting
-  export const rateLimitMap = new Map<string, { count: number; lastRequest: number }>();
-  export const RATE_LIMIT = { maxRequests: 10, timeWindow: 60 * 1000 }; // 10 requests per minute
+  export const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
+  export const RATE_LIMIT = { maxRequests: 30, timeWindow: 60_000 }; // 10 requests per minute
+  export const PUBLIC_RATE_LIMIT = { maxRequests: 20, timeWindow: 60_000 }; // 3 requests per minute
   
   // ✅ Role Hierarchy (Admins inherit all permissions)
   export const ROLE_HIERARCHY: Record<string, string[]> = {
@@ -255,15 +256,54 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
   
   
   // Function to safely extract IP from request headers
-  export const getClientIp = (req: NextRequest): string => {
-    // Try to get IP from standard "x-forwarded-for" header (proxy-aware)
-    const forwardedFor = req.headers.get("x-forwarded-for");
-    if (forwardedFor) {
-      return forwardedFor.split(",")[0].trim(); // Take the first IP in the list
+  const PRIVATE_IP_RANGES = [
+    /^10\./,
+    /^127\./,
+    /^169\.254\./,
+    /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+    /^192\.168\./,
+    /^fc00:/i, // IPv6 ULA
+    /^fe80:/i, // IPv6 link-local
+  ];
+
+  const stripPort = (ip: string) => ip.replace(/:\d+$/, '');
+
+  const isPrivate = (ip: string) => PRIVATE_IP_RANGES.some((rx) => rx.test(ip));
+
+  const parseForwardedFor = (xff: string | null): string | null => {
+    if (!xff) return null;
+    for (const raw of xff.split(',')) {
+      const candidate = stripPort(raw.trim());
+      // pick first non-empty
+      if (candidate) return candidate;
     }
-  
-    // Fallback for environments without a proxy
-    return req.headers.get("cf-connecting-ip") || "127.0.0.1"; // Default to localhost for safety
+    return null;
+  };
+  export const getClientIp = (req: NextRequest): string => {
+    const candidates = [
+      req.headers.get('cf-connecting-ip'),      // Cloudflare
+      req.headers.get('true-client-ip'),        // Some proxies
+      req.headers.get('x-real-ip'),             // Nginx/Ingress
+      req.headers.get('fly-client-ip'),         // Fly.io
+      req.headers.get('x-vercel-forwarded-for') // Vercel
+    ].filter(Boolean) as string[];
+
+    for (const raw of candidates) {
+      const ip = stripPort(raw);
+      const isPrivateIp = isPrivate(ip);
+      if (ip && !isPrivateIp) return ip;
+    }
+
+    // 2) x-forwarded-for (may contain a list)
+    const xff = parseForwardedFor(req.headers.get('x-forwarded-for'));
+    if (xff) return xff;
+
+    // 3) Next’s best effort (may be undefined on edge)
+    const fallback = (req as any).ip as string | undefined;
+    if (fallback) return stripPort(fallback);
+
+    // 4) Last resort
+    return '127.0.0.1'; // Default to localhost for safety
   };
 
   export function transformObjectToParams(object: {
