@@ -23,10 +23,7 @@ import { Provider } from "@/lib/types/custom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import logger from '@/utils/logger';
-import dayjs from "dayjs";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
+import { BirthdayPicker } from "@/components/BirthdayPicker";
 
 // Regular expression for password and phone validation
 const passwordValidation = new RegExp(
@@ -329,73 +326,21 @@ export default function Signup() {
                 <FormField
                   name="birthday"
                   control={form.control}
-                  render={({ field }) => {
-                    const value = field.value ?? ""; // expecting "YYYY-MM-DD"
-                    const selectedDate = value ? dayjs(value, "YYYY-MM-DD", true).toDate() : undefined;
-
-                    return (
-                      <FormItem>
-                        <FormLabel>Birthday</FormLabel>
-                        <div className="flex gap-2">
-                          <FormControl className="flex-1">
-                            <Input
-                              id="bday"
-                              // TEXT INPUT so mobile can type:
-                              type="text"
-                              inputMode="numeric"
-                              autoComplete="bday"
-                              placeholder="YYYY-MM-DD"
-                              pattern="\d{4}-\d{2}-\d{2}"
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                              value={value}
-                              onChange={(e) => {
-                                const next = e.target.value;
-                                // optionally auto-correct common formats like YYYY/MM/DD or MM-DD-YYYY here
-                                field.onChange(next);
-                              }}
-                              onBlur={(e) => {
-                                const v = e.target.value.trim();
-                                if (!v) return;
-                                // normalize to YYYY-MM-DD if we can parse it
-                                const parsed =
-                                  dayjs(v, "YYYY-MM-DD", true).isValid()
-                                    ? dayjs(v, "YYYY-MM-DD")
-                                    : dayjs(v.replaceAll("/", "-")); // tiny normalization affordance
-                                if (parsed.isValid()) {
-                                  field.onChange(parsed.format("YYYY-MM-DD"));
-                                }
-                              }}
-                            />
-                          </FormControl>
-
-                          {/* Calendar button for tap/click selection */}
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button type="button" variant="outline" className="shrink-0">
-                                <CalendarIcon className="size-4" />
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="p-0">
-                              <Calendar
-                                mode="single"
-                                selected={selectedDate}
-                                // prevent picking a future date, matches your Zod refine
-                                disabled={(date) => date > new Date()}
-                                onSelect={(date) => {
-                                  if (!date) return;
-                                  const iso = dayjs(date).format("YYYY-MM-DD");
-                                  field.onChange(iso);
-                                }}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />                
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Birthday</FormLabel>
+                      <BirthdayPicker
+                        value={field.value || null}            // "YYYY-MM-DD" | null
+                        onChange={(v) => field.onChange(v ?? "")}
+                        fromMonth={new Date(1900, 0)}              // Jan 1900
+                        toMonth={new Date(new Date().getFullYear(), 11)} // Dec current year
+                        emptyDefaultYear={1990}                    // optional: where the calendar opens initially
+                        className="w-full"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />              
                 <FormField
                     name="password"
                     control={form.control}
