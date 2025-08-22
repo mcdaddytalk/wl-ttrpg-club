@@ -43,7 +43,7 @@ export default function ConnectedAccountsCard() {
                 try {
                     setLinking(p);
                     await signInWithProvider(p, {
-                        postLoginRedirect: '/member/dashboard',
+                        postLoginRedirect: '/member',
                         redirectTo: getURL('/auth/callback'), // optional override
                         force: true, // if you want to force re-consent / account picker
                     });

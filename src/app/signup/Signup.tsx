@@ -332,9 +332,9 @@ export default function Signup() {
                       <BirthdayPicker
                         value={field.value || null}            // "YYYY-MM-DD" | null
                         onChange={(v) => field.onChange(v ?? "")}
-                        fromMonth={new Date(1900, 0)}              // Jan 1900
-                        toMonth={new Date(new Date().getFullYear(), 11)} // Dec current year
-                        emptyDefaultYear={1990}                    // optional: where the calendar opens initially
+                        startMonth={new Date(1900, 0)}              // Jan 1900
+                        endMonth={new Date(new Date().getFullYear(), 11)} // Dec current year
+                        emptyDefaultYear={new Date().getFullYear()}                    // optional: where the calendar opens initially
                         className="w-full"
                       />
                       <FormMessage />

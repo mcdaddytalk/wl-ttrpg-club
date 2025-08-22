@@ -20,14 +20,14 @@ type BirthdayPickerProps = {
    * Bounds for the calendar dropdowns (inclusive).
    * Use the new props below to avoid deprecation warnings.
    */
-  fromMonth?: Date; // e.g., new Date(1900, 0)
-  toMonth?: Date;   // e.g., new Date(new Date().getFullYear(), 11)
+  startMonth?: Date; // e.g., new Date(1900, 0)
+  endMonth?: Date;   // e.g., new Date(new Date().getFullYear(), 11)
 
   /**
-   * @deprecated Prefer fromMonth/toMonth. Kept for convenience; we translate to months internally.
+   * @deprecated Prefer startMonth/endMonth. Kept for convenience; we translate to months internally.
    */
   fromYear?: number;
-  /** @deprecated Prefer fromMonth/toMonth. */
+  /** @deprecated Prefer startMonth/endMonth. */
   toYear?: number;
 
   placeholder?: string;
@@ -40,8 +40,9 @@ export function BirthdayPicker({
   value,
   onChange,
   className,
-  fromMonth,
-  toMonth,
+  startMonth,
+  endMonth,
+  // TDODO remove deprecations by end of year
   // deprecated aliases (still work if you pass them)
   fromYear,
   toYear,
@@ -59,10 +60,10 @@ export function BirthdayPicker({
 
   // Compute month bounds, preferring new props; fall back to year aliases if provided; finally sensible defaults.
   const computedFromMonth =
-    fromMonth ??
+    startMonth ??
     (typeof fromYear === "number" ? new Date(fromYear, 0) : new Date(1900, 0));
   const computedToMonth =
-    toMonth ??
+    endMonth ??
     (typeof toYear === "number"
       ? new Date(toYear, 11)
       : new Date(new Date().getFullYear(), 11));
@@ -126,8 +127,8 @@ export function BirthdayPicker({
               setOpen(false);
             }}
             captionLayout="dropdown"
-            fromMonth={computedFromMonth}   // ✅ new API (no deprecation warnings)
-            toMonth={computedToMonth}       // ✅ new API (no deprecation warnings)
+            startMonth={computedFromMonth}   // ✅ new API (no deprecation warnings)
+            endMonth={computedToMonth}       // ✅ new API (no deprecation warnings)
             disabled={(d) => d > today}
             defaultMonth={selectedDate ?? defaultMonth}
             showOutsideDays={false}
