@@ -6,7 +6,7 @@ import { ENVS } from "@/utils/constants/envs"
 
 function getSafeNext(request: Request, target: string | null): string {
   // Default landing if something is off
-  const FALLBACK = '/member/dashboard';
+  const FALLBACK = '/member';
 
   try {
     const reqUrl = new URL(request.url);

@@ -1,205 +1,179 @@
-"use client"
+"use client";
 
 import {
-    CalendarCheck,
-    CalendarClock,
-    CalendarCog,
-    ChevronLeft,
-    ChevronRight,
-    Clock,
-  } from "lucide-react";
-import { Button, buttonVariants } from '@/components/ui/button';
+  CalendarCheck,
+  CalendarClock,
+  CalendarCog,
+  Clock,
+} from "lucide-react";
 import React, { useRef } from "react";
 import { cn } from "@/lib/utils";
-import { 
-    DayPicker, 
-    DayPickerSingleProps
-} from "react-day-picker";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar"; // ⬅️ use your wrapper
 import { format } from "date-fns";
 import { TimePickerInput } from "@/components/TimePicker";
 
 export type DatetimePickerProps = Omit<
-    DayPickerSingleProps,
-    "mode" | "onSelect"
-    > & {
-        setDate: (date: Date) => void
-    };
+  React.ComponentProps<typeof Calendar>,
+  "mode" | "selected" | "onSelect"
+> & {
+  /** The currently selected full Date (date + time). */
+  selected?: Date;
+  /** Update function that receives a full Date (date + time). */
+  setDate: (date: Date) => void;
+  /** Optional bounds for the calendar dropdowns. */
+  startMonth?: Date;
+  endMonth?: Date;
+};
 
 const DatetimePicker = ({
-    className,
-    classNames,
-    showOutsideDays = true,
-    setDate: setGlobalDate,
-    ...props
+  className,
+  classNames,
+  showOutsideDays = true,
+  selected,
+  setDate: setGlobalDate,
+  startMonth = new Date(1900, 0), // Jan 1900 (new API replaces fromYear)
+  endMonth = new Date(new Date().getFullYear(), 11), // Dec current year
+  ...props
 }: DatetimePickerProps) => {
-    const minuteRef = useRef<HTMLInputElement>(null);
-    const hourRef = useRef<HTMLInputElement>(null);
-    const { selected: selectedDate } = props as { selected: Date };
-    const setDate = (dateInput: Date) => {
-        const date = new Date(selectedDate);
-        date.setDate(dateInput.getDate());
-        date.setMonth(dateInput.getMonth());
-        date.setFullYear(dateInput.getFullYear());
-        setGlobalDate(date);
-    }
-    const setTime = (dateInput: Date | undefined) => {
-        if (!dateInput) return;
-        const time = new Date(selectedDate);
-        time.setHours(dateInput.getHours());
-        time.setMinutes(dateInput.getMinutes());
-        setGlobalDate(time);
-    }
+  const minuteRef = useRef<HTMLInputElement>(null);
+  const hourRef = useRef<HTMLInputElement>(null);
 
-    return (
-        <div className="datetime-picker">
-          <div className="daypicker-wrapper">
-            <DayPicker
-              mode="single"
-              selected={selectedDate}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              onSelect={setDate as any}
-              showOutsideDays={showOutsideDays}
-              className={cn("py-3", className)}
-              classNames={{
-                months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                month: "space-y-4",
-                caption: "flex justify-center pt-1 relative items-center",
-                caption_label: "text-sm font-medium",
-                nav: "space-x-1 flex items-center",
-                nav_button: cn(
-                    buttonVariants({ variant: "outline" }),
-                    "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-                ),
-                nav_button_previous: "absolute left-1",
-                nav_button_next: "absolute right-1",
-                table: "w-full border-collapse space-y-1",
-                head_row: "flex",
-                head_cell:
-                  "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-                row: "flex w-full",
-                cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                day: cn(
-                  buttonVariants({ variant: "ghost" }),
-                  "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
-                ),
-                day_range_end: "day-range-end",
-                day_selected:
-                  "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                day_today: "bg-accent text-accent-foreground",
-                day_outside:
-                  "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-                day_disabled: "text-muted-foreground opacity-50",
-                day_range_middle:
-                  "aria-selected:bg-accent aria-selected:text-accent-foreground",
-                day_hidden: "invisible",
-                ...classNames,
-              }}
-              components={{        
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
-              }}
-              {...props}
-            />
-          </div>
-          <div className="daypicker-footer">
-            <hr className="mt-2" />
-            <div className="mt-2 -ml-2 -mr-2">
-              <div>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between text-gray-700"
-                  onClick={() => {
-                    const chosenDate = new Date();
-                    setDate(chosenDate);
-                  }}
-                >
-                  <div className="flex">
-                    <CalendarCheck className="h-5 w-5 mr-2" />
-                    Today
-                  </div>
-                  <p className="text-sm text-gray-400 font-normal">
-                    {format(new Date(), "PPP")}
-                  </p>
-                </Button>
-              </div>
-              <div>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between text-gray-700"
-                  onClick={() => {
-                    const chosenDate = new Date();
-                    chosenDate.setDate(chosenDate.getDate() + 1);
-                    setDate(chosenDate);
-                  }}
-                >
-                  <div className="flex">
-                    <CalendarCog className="h-5 w-5 mr-2" />
-                    Tomorrow
-                  </div>
-                  <p className="text-sm text-gray-400 font-normal">
-                    {format(
-                      new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-                      "PPP"
-                    )}
-                  </p>
-                </Button>                  </div>
-              <div>
-                <div>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between text-gray-700"
-                    onClick={() => {
-                      const chosenDate = new Date();
-                      chosenDate.setDate(chosenDate.getDate() + 7);
-                      setDate(chosenDate);
-                    }}
-                  >
-                    <div className="flex">
-                      <CalendarClock className="h-5 w-5 mr-2" />
-                      Next week
-                    </div>
-                    <p className="text-sm text-gray-400 font-normal">
-                      {format(
-                        new Date(
-                          new Date().getTime() + 7 * 24 * 60 * 60 * 1000
-                        ),
-                        "PPP"
-                      )}
-                    </p>
-                  </Button>
-                </div>
-              </div>
-          </div>
-          <div className="px-2 mt-4 flex justify-between">
-            <div className="flex gap-2 items-center text-gray-700">
-              <Clock className="h-5 w-5" />
-              <p className="text-sm font-medium">Time</p>
-            </div>
-            <div className="font-medium">
-              <div className="flex items-center gap-2">
-                <TimePickerInput
-                  picker="hours"
-                  date={selectedDate}
-                  setDate={setTime}
-                  ref={hourRef}
-                  onRightFocus={() => minuteRef.current?.focus()}
-                />
-                <span>:</span>
-                <TimePickerInput
-                  picker="minutes"
-                  date={selectedDate}
-                  setDate={setTime}
-                  ref={minuteRef}
-                  onLeftFocus={() => hourRef.current?.focus()}
-                />
-              </div>
-            </div>
+  const base = selected ?? new Date();
+
+  // Merge Y/M/D from a picked date into the existing selected Date (preserve time)
+  const setDate = (picked: Date | undefined) => {
+    if (!picked) return;
+    const next = new Date(selected ?? picked);
+    next.setFullYear(picked.getFullYear());
+    next.setMonth(picked.getMonth());
+    next.setDate(picked.getDate());
+    setGlobalDate(next);
+  };
+
+  // Merge H:M from time inputs into the existing selected Date (preserve date)
+  const setTime = (timeInput: Date | undefined) => {
+    if (!timeInput) return;
+    const next = new Date(selected ?? new Date());
+    next.setHours(timeInput.getHours());
+    next.setMinutes(timeInput.getMinutes());
+    next.setSeconds(0);
+    next.setMilliseconds(0);
+    setGlobalDate(next);
+  };
+
+  const disabledMatchers = [
+    { before: new Date(startMonth.getFullYear(), startMonth.getMonth(), 1) },
+    { after:  new Date(endMonth.getFullYear(),   endMonth.getMonth() + 1, 0) },
+  ];
+
+  return (
+    <div className="datetime-picker">
+      <div className="daypicker-wrapper">
+        <Calendar
+          mode="single"
+          selected={selected ?? undefined}
+          onSelect={setDate}
+          showOutsideDays={showOutsideDays}
+          className={cn("py-3", className)}
+          // Fast month/year selection + non-deprecated bounds
+          captionLayout="dropdown"
+          startMonth={startMonth}
+          endMonth={endMonth}
+          disabled={disabledMatchers}
+          // Optional: keep your wrapper styling knobs; pass-through extra props
+          {...props}
+        />
       </div>
+
+      <div className="daypicker-footer">
+        <hr className="mt-2" />
+        <div className="mt-2 -ml-2 -mr-2">
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full justify-between text-gray-700"
+              onClick={() => setDate(new Date())}
+            >
+              <div className="flex">
+                <CalendarCheck className="h-5 w-5 mr-2" />
+                Today
+              </div>
+              <p className="text-sm text-gray-400 font-normal">
+                {format(new Date(), "PPP")}
+              </p>
+            </Button>
+          </div>
+
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full justify-between text-gray-700"
+              onClick={() => {
+                const d = new Date();
+                d.setDate(d.getDate() + 1);
+                setDate(d);
+              }}
+            >
+              <div className="flex">
+                <CalendarCog className="h-5 w-5 mr-2" />
+                Tomorrow
+              </div>
+              <p className="text-sm text-gray-400 font-normal">
+                {format(new Date(Date.now() + 24 * 60 * 60 * 1000), "PPP")}
+              </p>
+            </Button>
+          </div>
+
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full justify-between text-gray-700"
+              onClick={() => {
+                const d = new Date();
+                d.setDate(d.getDate() + 7);
+                setDate(d);
+              }}
+            >
+              <div className="flex">
+                <CalendarClock className="h-5 w-5 mr-2" />
+                Next week
+              </div>
+              <p className="text-sm text-gray-400 font-normal">
+                {format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), "PPP")}
+              </p>
+            </Button>
+          </div>
+        </div>
+
+        <div className="px-2 mt-4 flex justify-between">
+          <div className="flex gap-2 items-center text-gray-700">
+            <Clock className="h-5 w-5" />
+            <p className="text-sm font-medium">Time</p>
+          </div>
+          <div className="font-medium">
+            <div className="flex items-center gap-2">
+              <TimePickerInput
+                picker="hours"
+                date={base}
+                setDate={setTime}
+                ref={hourRef}
+                onRightFocus={() => minuteRef.current?.focus()}
+              />
+              <span>:</span>
+              <TimePickerInput
+                picker="minutes"
+                date={base}
+                setDate={setTime}
+                ref={minuteRef}
+                onLeftFocus={() => hourRef.current?.focus()}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    )
-}
+  );
+};
 
-export default DatetimePicker
+export default DatetimePicker;
