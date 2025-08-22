@@ -144,7 +144,7 @@ export async function signInWithProvider(
     opts: OAuthOpts = {}
 ): Promise<void> {
     const supabase = await createSupabaseServerClient();
-    const postLogin = opts.postLoginRedirect ?? '/member/dashboard';
+    const postLogin = opts.postLoginRedirect ?? '/member';
     const callbackUrl = (opts.redirectTo ?? getURL('/auth/callback')) + `?next=${encodeURIComponent(postLogin)}`;
 
     const credentials: SignInWithOAuthCredentials = {
