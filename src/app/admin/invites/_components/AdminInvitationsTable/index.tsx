@@ -23,9 +23,9 @@ export const AdminInvitationsTable = () => {
   const { mutate: cancelInvite } = useCancelInvite();
 
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [selectedInvite, setSelectedInvite] = useState<any | null>(null);
+  const [selectedInvite, setSelectedInvite] = useState<InviteDO | null>(null);
 
-  const openModal = (modal: string, invite?: any) => {
+  const openModal = (modal: string, invite?: InviteDO) => {
     setSelectedInvite(invite || null);
     setActiveModal(modal);
   };

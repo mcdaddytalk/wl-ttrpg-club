@@ -26,6 +26,7 @@ export function serializeGMGameData(game: GMGameData): GMGameDO {
     location_id: schedule?.location_id ?? null,
     location: schedule?.location ?? null,
     visibility: game.visibility,
+    gamemaster_id: game.gamemaster_id,
     gamemaster: game.gamemaster,
     invites,
     pending,

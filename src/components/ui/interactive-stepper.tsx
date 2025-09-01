@@ -448,7 +448,6 @@ export const InteractiveStepperSeparator = React.forwardRef<HTMLDivElement, ISte
 );
 
 export const InteractiveStepperContent = React.forwardRef<HTMLDivElement, IStepperContentProps>(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ({ children, className = '', step, ...props }, ref) => {
     const contentClasses = className;
 

@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { useCreateInvite } from "@/hooks/admin/useAdminInvites";
-import { useState } from "react";
+import { normalizeEmail, normalizePhoneE164 } from "@/utils/normalize";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,15 @@ interface SendInviteModalProps {
     onClose: () => void;
 }
 
+function useDebouncedValue<T>(value: T, delay = 300) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+}
+
 const SendInviteModal = ({ isOpen, onClose }: SendInviteModalProps) => {
     const [form, setForm] = useState({
       game_id: "",
@@ -22,10 +32,30 @@ const SendInviteModal = ({ isOpen, onClose }: SendInviteModalProps) => {
       email: "",
       phone: "",
       gamemaster_id: "",
+      expires_in_days: 7
     });
   
     const { mutate: createInvite, isPending } = useCreateInvite();
     const { data: games, isError, isLoading: isGamesLoading } = useAvailableGames();
+
+    // Debounce the raw inputs
+    const debouncedEmail = useDebouncedValue(form.email, 300);
+    const debouncedPhone = useDebouncedValue(form.phone, 300);
+
+    // Normalize after debounce (guard to avoid loops)
+    useEffect(() => {
+        const normalized = normalizeEmail(debouncedEmail);
+        if (normalized && normalized !== form.email) {
+            setForm(f => ({ ...f, email: normalized }));
+        }
+    }, [debouncedEmail]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        const normalized = normalizePhoneE164(debouncedPhone);
+        if (normalized && normalized !== form.phone) {
+            setForm(f => ({ ...f, phone: normalized }));
+        }
+    }, [debouncedPhone]); // eslint-disable-line react-hooks/exhaustive-deps
     
     const handleSubmit = () => {
         if (!form.game_id || !form.display_name || (!form.email && !form.phone)) {
@@ -33,18 +63,20 @@ const SendInviteModal = ({ isOpen, onClose }: SendInviteModalProps) => {
             return;
         }
       
+        const [first, ...rest] = form.display_name.trim().split(/\s+/);
         const invitee = {
-            displayName: form.display_name,
+            displayName: form.display_name.trim(),
+            given_name: first ?? form.display_name.trim(),
+            surname: rest.join(" "),
             email: form.email || undefined,
             phone: form.phone || undefined,
-            given_name: form.display_name.split(" ")[0], // use first word
-            surname: form.display_name.split(" ").slice(1).join(" "), // use remaining words
+            expires_in_days: Number(form.expires_in_days) || 7, // if you expose it
         };
 
         createInvite({
                 game_id: form.game_id,
                 gamemaster_id: form.gamemaster_id,
-                invitee,
+                invitees: [invitee],
             }, {
             onSuccess: () => {
                 toast.success("Invite sent");
@@ -94,6 +126,16 @@ const SendInviteModal = ({ isOpen, onClose }: SendInviteModalProps) => {
             <Input placeholder="Display Name" value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} />
             <Input placeholder="Email (if external)" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             <Input placeholder="Phone (optional)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            <div className="flex items-center gap-2">
+                <Label>Expires (days)</Label>
+                <Input
+                    type="number"
+                    min={1}
+                    max={60}
+                    value={form.expires_in_days}
+                    onChange={(e) => setForm({ ...form, expires_in_days: Number(e.target.value) })}
+                />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={onClose}>Cancel</Button>

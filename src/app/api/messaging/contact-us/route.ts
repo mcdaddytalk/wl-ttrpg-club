@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Resend } from 'resend';
 import { ContactUsAutoReply, ContactUsEmail } from "@/components/EmailTemplate";
 import logger from "@/utils/logger";
-import { ENVS } from "@/utils/constants/envs";
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 import { ContactData } from "@/lib/types/custom";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { checkRateLimit } from "@/server/rate-limit";

@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from '@/utils/supabase/server';
-import { CreateMessage } from '@/lib/types/custom';
+import { CreateMessage, SupabaseRecipientListResponse } from '@/lib/types/custom';
 import { AnnouncementDO } from '../types/data-objects';
 
 export async function sendInternalAnnouncementMessage(announcement: AnnouncementDO) {
@@ -7,15 +7,15 @@ export async function sendInternalAnnouncementMessage(announcement: Announcement
 
   const { data: recipients, error: recipientError } = await supabase.rpc('get_announcement_recipients', {
     audience: announcement.audience
-  });
+  }) as unknown as SupabaseRecipientListResponse;
 
   if (recipientError || !recipients?.length) return;
 
   const messages: CreateMessage[] = recipients
-    .filter((m: any) => m.consent === true)
-    .map((member: any) => ({
+    .filter((m) => m.consent === true)
+    .map((m) => ({
       sender_id: announcement.author_id,
-      recipient_id: member.id,
+      recipient_id: m.id,
       subject: announcement.title,
       content: announcement.body,
       category: 'announcement',

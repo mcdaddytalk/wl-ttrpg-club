@@ -7,11 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAdminAssignGamemaster, useAdminGamemasters } from "@/hooks/admin/useAdminGamemasters";
+import { GMGameDataDO } from "@/lib/types/data-objects";
 
 interface AssignGamemasterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  game: { id: string; title: string; gm_id: string };
+  game: GMGameDataDO;
 }
 
 export const AssignGamemasterModal = ({ isOpen, onClose, game }: AssignGamemasterModalProps) => {

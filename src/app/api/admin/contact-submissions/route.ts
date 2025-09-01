@@ -1,3 +1,4 @@
+import { SupabaseContactSubmissionListResponse } from '@/lib/types/custom';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const { data, error } = await supabase
     .from('contact_submissions')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false }) as unknown as SupabaseContactSubmissionListResponse;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

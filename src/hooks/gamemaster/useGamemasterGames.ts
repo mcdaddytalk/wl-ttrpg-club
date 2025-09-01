@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import fetcher from "@/utils/fetcher";
 import {  GMGameSummaryDO, GMGameDO } from "@/lib/types/data-objects";
+import { CreateGameFormValues } from "@/lib/validation/games";
 import { useQueryClient } from "../useQueryClient";
 import logger from "@/utils/logger";
 
@@ -36,7 +37,7 @@ export const useGamemasterGamesFull = () => {
 
 export const useCreateGame = () => {
   return useMutation({
-    mutationFn: (payload: any) => fetcher<GMGameDO>("/api/gamemaster/games", {
+    mutationFn: (payload: CreateGameFormValues) => fetcher<GMGameDO>("/api/gamemaster/games", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -54,7 +55,7 @@ export const useGameDetails = (id: string) => {
 export const useUpdateGameDetails = (id: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: any) => {
+    mutationFn: async (payload: Partial<GMGameDO>) => {
       logger.debug("useUpdateGameDetails", payload);
       return await fetcher(`/api/gamemaster/games/${id}`, {
         method: "PATCH",

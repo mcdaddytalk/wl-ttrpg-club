@@ -61,6 +61,7 @@ export type GMGameDO = {
   invites: number;
   pending: number;
   registered: number;
+  gamemaster_id: string;
   gamemaster: MemberData;
   onShowDetails?: (game: GMGameDO) => void;
   onEditGame?: (game: GMGameDO) => void;
@@ -244,6 +245,7 @@ export type MessageDO = Omit<MessageData, "sender" | "recipient"> & {
 export type RoleDO = {
   id: string;
   name: string;
+  
 }
 
 export type UpcomingGameDO = {

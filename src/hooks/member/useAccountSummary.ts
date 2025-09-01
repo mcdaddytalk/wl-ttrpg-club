@@ -4,7 +4,7 @@ import { MemberDO } from '@/lib/types/data-objects';
 import { useQueryClient } from '../useQueryClient';
 import { OauthProvider } from '@/lib/types/custom';
 
-type MemberAccountSummary = {
+export type MemberAccountSummary = {
     member: MemberDO;
     hasPassword: boolean;
     providers: OauthProvider[];

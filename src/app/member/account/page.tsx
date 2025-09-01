@@ -8,6 +8,7 @@ import { useAccountSummary } from '@/hooks/member/useAccountSummary';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import SoftDeletedBanner from '@/components/widgets/SoftDeleteBanner';
+import { OauthProvider } from '@/lib/types/custom';
 
 export default function AccountPage() {
   const { summaryQuery: { isLoading, data }, changePassword, unlinkProvider: unlink } = useAccountSummary();
@@ -49,8 +50,9 @@ export default function AccountPage() {
                 await changePassword.mutateAsync({ currentPassword: hasPassword ? pw.current : undefined, newPassword: pw.next });
                 toast.success('Password updated');
                 setPw({ current: '', next: '' });
-              } catch (e:any) {
-                toast.error(e?.message ?? 'Failed to update password');
+              } catch (e: unknown) {
+                const message = e instanceof Error ? e.message : 'Failed to update password';
+                toast.error(message);
               }
             }}
           >
@@ -63,7 +65,7 @@ export default function AccountPage() {
       <Card>
         <CardHeader><CardTitle>Connected Accounts</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          {providers.map((p: any) => (
+          {providers.map((p: OauthProvider) => (
             <div key={p.id} className="flex items-center justify-between rounded-md border p-2">
               <div className="text-sm">{p.provider}</div>
               <Button variant="outline" onClick={() => unlink.mutate(p.id)}>Unlink</Button>

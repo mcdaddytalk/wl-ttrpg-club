@@ -1,26 +1,32 @@
 import { useMutation } from "@tanstack/react-query";
 import { useQueryClient } from "./useQueryClient";
 import logger from "@/utils/logger";
+import fetcher from "@/utils/fetcher";
+
+type TransferGamePayload = {
+    game_id: string;
+    game_title: string;
+    old_gm_id: string;
+    old_gm_name: string;
+    new_gm_id: string;
+};
 
 export const useTransferGame = () => {
     const queryClient = useQueryClient();
 
-    return useMutation({
+    return useMutation< // TData, TError, TVariables
+        void,             // your endpoint returns nothing (adjust if it returns JSON)
+        unknown,
+        TransferGamePayload
+    >({
         mutationFn: async ({
-            id,
+            game_id,
             game_title,
             old_gm_id,
             old_gm_name,
             new_gm_id
-        }: {
-            id: string;
-            game_title: string;
-            old_gm_id: string;
-            old_gm_name: string;
-            new_gm_id: string
-        }) => {
-            const game_id = id;
-            const response = await fetch(`/api/games/${game_id}/transfer`,                 
+        }: TransferGamePayload) => {
+            return await fetcher<void>(`/api/games/${game_id}/transfer`,                 
         {
                 method: "PUT",
                 headers: {
@@ -33,18 +39,14 @@ export const useTransferGame = () => {
                     updated_by_name: old_gm_name,
                     gamemaster_id: new_gm_id
                 }),
-            });
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json();
+            })
         },
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onSuccess: (_data, { old_gm_id, new_gm_id }) => {
-                queryClient.invalidateQueries({ queryKey: ["games", old_gm_id, "gm", "full"] });
-                queryClient.invalidateQueries({ queryKey: ["games", new_gm_id, "gm", "full"] });
+        onSuccess: (_data, variables) => {
+            const { old_gm_id, new_gm_id } = variables;
+            queryClient.invalidateQueries({ queryKey: ["games", old_gm_id, "gm", "full"] });
+            queryClient.invalidateQueries({ queryKey: ["games", new_gm_id, "gm", "full"] });
         },
-        onError: (error) => {
+        onError: (error: unknown) => {
             logger.error(error);
         }
     });

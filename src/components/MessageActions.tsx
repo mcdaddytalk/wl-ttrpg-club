@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Reply, Forward, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal"
+import { User } from "@supabase/supabase-js"
 
 interface MessageActionProps {
     senderId?: string
@@ -55,7 +56,7 @@ export function MessageActions({
             onCancel={() => setOpenModal(false)}
             onConfirm={() => setOpenModal(false)}
             members={members}
-            user={{ id: userId } as any}
+            user={{ id: userId } as User}
             mode={mode}
             message={message}
             fixedRecipient={mode === "reply" && senderId ? senderId : ""}

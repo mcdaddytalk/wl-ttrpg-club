@@ -56,7 +56,6 @@ export function ProfileCompletion({ profile }: ProfileCompletionProps) {
     } catch {
       // ignore storage errors (e.g., Safari private mode)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

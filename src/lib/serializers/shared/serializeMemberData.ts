@@ -1,11 +1,12 @@
+import { MemberData, RoleData } from "@/lib/types/custom";
 import { MemberDO } from "@/lib/types/data-objects";
 
-export function serializeMemberData(member: any): MemberDO {
+export function serializeMemberData(member: MemberData): MemberDO {
   return {
     id: member.id,
     status: member.status,
     email: member.email,
-    phone: member.phone ?? null,
+    phone: member.phone ?? "",
     provider: member.provider,
     isAdmin: !!member.is_admin,
     isMinor: !!member.is_minor,
@@ -18,20 +19,18 @@ export function serializeMemberData(member: any): MemberDO {
     deleted_by: member.deleted_by,
     deletion_requested_at: member.deletion_requested_at,
     deletion_reason: member.deletion_reason,
-    given_name: member.profiles?.given_name,
-    surname: member.profiles?.surname,
+    given_name: member.profiles?.given_name ?? 'unknown',
+    surname: member.profiles?.surname ?? 'unknown',
     displayName: `${member.profiles?.given_name} ${member.profiles?.surname}`,
     birthday: member.profiles?.birthday,
-    bio: member.profiles?.bio,
-    avatar: member.profiles?.avatar,
+    bio: member.profiles?.bio ?? undefined,
+    avatar: member.profiles?.avatar ?? '',
     experienceLevel: member.profiles?.experience_level ?? "new",
-    roles: member.member_roles?.map((mr: any) => ({
-      role_id: mr.role_id,
-      member_id: mr.member_id,
-      roles: {
+    roles: member.member_roles?.map((mr: RoleData) => (
+      {
         id: mr.roles?.id,
         name: mr.roles?.name,
-      },
-    })) ?? [],
+      })
+    ) ?? [],
   };
 }

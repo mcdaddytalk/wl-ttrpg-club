@@ -71,6 +71,7 @@ export default function NewGameModal({
       interval: 'weekly',
       day_of_week: 'sunday',
       first_game_date: dayjs().hour(12).minute(0).second(0).millisecond(0).toISOString(),
+      next_game_date: dayjs().hour(12).minute(0).second(0).millisecond(0).toISOString(),
       location_id: ''
     }
   });

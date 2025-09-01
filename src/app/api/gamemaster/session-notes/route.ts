@@ -5,7 +5,7 @@ import z from "zod";
 import { SessionNoteInsertSchema } from "@/lib/validation/sessionNotes";
 
 const querySchema = z.object({
-    game_id: z.string().uuid().optional(),
+    game_id: z.uuid().optional(),
 })
 
 export async function GET(req: NextRequest): Promise<NextResponse> {

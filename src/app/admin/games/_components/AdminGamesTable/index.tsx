@@ -21,9 +21,9 @@ export const AdminGamesTable = () => {
   const pageCount = data?.pageCount ?? 1;
 
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [selectedGame, setSelectedGame] = useState<any | null>(null);
+  const [selectedGame, setSelectedGame] = useState<GMGameDataDO | null>(null);
 
-  const openModal = (modal: string, game?: any) => {
+  const openModal = (modal: string, game?: GMGameDataDO) => {
     setSelectedGame(game || null);
     setActiveModal(modal);
   };
@@ -89,14 +89,14 @@ export const AdminGamesTable = () => {
             setGlobalFilter={setGlobalFilter}
           />
         </DataTable>
-        {activeModal === "archiveGame" && (
+        {activeModal === "archiveGame" && selectedGame && (
             <ArchiveGameModal
                 isOpen={activeModal === "archiveGame"}
                 onClose={closeModal}
                 game={selectedGame}
             />
         )}
-        {activeModal === "assignGM" && (
+        {activeModal === "assignGM" && selectedGame && (
             <AssignGamemasterModal
                 isOpen={activeModal === "assignGM"}
                 onClose={closeModal}

@@ -1,5 +1,6 @@
 import { GetMembersSchema } from "@/app/admin/_lib/adminMembers";
 import { 
+  SupabaseMemberListResponse,
     TypedSupabaseClient 
 } from "@/lib/types/custom";
 import { MemberDO, RoleDO } from "@/lib/types/data-objects";
@@ -78,12 +79,12 @@ export async function fetchMembersWithParams(
     query = query.eq("is_minor", isMinor === "true");
   if (status) query = query.eq("status", status);
 
-  const { data, error, count } = await query;
+  const { data, error, count } = await query as unknown as SupabaseMemberListResponse;
 
   if (error) throw new Error(error.message);
   if (!data) return { members: [], count: 0 };
 
-  const members: MemberDO[] = data.map((m: any) => ({
+  const members: MemberDO[] = data.map((m) => ({
     id: m.id,
     email: m.email,
     provider: m.provider ?? "",
@@ -95,12 +96,12 @@ export async function fetchMembersWithParams(
     experienceLevel: m.profiles?.experience_level,
     isAdmin: m.is_admin,
     isMinor: m.is_minor,
-    created_at: m.createdAt,
-    updated_at: m.updatedAt,
+    created_at: m.created_at,
+    updated_at: m.updated_at,
     updated_by: m.updated_by,
     bio: m.profiles?.bio ?? "",
     avatar: m.profiles?.avatar ?? "",
-    roles: m.member_roles?.map((r: { roles: any; }) => r.roles) ?? [],
+    roles: m.member_roles?.map((r) => r.roles) ?? [],
     status: m.status,
     consent: m.consent,
     last_login_at: m.last_login_at,
