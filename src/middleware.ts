@@ -37,6 +37,9 @@ const PUBLIC_API_EXCEPTIONS = [
   '/api/messaging/contact-us',
 ];
 
+const TOUCH_COOKIE = "last_login_touched_at";
+const TOUCH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+
 let lastSweep = Date.now();
 function maybeSweep() {
   const now = Date.now();
@@ -157,6 +160,36 @@ export async function middleware(request: NextRequest) {
     });
 
     const { session } = await getInitialSession();
+
+    if (session) {
+      const touchedAtRaw = request.cookies.get(TOUCH_COOKIE)?.value;
+      const touchedAt = touchedAtRaw ? Number(touchedAtRaw) : 0;
+      const now = Date.now();
+      const stale = !touchedAt || now - touchedAt > TOUCH_INTERVAL_MS;
+
+      if (stale) {
+        const headers: Record<string, string> = {};
+        if (session.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+
+        // You can also send the incoming cookies if you prefer cookie auth:
+        // const cookieHeader = request.headers.get("cookie");
+        // if (cookieHeader) headers.cookie = cookieHeader;
+
+        // Fire-and-forget; don’t block
+        fetch(new URL("/api/auth/touch", request.url), {
+          method: "POST",
+          headers,
+          cache: "no-store",
+        }).catch(() => {});
+
+        supaResp.cookies.set(TOUCH_COOKIE, String(now), {
+          httpOnly: true,
+          sameSite: "lax",
+          path: "/",
+          maxAge: TOUCH_INTERVAL_MS / 1000,
+        });
+      }
+    }
 
     logger.debug('MW hit', {
       pathname,

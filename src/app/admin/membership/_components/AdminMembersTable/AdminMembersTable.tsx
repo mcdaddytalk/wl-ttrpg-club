@@ -2,7 +2,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/DataTable/data-table";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import useSession from "@/utils/supabase/use-session";
 import { User } from "@supabase/supabase-js";
 import { useState } from "react";
 import { DataTableFilterField } from "@/lib/types/data-table";
@@ -28,13 +27,12 @@ import { useRemoveMember } from "@/hooks/useRemoveMember";
 import { ChangeEmailModal } from "@/components/modals/ChangeEmailModal";
 
 interface AdminMembersTableProps {
+    user: User;
     className?: string
 }
  
-const AdminMembersTable = ({ className }: AdminMembersTableProps): React.ReactElement => {
-    const session = useSession();
+const AdminMembersTable = ({ user, className }: AdminMembersTableProps): React.ReactElement => {
     const router = useRouter();
-    const user: User = (session?.user as User) ?? null;
     const { mutate: sendResetPasswordEmail } = useSendPasswordReset();
     const { mutate: removeMember } = useRemoveMember();
         

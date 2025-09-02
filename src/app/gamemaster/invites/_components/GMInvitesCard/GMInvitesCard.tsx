@@ -10,7 +10,7 @@ import { GMInviteModal } from "@/components/modals/GMIniviteModal";
 import { TodoModal } from "@/components/modals/TodoModal";
 import { Button } from "@/components/ui/button";
 import { useGameMembers } from "@/hooks/gamemaster/useGamemasterPlayers";
-import { useGamemasterGames } from "@/hooks/gamemaster/useGamemasterGames";
+import { useGamemasterGamesFull } from "@/hooks/gamemaster/useGamemasterGames";
 
 type GMInvitesCardProps = {
     invites: InviteDO[];
@@ -31,7 +31,7 @@ export default function GMInvitesCard({invites, gamemasterId, onInviteAdded, onI
     const [isDeleteInviteModalOpen, setDeleteInviteModalOpen] = useState(false);
 
     const { members = [] } = useGameMembers();
-    const { games = [] } = useGamemasterGames();
+    const { games = [] } = useGamemasterGamesFull();
 
     const openModal = (modal: ActiveModal, invite?: InviteDO) => {
         if (invite) setSelectedInvite(invite);
@@ -122,7 +122,7 @@ export default function GMInvitesCard({invites, gamemasterId, onInviteAdded, onI
                         onClick={() => openModal('addNew')}
                         className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                     >
-                        Add New Invite
+                        + Add New Invite
                     </Button>
 
                     {/* Right-Aligned Button */}

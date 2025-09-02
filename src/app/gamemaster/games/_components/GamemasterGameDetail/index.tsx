@@ -31,9 +31,8 @@ export default function GamemasterGameDetail({ gameId }: GamemasterGameDetailPro
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold mb-4">Invited Players</h2>
         <InvitedPlayersManager 
-          gameId={gameId} 
+          game={game} 
           invites={invites || []} 
           onInviteUpdated={() => refreshInvites()} 
         />

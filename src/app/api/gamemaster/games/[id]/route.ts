@@ -38,7 +38,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
     .from("games")
     .select(`
       *,
-      game_schedule(*)
+      game_schedule(*),
+      gamemaster_id,
+      gamemaster: members!fk_games_members (
+        id,
+        email,
+        profiles (
+          avatar,
+          given_name,
+          surname
+        )
+      )
     `)
     .eq("id", id)
     .eq("gamemaster_id", member.id)
@@ -53,7 +63,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
   }
 
   // Invite count
-  const { count: inviteCount } = await supabase
+  const { data: inviteData, count: inviteCount } = await supabase
     .from("game_invites")
     .select("id")
     .eq("game_id", gameData.id)
@@ -69,6 +79,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
   const confirmedRegistrants = registered?.filter((reg) => reg.status === "approved");
 
   logger.debug("Game data", gameData)
+  logger.debug('Game Invites', inviteData)
 
   const games: GMGameDO = {
     id: gameData.id,

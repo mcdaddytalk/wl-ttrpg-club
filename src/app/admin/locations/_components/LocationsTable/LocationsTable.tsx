@@ -38,9 +38,10 @@ const fetchGamemasters = async (): Promise<ContactListDO[]> => {
       case 404:
         toast.error("Gamemasters not found");
         return [];
-      case 200:
+      case 200: {
         const gamemasters = await response.json();
         return gamemasters as ContactListDO[] || [];
+      }
       default:
         toast.error("Error fetching gamemasters");
         return [];
@@ -63,9 +64,10 @@ const fetchLocations = async (): Promise<AdminLocationDO[]> => {
       case 404:
         toast.error("Locations not found");
         return [];
-      case 200:
+      case 200: {
         const locations = await response.json();
         return locations as AdminLocationDO[] || [];
+      }
       default:
         toast.error("Error fetching locations");
         return [];
