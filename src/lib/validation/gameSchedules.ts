@@ -8,7 +8,7 @@ const DayOfWeekEnum = z.enum([...DaysOfWeek])
 export const GMGameScheduleSchema = z.object({
     interval: GameIntervalEnum.optional(),
     status: GameStatusEnum.optional(),
-    location_id: z.string().uuid().optional(),
+    location_id: z.uuid().optional(),
     first_game_date: z.string().refine(val => !isNaN(Date.parse(val)), {
       message: "Invalid date",
     }).optional(),

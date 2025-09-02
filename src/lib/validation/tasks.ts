@@ -8,8 +8,8 @@ export const TaskCreateSchema = z.object({
     title: z.string().min(1),
     status: TaskStatusEnum.default('pending'),
     priority: TaskPriorityEnum.default('medium'),
-    created_by: z.string().uuid().optional().nullable(),
-    assigned_to: z.string().uuid().nullable().optional().transform(val => val ?? null),
+    created_by: z.uuid().optional().nullable(),
+    assigned_to: z.uuid().nullable().optional().transform(val => val ?? null),
     description: z.string().nullable().optional().transform(val => val ?? null),
     due_date: z.string().nullable().optional().transform(val => val ?? null),
     tags: z.array(z.string()).nullable().optional().transform(val => val ?? null),
@@ -21,7 +21,7 @@ export const TaskFilterSchema = z.object({
   status: TaskStatusEnum.optional(),
   priority: TaskPriorityEnum.optional(),
   search: z.string().optional(),
-  assigned_to: z.string().uuid().optional(),
+  assigned_to: z.uuid().optional(),
   due_before: z.string().optional(), // ISO date string
   include_archived: z.boolean().optional(),
   tags: z

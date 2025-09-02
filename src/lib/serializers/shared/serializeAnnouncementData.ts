@@ -1,6 +1,7 @@
+import { Announcement } from "@/lib/types/custom";
 import { AnnouncementDO } from "@/lib/types/data-objects";
 
-export function serializeAnnouncementData(row: any): AnnouncementDO {
+export function serializeAnnouncementData(row: Announcement): AnnouncementDO {
   return {
     id: row.id,
     title: row.title,

@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
+import { RoleDO } from "@/lib/types/data-objects";
 
 interface Params {
     id: string;
@@ -32,7 +33,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Params }
 
     const { error: memberRolesInsertError } = await supabase
         .from('member_roles')
-        .insert(roles.map((role: any) => ({
+        .insert(roles.map((role: RoleDO) => ({
             member_id: id,
             role_id: role.id
         })));

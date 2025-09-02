@@ -1,12 +1,18 @@
+import { ContactSubmission } from '@/lib/types/custom';
+import fetcher from '@/utils/fetcher';
 import { useQuery } from '@tanstack/react-query';
 
 export function useContactSubmissions() {
-  return useQuery({
+  const result = useQuery<ContactSubmission[]>({
     queryKey: ['admin', 'contact-submissions'],
-    queryFn: async () => {
-      const res = await fetch('/api/admin/contact-submissions');
-      if (!res.ok) throw new Error('Failed to fetch submissions');
-      return res.json();
-    },
+    queryFn: async () => fetcher<ContactSubmission[]>('/api/admin/contact-submissions')
   });
+
+  return {
+    data: result.data as ContactSubmission[] || [],
+    isLoading: result.isLoading,
+    isError: result.isError,
+    error: result.error, 
+    refetch: result.refetch
+  }
 }

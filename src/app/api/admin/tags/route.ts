@@ -2,6 +2,7 @@ import { TagDO } from '@/lib/types/custom';
 import logger from '@/utils/logger';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { PostgresError } from 'postgres';
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
     if (request.method !== 'GET') {
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     type TagCountRow = { tag_id: string; count: number };
 
     const { data: counts, error: countError } = await supabase
-      .rpc('get_tag_counts') as unknown as { data: TagCountRow[]; error: any };
+      .rpc('get_tag_counts') as unknown as { data: TagCountRow[]; error: PostgresError | null};
 
     if (countError) {
         logger.error(countError);

@@ -20,7 +20,7 @@ export default function AdminContactSubmissionsPage() {
             <p>No submissions yet.</p>
           ) : (
             <ul className="space-y-4">
-              {data.map((entry: any) => (
+              {data.map((entry) => (
                 <li key={entry.id} className="border-b pb-4">
                   <p><strong>{entry.name}</strong> ({entry.email})</p>
                   <p className="text-sm text-muted-foreground">

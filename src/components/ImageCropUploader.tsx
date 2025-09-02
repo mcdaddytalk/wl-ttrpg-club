@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import Cropper from 'react-easy-crop';
+import Cropper, { Area, Point } from 'react-easy-crop';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
@@ -28,27 +28,37 @@ export function ImageCropUploader({
   onUpload,
   onDelete,
   aspectRatio = 16 / 9,
-  disabled,
+  disabled = false,
   placeholderUrl = '/images/defaults/default_game.webp',
 }: ImageCropUploaderProps) {
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
-    if (!file.type.startsWith('image/')) {
+    if (!file) return;
+
+    if (!file.type || !file.type.startsWith('image/')) {
       toast.error('Only image files are allowed.');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = () => {
-      setImageSrc(reader.result as string);
-      setCropModalOpen(true);
+      const result = reader.result;
+      if (typeof result === 'string') {
+        setImageSrc(result);
+        setCropModalOpen(true);
+      } else {
+        toast.error('Failed to read image file.');
+      }
     };
+    reader.onerror = () => {
+      toast.error('Failed to read image file.');
+    }
     reader.readAsDataURL(file);
   }, []);
 
@@ -57,13 +67,14 @@ export function ImageCropUploader({
     maxSize: 20 * 1024 * 1024,
     onDrop,
     disabled,
+    multiple: false,
   });
 
-  const handleCropComplete = useCallback((_: any, croppedPixels: any) => {
+  const handleCropComplete = useCallback((_: Area, croppedPixels: Area) => {
     setCroppedAreaPixels(croppedPixels);
   }, []);
 
-  const handleCropConfirm = async () => {
+  const handleCropConfirm = async (): Promise<void> => {
     if (!imageSrc || !croppedAreaPixels) return;
 
     try {
@@ -73,23 +84,28 @@ export function ImageCropUploader({
       const publicUrl = await onUpload(file);
       onChange(publicUrl);
       toast.success('Image uploaded.');
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error(err);
       toast.error('Image crop or upload failed.');
     } finally {
       setCropModalOpen(false);
       setImageSrc(null);
+      setCroppedAreaPixels(null);
+      setZoom(1);
+      setCrop({ x: 0, y: 0 });
     }
   };
 
-  const handleRemove = async () => {
+  const handleRemove = async (): Promise<void> => {
     if (!onDelete) return;
     try {
       await onDelete();
       onChange('default');
       toast.success('Image removed.');
-    } catch (err: any) {
-      toast.error(`Failed to remove image: ${err.message}`);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred.";
+      toast.error(`Failed to remove image: ${message}`);
     }
   };
 
@@ -98,17 +114,25 @@ export function ImageCropUploader({
   return (
     <div className="space-y-2">
       <div className="relative">
-        <AspectRatio ratio={aspectRatio} className="rounded border overflow-hidden">
+        <AspectRatio ratio={aspectRatio} className="overflow-hidden rounded border">
           <Image
             src={isDefault ? placeholderUrl : value}
-            alt="Preview"
+            alt="Image preview"
             fill
             sizes="(min-width: 768px) 100vw, 100vw"
-            className="object-cover w-full h-full"
+            className="h-full w-full object-cover"
+            priority={false}
           />
         </AspectRatio>
+
         {!isDefault && onDelete && (
-          <Button type="button" variant="destructive" onClick={handleRemove} className="mt-2">
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleRemove}
+            className="mt-2"
+            disabled={disabled}
+          >
             Remove Image
           </Button>
         )}
@@ -116,12 +140,17 @@ export function ImageCropUploader({
 
       <div
         {...getRootProps()}
-        className={`border-dashed border-2 p-4 rounded-md text-center cursor-pointer ${
-          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-        }`}
+        className={`cursor-pointer rounded-md border-2 border-dashed p-4 text-center ${
+          isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"
+        } ${disabled ? "opacity-60" : ""}`}
+        aria-disabled={disabled}
       >
-        <input {...getInputProps()} />
-        {isDragActive ? <p>Drop image here…</p> : <p>Click or drag an image to upload and crop</p>}
+        <input {...getInputProps()} aria-label="Upload image" />
+        {isDragActive ? (
+          <p>Drop image here…</p>
+        ) : (
+          <p>Click or drag an image to upload and crop</p>
+        )}
       </div>
 
       <Dialog open={cropModalOpen} onOpenChange={setCropModalOpen}>
@@ -129,7 +158,8 @@ export function ImageCropUploader({
           <DialogHeader>
             <DialogTitle>Crop Image</DialogTitle>
           </DialogHeader>
-          <div className="relative w-full h-[300px] bg-black">
+
+          <div className="relative h-[300px] w-full bg-black">
             {imageSrc && (
               <Cropper
                 image={imageSrc}
@@ -139,9 +169,12 @@ export function ImageCropUploader({
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={handleCropComplete}
+                restrictPosition={true}
+                showGrid={false}
               />
             )}
           </div>
+
           <div className="mt-4">
             <label className="text-sm">Zoom</label>
             <Slider
@@ -149,11 +182,20 @@ export function ImageCropUploader({
               max={3}
               step={0.1}
               value={[zoom]}
-              onValueChange={(val) => setZoom(val[0])}
+              onValueChange={(vals: number[]) => {
+                const [z] = vals;
+                // Guard against undefined
+                setZoom(typeof z === "number" ? z : 1);
+              }}
             />
           </div>
+
           <div className="mt-4 flex justify-end gap-2">
-            <Button type="button" onClick={() => setCropModalOpen(false)} variant="ghost">
+            <Button
+              type="button"
+              onClick={() => setCropModalOpen(false)}
+              variant="ghost"
+            >
               Cancel
             </Button>
             <Button type="button" onClick={handleCropConfirm}>

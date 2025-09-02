@@ -10,6 +10,7 @@ type LogAuditParams = {
   target_type: string;
   target_id: string;
   summary?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: Record<string, any>;
 };
 
@@ -26,7 +27,7 @@ export async function logAuditEvent(input: Omit<LogAuditParams, 'actor_id'> & { 
   let actor = actor_id;
   if (!actor) {
     const { data: { user } } = await supabase.auth.getUser();
-    actor = user?.id ?? null as any;
+    actor = user?.id ?? undefined;
   }
    
   logger.debug("Audit trail logging:", {

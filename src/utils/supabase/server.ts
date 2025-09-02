@@ -3,7 +3,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { type NextRequest, type NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { Database } from "@/lib/types/supabase"
-import { ENVS } from "@/utils/constants/envs"
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 
 
 

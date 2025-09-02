@@ -11,46 +11,59 @@ import {
 import {
   Control,
   FieldValues,
-  Path,
   useController,
+  FieldPathValue,
+  FieldPathByValue
 } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
-interface Option {
-  value: string;
+export interface MultiSelectOption<V extends string = string> {
+  value: V;
   label: string;
 }
 
-interface FormMultiSelectProps<TFieldValues extends FieldValues> {
+type StringArray = string[];
+
+export interface FormMultiSelectProps<
+  TFieldValues extends FieldValues,
+  TName extends FieldPathByValue<TFieldValues, StringArray>
+> {
   control: Control<TFieldValues>;
-  name: Path<TFieldValues>;
-  options: Option[];
+  name: TName
+  options: ReadonlyArray<MultiSelectOption>;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
 }
 
-export function FormMultiSelect<TFieldValues extends FieldValues>({
+export function FormMultiSelect<
+  TFieldValues extends FieldValues,
+  TName extends FieldPathByValue<TFieldValues, StringArray>
+>({
   control,
   name,
   options,
   placeholder = "Select one or more",
   disabled = false,
   className,
-}: FormMultiSelectProps<TFieldValues>) {
+}: FormMultiSelectProps<TFieldValues, TName>) {
   const {
     field: { value, onChange },
     fieldState: { error },
-  } = useController({ name, control });
+  } = useController<TFieldValues, TName>({ name, control });
 
-  const selected = (value ?? []) as string[];
+  const selected: StringArray = Array.isArray(
+    value as FieldPathValue<TFieldValues, TName>
+  )
+    ? (value as unknown as StringArray)
+    : [];
 
   const toggleSelect = (val: string) => {
-    const updated = selected.includes(val)
+    const next = selected.includes(val)
       ? selected.filter((v) => v !== val)
       : [...selected, val];
-    onChange(updated);
+    onChange(next);
   };
 
   const removeTag = (val: string) => {
@@ -60,7 +73,7 @@ export function FormMultiSelect<TFieldValues extends FieldValues>({
   return (
     <div className={className}>
       <Select onValueChange={toggleSelect} disabled={disabled}>
-        <SelectTrigger>
+        <SelectTrigger aria-invalid={!!error}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -77,39 +90,19 @@ export function FormMultiSelect<TFieldValues extends FieldValues>({
           return (
             <Badge key={val} variant="secondary" className="flex items-center gap-1">
               {item?.label}
-              <button type="button" onClick={() => removeTag(val)}>
+              <button 
+                type="button"
+                aria-label={`Remove ${item?.label ?? val}`}
+                onClick={() => removeTag(val)}
+              >
                 <X className="w-3 h-3" />
               </button>
             </Badge>
           );
         })}
       </div>
-      {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
+      {error?.message && <p className="text-red-500 text-sm mt-1">{String(error.message)}</p>}
     </div>
   );
 }
 
-// Async version placeholder (API driven options)
-export function useAsyncOptions(endpoint: string) {
-  const [options, setOptions] = React.useState<Option[]>([]);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    async function fetchOptions() {
-      try {
-        setLoading(true);
-        const res = await fetch(endpoint);
-        const data = await res.json();
-        setOptions(data.map((item: any) => ({ value: item.id, label: item.title || item.name })));
-      } catch (e) {
-        console.error("Failed to fetch options", e);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchOptions();
-  }, [endpoint]);
-
-  return { options, loading };
-}

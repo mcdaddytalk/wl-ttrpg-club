@@ -113,6 +113,7 @@ export type AuditTrailData = {
   target_type: string;
   target_id: string;
   summary: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata: Record<string, any> | null;
   created_at: string;
   actor?: MemberData;
@@ -187,6 +188,18 @@ export type MemberData = {
 export type SupabaseMemberResponse = SupabaseDataResponseSingle<MemberData>
 export type SupabaseMemberListResponse = SupabaseDataResponse<MemberData>
 
+export interface ContactSubmission {
+  id: string;
+  name: string;
+  email: string;
+  category: ContactCategory;
+  message: string;
+  created_at: string;
+}
+
+export type SupabaseContactSubmissionResponse = SupabaseDataResponseSingle<ContactSubmission>
+export type SupabaseContactSubmissionListResponse = SupabaseDataResponse<ContactSubmission>
+
 export interface CreateMessage {
   sender_id: string;
   recipient_id: string;
@@ -248,6 +261,8 @@ export type ProfileData = {
 export type SupabaseProfileResponse = SupabaseDataResponseSingle<ProfileData>
 
 export type RoleData = {
+  id: string;
+  member_id: string;
   roles: RoleDO;
 }
 export type SupabaseRoleListResponse = SupabaseDataResponse<RoleData>
@@ -308,6 +323,14 @@ export type RegisteredGameDO = {
   gm_given_name: string;
   gm_surname: string;
 }
+
+export type Recipient = {
+  id: string;
+  consent: boolean;
+}
+
+export type SupabaseRecipientListResponse = SupabaseDataResponse<Recipient>
+export type SupabaseRecipientResponse = SupabaseDataResponseSingle<Recipient>
 
 export type TagData = { 
   id: string; 

@@ -53,7 +53,7 @@ export const TransferGameModal: React.FC<TransferGameModalProps> = ({
         if (!selectedGamemaster) return;
         transferGame(
             { 
-                id: game.id,
+                game_id: game.id,
                 game_title: game.title,
                 old_gm_id: gamemaster_id,
                 old_gm_name: gamemaster?.displayName || gamemaster_id,

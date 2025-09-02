@@ -37,8 +37,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     .order('created_at', { ascending: false })
     .limit(1);
 
-  const sender_display_name = data?.[0]?.sender?.profiles?.given_name ?? '' + ' ' + data?.[0]?.sender?.profiles?.surname ?? '';
-  //const recipient_display_name = data?.[0]?.recipient?.profiles?.given_name ?? '' + ' ' + data?.[0]?.recipient?.profiles?.surname ?? '';
+  const profile = data?.[0]?.sender?.profiles;
+  const sender_display_name = [
+    profile?.given_name,
+    profile?.surname,
+  ].filter(Boolean).join(" ");
   
   return NextResponse.json({
     unreadCount: count ?? 0,

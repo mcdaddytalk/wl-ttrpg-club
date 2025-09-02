@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
-import { ENVS } from "@/utils/constants/envs";
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 
 export async function POST(req: Request) {
   const { email } = await req.json();

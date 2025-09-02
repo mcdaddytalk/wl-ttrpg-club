@@ -3,7 +3,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAccountSummary } from '@/hooks/member/useAccountSummary';
-import { Provider, PROVIDER_ALL } from '@/lib/types/custom';
+import { OauthProvider, Provider, PROVIDER_ALL } from '@/lib/types/custom';
 import { signInWithProvider } from '@/server/authActions';
 import { getURL } from '@/utils/helpers';
 import { useState } from 'react';
@@ -13,14 +13,14 @@ export default function ConnectedAccountsCard() {
   const { mutate: unlink, isPending } = unlinkProvider;
   const [linking, setLinking] = useState<Provider | null>(null);
 
-  const linkedProviders = new Set((data?.providers ?? []).map((p: any) => p.provider));
+  const linkedProviders: Set<Provider> = new Set((data?.providers ?? []).map((p: OauthProvider) => p.provider));
   const unlinked = PROVIDER_ALL.filter((p) => !linkedProviders.has(p));
 
   return (
     <Card>
       <CardHeader><CardTitle>Connected Accounts</CardTitle></CardHeader>
       <CardContent className="space-y-3">
-        {(data?.providers ?? []).map((p: any) => (
+        {(data?.providers ?? []).map((p: OauthProvider) => (
           <div key={p.id} className="flex items-center justify-between rounded-md border p-2">
             <div className="text-sm">{p.provider}</div>
             <Button 
