@@ -1,5 +1,5 @@
 import { DaysOfWeek, DOW, GameData, GameInterval, ProfileData } from "@/lib/types/custom";
-import { ENVS } from "@/utils/constants/envs"
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 import { NextRequest } from "next/server";
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -299,7 +299,7 @@ export const calculateNextGameDate = (dayOfWeek: DOW, interval: GameInterval, da
     if (xff) return xff;
 
     // 3) Next’s best effort (may be undefined on edge)
-    const fallback = (req as any).ip as string | undefined;
+    const fallback = (req as unknown as { ip?: string }).ip as string | undefined;
     if (fallback) return stripPort(fallback);
 
     // 4) Last resort

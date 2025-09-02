@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import twilio from 'twilio';
 import logger from './logger';
-import { ENVS } from "@/utils/constants/envs"
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 
 const resend = new Resend(ENVS.RESEND_API_KEY);
 const twilioClient = twilio(ENVS.TWILIO_ACCOUNT_SID, ENVS.TWILIO_AUTH_TOKEN);

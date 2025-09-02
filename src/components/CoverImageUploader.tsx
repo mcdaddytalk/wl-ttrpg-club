@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import Cropper from 'react-easy-crop';
+import Cropper, { type Area, type Point } from 'react-easy-crop';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
@@ -21,23 +21,33 @@ interface CoverImageUploaderProps {
 }
 
 export function CoverImageUploader({ gameId, value, onChange, disabled }: CoverImageUploaderProps) {
-  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [cropModalOpen, setCropModalOpen] = useState<boolean>(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
-    if (!file.type.startsWith('image/')) {
-      toast.error('Only image files are allowed.');
+    if (!file) return;
+
+    if (!file.type || !file.type.startsWith("image/")) {
+      toast.error("Only image files are allowed.");
       return;
     }
 
     const reader = new FileReader();
     reader.onload = () => {
-      setImageSrc(reader.result as string);
-      setCropModalOpen(true);
+      const result = reader.result;
+      if (typeof result === "string") {
+        setImageSrc(result);
+        setCropModalOpen(true);
+      } else {
+        toast.error("Failed to read file.");
+      }
+    };
+    reader.onerror = () => {
+      toast.error("Failed to read file.");
     };
     reader.readAsDataURL(file);
   }, []);
@@ -47,13 +57,14 @@ export function CoverImageUploader({ gameId, value, onChange, disabled }: CoverI
     maxSize: 20 * 1024 * 1024,
     onDrop,
     disabled,
+    multiple: false
   });
 
-  const handleCropComplete = useCallback((_: any, croppedPixels: any) => {
+  const handleCropComplete = useCallback((_: Area, croppedPixels: Area) => {
     setCroppedAreaPixels(croppedPixels);
   }, []);
 
-  const handleCropConfirm = async () => {
+  const handleCropConfirm = async (): Promise<void> => {
     if (!imageSrc || !croppedAreaPixels) return;
 
     try {
@@ -63,33 +74,52 @@ export function CoverImageUploader({ gameId, value, onChange, disabled }: CoverI
       const publicUrl = await uploadGameCover(gameId, file);
       onChange(publicUrl);
       toast.success('Cover image updated.');
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error(err);
       toast.error('Image crop or upload failed.');
     } finally {
       setCropModalOpen(false);
       setImageSrc(null);
+      setCroppedAreaPixels(null);
+      setZoom(1);
+      setCrop({ x: 0, y: 0 });
     }
   };
 
-  const handleRemove = async () => {
+  const handleRemove = async (): Promise<void> => {
     try {
       await deleteGameCover(gameId);
-      onChange('default');
-      toast.success('Cover image removed.');
-    } catch (err: any) {
-      toast.error(`Failed to remove image: ${err.message}`);
+      onChange("default");
+      toast.success("Cover image removed.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error.";
+      toast.error(`Failed to remove image: ${message}`);
     }
   };
+
+  const hasCover = Boolean(value && value !== "default");
 
   return (
     <div className="space-y-2">
-      {value && value !== 'default' && (
+      {hasCover && (
         <div className="relative">
-          <AspectRatio ratio={16 / 9} className="rounded border overflow-hidden">
-            <Image src={value} alt="Cover Preview" className="object-cover w-full h-full" />
+          <AspectRatio ratio={16 / 9} className="overflow-hidden rounded border">
+            <Image
+              src={value}
+              alt="Cover preview"
+              fill
+              sizes="(min-width: 768px) 100vw, 100vw"
+              className="h-full w-full object-cover"
+              priority={false}
+            />
           </AspectRatio>
-          <Button type="button" variant="destructive" onClick={handleRemove} className="mt-2">
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleRemove}
+            className="mt-2"
+            disabled={disabled}
+          >
             Remove Image
           </Button>
         </div>
@@ -97,12 +127,17 @@ export function CoverImageUploader({ gameId, value, onChange, disabled }: CoverI
 
       <div
         {...getRootProps()}
-        className={`border-dashed border-2 p-4 rounded-md text-center cursor-pointer ${
-          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-        }`}
+        className={`cursor-pointer rounded-md border-2 border-dashed p-4 text-center ${
+          isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"
+        } ${disabled ? "opacity-60" : ""}`}
+        aria-disabled={disabled}
       >
-        <input {...getInputProps()} />
-        {isDragActive ? <p>Drop image here…</p> : <p>Click or drag an image to upload and crop</p>}
+        <input {...getInputProps()} aria-label="Upload cover image" />
+        {isDragActive ? (
+          <p>Drop image here…</p>
+        ) : (
+          <p>Click or drag an image to upload and crop</p>
+        )}
       </div>
 
       <Dialog open={cropModalOpen} onOpenChange={setCropModalOpen}>
@@ -110,7 +145,8 @@ export function CoverImageUploader({ gameId, value, onChange, disabled }: CoverI
           <DialogHeader>
             <DialogTitle>Crop Cover Image</DialogTitle>
           </DialogHeader>
-          <div className="relative w-full h-[300px] bg-black">
+
+          <div className="relative h-[300px] w-full bg-black">
             {imageSrc && (
               <Cropper
                 image={imageSrc}
@@ -120,9 +156,12 @@ export function CoverImageUploader({ gameId, value, onChange, disabled }: CoverI
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={handleCropComplete}
+                restrictPosition
+                showGrid={false}
               />
             )}
           </div>
+
           <div className="mt-4">
             <label className="text-sm">Zoom</label>
             <Slider
@@ -130,11 +169,19 @@ export function CoverImageUploader({ gameId, value, onChange, disabled }: CoverI
               max={3}
               step={0.1}
               value={[zoom]}
-              onValueChange={(val) => setZoom(val[0])}
+              onValueChange={(vals: number[]) => {
+                const [z] = vals;
+                setZoom(typeof z === "number" ? z : 1);
+              }}
             />
           </div>
+
           <div className="mt-4 flex justify-end gap-2">
-            <Button type="button" onClick={() => setCropModalOpen(false)} variant="ghost">
+            <Button
+              type="button"
+              onClick={() => setCropModalOpen(false)}
+              variant="ghost"
+            >
               Cancel
             </Button>
             <Button type="button" onClick={handleCropConfirm}>

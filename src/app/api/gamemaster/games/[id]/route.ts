@@ -62,11 +62,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
   // Registrants
   const { data: registered } = await supabase
     .from("game_registrations")
-    .select("id")
+    .select("id, status")  
     .eq("game_id", gameData.id);
   
-  const pendingRegistrants = registered?.filter((reg: any) => reg.status === "pending");
-  const confirmedRegistrants = registered?.filter((reg: any) => reg.status === "confirmed");
+  const pendingRegistrants = registered?.filter((reg) => reg.status === "pending");
+  const confirmedRegistrants = registered?.filter((reg) => reg.status === "approved");
 
   logger.debug("Game data", gameData)
 
@@ -91,6 +91,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Pa
     invites: inviteCount ?? 0,
     pending: pendingRegistrants?.length ?? 0,
     registered: confirmedRegistrants?.length ?? 0,
+    gamemaster_id: gameData.gamemaster_id,
     gamemaster: gameData.gamemaster
   }
 

@@ -1,4 +1,4 @@
-import { ENVS } from '@/utils/constants/envs';
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 import { getURL } from '@/utils/helpers';
 import { ContactCategory } from '../types/custom';
 

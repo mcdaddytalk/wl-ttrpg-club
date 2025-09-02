@@ -6,7 +6,7 @@ export const GameResourceFilterSchema = z.object({
   category: z.enum([...RESOURCE_CATEGORIES]).optional(),
   pinned: z.coerce.boolean().optional(),
   visibility: z.enum([...RESOURCE_VISIBILITY]).optional(),
-  game_id: z.string().uuid().optional()
+  game_id: z.uuid().optional()
 });
 
 export type GameResourceFilterParams = z.infer<typeof GameResourceFilterSchema>;

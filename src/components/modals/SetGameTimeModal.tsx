@@ -44,8 +44,9 @@ export const SetGameTimeModal: React.FC<SetGameTimeModalProps> = ({
         setGameTime(
             { 
                 id: game.id, 
-                nextGameDate,
-                gm_id: gamemaster_id },
+                scheduled_next: nextGameDate,
+                gamemaster_id
+            },
             {
                 onSuccess: () => {
                     toast.success("Game Date Updated")

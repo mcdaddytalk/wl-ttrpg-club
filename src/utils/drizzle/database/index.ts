@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { GameData } from '@/lib/types/custom';
 import { games } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { ENVS } from "@/utils/constants/envs"
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 
 const supabase = createClient(ENVS.NEXT_PUBLIC_SUPABASE_URL!, ENVS.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 

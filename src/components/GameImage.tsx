@@ -77,7 +77,7 @@ const GameImage: React.FC<GameImageProps> = ({
                 className={cn("object-cover rounded-md shadow", className)}
                 placeholder={blurDataURL ? "blur" : "empty"}
                 blurDataURL={blurDataURL}
-                onClick={onClick as any}
+                onClick={onClick}
             />
         </div>
         );

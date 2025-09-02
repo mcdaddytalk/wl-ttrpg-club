@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const ScheduleId = z
-  .union([z.string().uuid(), z.literal(""), z.null()])
+  .union([z.uuid(), z.literal(""), z.null()])
   .optional()
   .transform((v) => (v && typeof v === "string" && v.length > 0 ? v : null));
 

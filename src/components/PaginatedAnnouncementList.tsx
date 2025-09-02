@@ -176,7 +176,7 @@ export default function PaginatedAnnouncementList() {
             </Select>
             <Button
               variant={showUnreadOnly ? "default" : "outline"}
-              onClick={() => setShowUnreadOnly((prev: any) => !prev)}
+              onClick={() => setShowUnreadOnly((prev: boolean) => !prev)}
             >
               {showUnreadOnly ? "Show All" : "Show Unread Only"}
             </Button>

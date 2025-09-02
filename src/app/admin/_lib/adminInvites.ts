@@ -22,14 +22,20 @@ export const searchParamsCache = createSearchParamsCache({
   to: parseAsString.withDefault(''),
 });
 
+const InvitedPlayerSchema = z.object({
+  displayName: z.string().min(1),
+  given_name: z.string().min(1),
+  surname: z.string().optional().default(""),
+  email: z.email().optional(),
+  phone: z.string().optional(),
+  expires_in_days: z.number().int().min(1).max(60).optional(), // defaults server-side
+});
+
 export const createInvitesSchema = z.object({
-    game_id: z.string(),
-    invitee: z.string(),
-    external_email: z.string().optional(),
-    external_phone: z.string().optional(),
-    expires_at: z.string(),
-    gamemaster_id: z.string(),
-})
+  game_id: z.string().min(1),
+  gamemaster_id: z.string().min(1),
+  invitees: z.array(InvitedPlayerSchema).min(1),
+});
 
 export const updateInviteSchema = createInvitesSchema.partial();
 

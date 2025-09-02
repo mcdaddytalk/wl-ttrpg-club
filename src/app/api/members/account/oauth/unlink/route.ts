@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
 
-const Body = z.object({ identityId: z.string().uuid() });
+const Body = z.object({ identityId: z.uuid() });
 
 export async function PATCH(req: NextRequest): Promise<NextResponse> {
     if (req.method !== "PATCH") {

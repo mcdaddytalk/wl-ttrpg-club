@@ -1,4 +1,4 @@
-import { ENVS } from "@/utils/constants/envs";
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {

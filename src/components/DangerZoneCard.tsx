@@ -34,13 +34,19 @@ export default function DangerZoneCard() {
       // await supabase.auth.signOut();
       // router.replace('/goodbye');
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed to schedule deletion"),
+    onError: (e: unknown) => {
+      const message = e instanceof Error ? e.message : "Failed to schedule deletion";
+      toast.error(message);
+    },
   });
 
   const restore = useMutation({
     mutationFn: () => fetcher("/api/members/account/restore", { method: "PATCH" }),
     onSuccess: () => toast.success("Account restored"),
-    onError: (e: any) => toast.error(e?.message ?? "Failed to restore account"),
+    onError: (e: unknown) => {
+      const message = e instanceof Error ? e.message : "Failed to restore account";
+      toast.error(message)
+    }
   });
 
   const confirmDisabled = typed !== "DELETE" || (hasPassword && password.length === 0);

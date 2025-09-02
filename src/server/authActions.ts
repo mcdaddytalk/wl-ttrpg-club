@@ -22,7 +22,7 @@ import { revalidatePath } from "next/cache";
 import useToastStore from "@/store/toastStore";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 import logger from '@/utils/logger';
-import { ENVS } from "@/utils/constants/envs"
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 import { getURL } from "@/utils/helpers";
 
 type JwtPayloadWithRoles = JwtPayload & { roles: string[] };
@@ -41,7 +41,6 @@ export const getInitialSession = async (): Promise<{ session: Session | null; us
 
 export const getUser = async (): Promise<User | null> => {
     const supabase = await createSupabaseServerClient();
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null
     // const { data: profile, error: profileError } = await supabase.from('profiles').select('*').limit(1).eq('id', user.id).maybeSingle() as unknown as SupabaseProfileResponse;

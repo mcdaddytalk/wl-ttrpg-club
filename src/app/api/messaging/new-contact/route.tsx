@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { Resend } from 'resend';
 import logger from '@/utils/logger';
-import { ENVS } from "@/utils/constants/envs"
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 import { NewContactEmail } from '@/components/EmailTemplate';
 import { contactFormSchema } from '@/components/ContactForm/schema';
 import { sendDiscordContactAlert } from '@/lib/notifications/sendDiscordContactAlert';

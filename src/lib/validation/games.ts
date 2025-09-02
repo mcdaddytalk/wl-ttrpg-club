@@ -22,8 +22,19 @@ export const CreateGameSchema = z.object({
     starting_seats: z.number().int().min(1).max(20).default(0),
     interval: gameInterval,
     day_of_week: dayOfWeekEnum,
-    first_game_date: z.string().datetime(),
-    location_id: z.string()
+    first_game_date: z.string()
+      .refine((val) => !isNaN(Date.parse(val)), {
+        message: "Invalid date string",
+      }),
+    next_game_date: z
+      .string()
+      .transform((val) => (val.trim() === "" ? undefined : val))
+      .optional()
+      .refine((val) => val === undefined || !isNaN(Date.parse(val)), {
+        message: "Invalid date string",
+      }),
+    location_id: z.string(),
+    gamemaster_id: z.uuid().optional(),
   });
 
 export type CreateGameFormValues = z.infer<typeof CreateGameSchema>

@@ -3,24 +3,19 @@ import { useQueryClient } from "../useQueryClient";
 import fetcher from "@/utils/fetcher";
 import { Player } from "@/lib/types/custom";
 import { InviteDO } from "@/lib/types/data-objects";
+import { CreateInviteSchema } from "@/app/admin/_lib/adminInvites";
 
 
 export const useCreateInvite = () => {
     const queryClient = useQueryClient();
     return useMutation({
-      mutationFn: async (payload: any) => {
-        const { game_id, invitee, gamemaster_id } = payload;
-        const newPayload = {
-            invitees: [invitee],
-            gamemasterId: gamemaster_id
-        }
-        const res = await fetch(`/api/games/${game_id}/invite`, {
+      mutationFn: async (payload: CreateInviteSchema) => {
+        const { game_id, gamemaster_id, invitees } = payload;
+        return await fetcher<InviteDO>(`/api/games/${game_id}/invite`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newPayload),
+          body: JSON.stringify({ invitees, gamemasterId: gamemaster_id }),
         });
-        if (!res.ok) throw new Error("Failed to create invite");
-        return res.json();
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["admin", "invites"] });

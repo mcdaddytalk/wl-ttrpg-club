@@ -137,6 +137,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       system: game.system ?? '',
       coverImage: game.cover_image ?? 'default',
       gameCode: game.game_code ?? '',
+      gamemaster_id: game.gamemaster.id,
       gamemaster: game.gamemaster,
       scheduled_next: game.game_schedule[0]?.next_game_date,
       interval: game.game_schedule[0]?.interval,

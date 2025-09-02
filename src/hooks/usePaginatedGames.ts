@@ -25,7 +25,10 @@ export const usePaginatedGames = () => {
       if (!res.ok) throw new Error("Failed to fetch games");
       const data = await res.json();
       const pageCount = Math.ceil(data.count / parsedParams.pageSize);
-      return { games: data.games, pageCount };
+      return { 
+        games: data.games as GMGameDataDO[] || [], 
+        pageCount 
+      };
     },
   });
 };

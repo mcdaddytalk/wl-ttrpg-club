@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
-import { ENVS } from "@/utils/constants/envs"
+import { SERVER_ENVS as ENVS } from "@/utils/constants/envs"
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
