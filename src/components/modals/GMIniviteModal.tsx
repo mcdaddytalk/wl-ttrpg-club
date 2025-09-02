@@ -1,6 +1,6 @@
 "use client"
 
-import { MemberDO, InvitedPlayer, GMGameSummaryDO } from "@/lib/types/data-objects";
+import { MemberDO, GMGameDO } from "@/lib/types/data-objects";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -8,39 +8,24 @@ import { Input } from "@/components/ui/input";
 import { Command, CommandInput, CommandList, CommandItem, CommandGroup, CommandEmpty } from "@/components/ui/command";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
 import UserAvatar from "../UserAvatar";
 import { Badge } from "@/components/ui/badge";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InviteFormSchema, InviteFormValues } from "@/lib/validation/invites";
 import { FormSelect } from "@/components/ui/form-select";
+import { useSendInvite } from "@/hooks/gamemaster/useGamemasterInvites";
+import { useEffect } from "react";
 
 interface GMInviteModalProps {
     isOpen: boolean;
     onCancel: () => void;
     onConfirm: () => void;
     gamemasterId: string;
-    games: GMGameSummaryDO[];
+    games: GMGameDO[];
     members: MemberDO[];
 }
-
-async function sendGameInvite({ gameId, invitees, gamemasterId }: { gameId: string; invitees: InvitedPlayer[], gamemasterId: string }) {
-    const res = await fetch(`/api/games/${gameId}/invite`, {
-      method: "POST",
-      body: JSON.stringify({ invitees, gamemasterId }),
-      headers: { "Content-Type": "application/json" },
-    });
-  
-    if (!res.ok) {
-      throw new Error("Failed to send invites.");
-    }
-  
-
-    return res.json();
-  }
-
-  export const GMInviteModal: React.FC<GMInviteModalProps> = ({ gamemasterId, games, members, isOpen, onConfirm, onCancel }) => {
+export const GMInviteModal: React.FC<GMInviteModalProps> = ({ gamemasterId, games, members, isOpen, onConfirm, onCancel }) => {
     const form = useForm<InviteFormValues>({
       resolver: zodResolver(InviteFormSchema),
       mode: "onChange",
@@ -61,16 +46,14 @@ async function sendGameInvite({ gameId, invitees, gamemasterId }: { gameId: stri
     } = form;
   
     const externalInvitees = useFieldArray({ control, name: "external_invitees" });
-    const inviteMutation = useMutation({
-      mutationFn: sendGameInvite,
-      onSuccess: () => {
-        toast.success("Invite sent successfully!");
-        form.reset();
-        onConfirm();
-      },
-      onError: () => toast.error("Failed to send invite."),
-    });
-  
+    const { mutate: sendGameInvite, isPending: isSending } = useSendInvite();
+
+    useEffect(() => {
+      if (isOpen && games?.length === 1) {
+        setValue("game_id", games[0].id, { shouldValidate: true });
+      }
+    }, [isOpen, games, setValue]);
+    
     const onSubmit = handleSubmit((data) => {
         if (!data.game_id) {
             toast.error("Please select a game.");
@@ -102,12 +85,18 @@ async function sendGameInvite({ gameId, invitees, gamemasterId }: { gameId: stri
         }))
     ];
   
-      inviteMutation.mutate({
+      sendGameInvite({
         gameId: data.game_id,
         invitees: allInvitees,
         gamemasterId,
+      }, {
+        onSuccess: () => {
+          toast.success("Invite sent successfully!");
+          form.reset();
+        },
+        onError: () => toast.error("Failed to send invite."),
+        onSettled: () => onConfirm(),
       });
-      onConfirm();
     });
   
     return (
@@ -121,13 +110,24 @@ async function sendGameInvite({ gameId, invitees, gamemasterId }: { gameId: stri
             {/* Game Select */}
             <div className="grid grid-cols-4 items-center gap-4">
                 <Label>Game</Label>
-                <FormSelect
+                <div className="col-span-3">
+                {games.length === 1 ? (
+                  <>
+                    {/* Read-only display */}
+                    <Input value={games[0].title} readOnly disabled />
+                    {/* Hidden field so RHF always has game_id */}
+                    <input type="hidden" {...register("game_id")} value={games[0].id} />
+                  </>
+                ) : (
+                  <FormSelect
                     control={control}
-                    className="col-span-3"
                     name="game_id"
+                    className="w-full"
                     options={games.map((g) => ({ value: g.id, label: g.title }))}
                     placeholder="Select a game"
-                />
+                  />
+                )}
+              </div>
             </div>
   
             {/* Internal Invitees */}
@@ -221,7 +221,7 @@ async function sendGameInvite({ gameId, invitees, gamemasterId }: { gameId: stri
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" onClick={onSubmit} disabled={inviteMutation.isPending || !form.formState.isValid}>
+            <Button type="button" onClick={onSubmit} disabled={isSending || !form.formState.isValid}>
                 Send Invites
             </Button>
           </DialogFooter>

@@ -46,8 +46,21 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createSupabaseServerClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-
+  
     if (!error) {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      
+      try {
+        await fetch(new URL("/api/auth/touch", origin), {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          // no need to forward cookies here since token is enough
+        });
+      } catch (e) {
+        logger.warn(`touch last_login_at failed: ${String(e)}`);
+      }
+
       const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
       const isLocalEnv = ENVS.IS_DEV
       logger.debug('isLocalEnv', isLocalEnv)

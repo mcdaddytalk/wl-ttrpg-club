@@ -5,6 +5,7 @@ import AdminMembersDashboardClient from "./AdminMembersDashboardClient";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { fetchMembersWithParams } from "@/queries/fetchMembers";
+import { getUser } from "@/server/authActions";
 
 export default async function AdminMembersDashboard() {
     const params = defaultMembersParams;
@@ -21,8 +22,12 @@ export default async function AdminMembersDashboard() {
     logger.debug("Dehydrated state: ", dehydrate(queryClient));
     logger.debug("Hydrated state: ", queryClient.getQueryData(queryKey));
     logger.debug("QUERY KEY: ", JSON.stringify(queryKey))
+
+    const user = await getUser();
         
-    return (<HydrationBoundary state={dehydrate(queryClient)}>
-        <AdminMembersDashboardClient />
-    </HydrationBoundary>);
+    return (
+        <HydrationBoundary state={dehydrate(queryClient)}>
+            {user && <AdminMembersDashboardClient user={user} />}
+        </HydrationBoundary>
+    )
 }

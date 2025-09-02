@@ -1,4 +1,5 @@
 import { logAuditEvent } from "@/server/auditTrail";
+import logger from "@/utils/logger";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -33,13 +34,16 @@ export async function PATCH(
     }
   
     const body = await request.json();
+    logger.debug("PATCH /api/gamemaster/games/[id]/players/[member_id]  body:", body);
     const schema = z.object({
-      status: z.enum(["rejected", "banned"]),
-      status_note: z.string().min(1),
+      status: z.enum(["rejected", "banned", "approved", "pending"]),
+      status_note: z.string().optional()
     });
   
     const result = schema.safeParse(body);
+    logger.debug("PATCH /api/gamemaster/games/[id]/players/[member_id]  result:", result);
     if (!result.success) {
+      logger.debug("PATCH /api/gamemaster/games/[id]/players/[member_id]  result.error:", result.error);
       return NextResponse.json({ message: "Invalid input", errors: result.error.format() }, { status: 400 });
     }
   

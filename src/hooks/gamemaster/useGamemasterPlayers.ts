@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import fetcher from "@/utils/fetcher";
-import { Player } from "@/lib/types/custom";
+import { GameRegStatus, Player } from "@/lib/types/custom";
 
 import { useQueryClient } from "../useQueryClient";
 import { GMGamePlayerDO, MemberDO } from "@/lib/types/data-objects";
@@ -43,24 +43,22 @@ export const useRefreshRegistrants = () => {
     });
 }
 
-type RemovePlayerPayload = {
-    member_id: string;
-    status: "rejected" | "banned";
-    note: string;
-  };
+type UpdateRegistrantPayload = {
+  member_id: string;
+  status: Extract<GameRegStatus, "approved" | "rejected" | "banned" | "pending">;
+  note: string;
+};
 
-export const useRemovePlayer = (gameId: string) => {
+export const useUpdateRegistrantStatus = (gameId: string) => {
     const queryClient = useQueryClient();
 
-    return useMutation<unknown, Error, RemovePlayerPayload>({
+    return useMutation<unknown, Error, UpdateRegistrantPayload>({
         mutationFn: async ({ member_id, status, note }) => {
-            const res = await fetch(`/api/gamemaster/games/${gameId}/players/${member_id}`, {
+            return fetcher<void>(`/api/gamemaster/games/${gameId}/players/${member_id}`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ status, status_note: note }),
             });
-            if (!res.ok) throw new Error("Failed to remove player");
-            return res.json();
           },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["gamemaster", "game_players", gameId] });

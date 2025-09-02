@@ -76,6 +76,8 @@ export default [
   ...compat.extends(
     "next/core-web-vitals",
     // If this preset forces TS across the board and causes trouble, remove it:
+    "next",
+    "eslint:recommended",
     "next/typescript",
     "plugin:@tanstack/query/recommended",
     "plugin:@typescript-eslint/recommended"

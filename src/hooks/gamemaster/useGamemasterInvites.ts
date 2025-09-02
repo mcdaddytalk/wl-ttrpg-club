@@ -2,7 +2,7 @@ import fetcher from "@/utils/fetcher";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "../useQueryClient";
 import { toast } from "sonner";
-import { InviteDO } from "@/lib/types/data-objects";
+import { InviteDO, InvitedPlayer } from "@/lib/types/data-objects";
 
 
 
@@ -35,6 +35,23 @@ export function useGamemasterInvites(gamemasterId?: string) {
       }),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["invites", "full", { gamemaster_id: gamemasterId }] });
+      },
+    });
+  }
+
+  type NewInvitePayload = {
+    gameId: string; 
+    invitees: InvitedPlayer[], 
+    gamemasterId: string
+  }
+
+  export const useSendInvite = () => {
+    return useMutation({
+      mutationFn: async (payload: NewInvitePayload) => {
+        return await fetcher(`/api/games/${payload.gameId}/invite`, {
+          method: "POST",
+          body: JSON.stringify({ invitees: payload.invitees, gamemasterId: payload.gamemasterId }),
+        });
       },
     });
   }

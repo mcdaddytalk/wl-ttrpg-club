@@ -1814,6 +1814,10 @@ export type Database = {
         Args: { uid: string }
         Returns: boolean
       }
+      touch_member_last_login: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       transfer_game_ownership: {
         Args: {
           game_id: string
